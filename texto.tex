@@ -1,0 +1,706 @@
+\chapter{Introdução}
+
+%\textcolor{red}{Motivação. Problema de drift em sensores de poços de petróleo, demanda por
+%validação de dados, dificuldades atuais, importância de sistemas de monitoramento de
+%calibração.}
+
+Na industria petrolífera, o emprego de sensores nos poços de produção possui papel
+fundamental tanto na segurança quanto no desempenho das operações. Os dados coletados
+fornecem medidas das condições de funcionamento de equipamentos e de parâmetros
+diretamente relacionados com as ações de controle, otimização da produção e monitoramento.
+O operador da planta interpreta as medições baseado na sua experiência e conhecimento do
+sistema, e toma decisões que podem ser cruciais durante situações de emergência.
+Entretanto, devido às condições degradantes a que ficam submetidos, os sensores de poços
+normalmente apresentam algum tipo de falha ou \textit{drift} (desvio nas medidas) durante
+o período produtivo de um poço. Trocas ou reparos desses sensores raramente ocorrem, mesmo
+quando se sabe que as medições estão incorretas, uma vez que possuem difícil acesso e alto
+custo de manutenção \cite{Davies2007}, principalmente em plataformas \textit{offshore}.
+Por isso, a validação das leituras dos sensores e a determinação de seus estados de
+funcionamento são competências altamente desejáveis.
+
+Em diversos setores da indústria, a validação de sensores é realizada através dos métodos
+tradicionais de manutenção, os quais envolvem a calibração periódica dos instrumentos.
+Várias técnicas de calibração periódica necessitam de paradas dos processos de produção
+e/ou de se retirar de operação os instrumentos de medição. Entretanto, como apresentado em
+\cite{Hines2008}, estudos recentes mostraram que menos de 5\% da calibração manual
+realizada é sequer necessária. Além disso, a confiabilidade de um instrumento pode ser
+afetado de forma adversa pelas intervenções manuais.
+
+%TODO: usar este texto
+%\textcolor{blue}{Operador interpreta os dados dos sensores e decide sobre o estado de
+%funcionamento dos mesmos. Problema para análise de uma grande quantidade de sinais,
+%necessidade de conhecimentos especialistas. (Ver artigo do Rio Automação e tese do Mauto
+%Vitor)}
+
+Por essas e outras razões, como a competitividade de mercado, tem crescido a procura por
+estratégias menos invasivas e mais eficientes. Técnicas de manutenção baseadas em condição
+(CBM --- \textit{Condition Based Maintenance})
+tendem à manutenção ótima, pois o desempenho dos instrumentos é monitorado durante a
+operação da planta e recalibrações físicas são realizadas apenas esse desempenho está
+degradado.  Na literatura, esses métodos têm sido chamados de monitoramento
+\textit{on-line} de calibração (OLM --- \textit{On-line
+Monitoring}).
+
+\abreviatura{CBM}{Manutenção baseada em condição}
+\abreviatura{OLM}{On-line Monitoring}
+
+O monitoramento de calibração baseia-se essencialmente em estimar as medidas corretas que
+deveriam ser realizadas pelos sensores, comparando-as com as reais medidas efetuadas pelos
+mesmos. Para isso, existem duas abordagens atualmente utilizadas: redundância por
+\textit{hardware} e redundância analítica \cite{Ma2011}.
+
+Na redundância por
+\textit{hardware}, sensores redundantes são utilizados para medirem uma mesma variável,
+possibilitando formas mais simples e intuitivas de estimação dos valores corretos das
+medições (pela média das medições, por exemplo). Porém, a redundância por
+\textit{hardware} inclui a possível necessidade de sensores extras, além de apresentar
+dificuldades na detecção de sensores descalibrados que apresentam \textit{drift} na mesma
+direção. Além disso, no caso dos sensores de fundo de poço, componentes redundantes ocupam
+um valioso e limitado espaço, e consomem uma energia preciosa.
+
+A outra abordagem, por redundância analítica, consiste na estimação das medidas
+dos sensores baseando-se em outras medidas correlacionadas disponíveis no sistema. Existem
+duas formas principais de modelagem dessas correlações: a modelagem por equações físicas
+que descrevem as interações entre as variáveis e modelagem baseada em dados. 
+Os modelos
+baseados em equações físicas, apesar de serem normalmente muito precisos, necessitam de
+significativos esforços de engenharia e são muito sensíveis à mudanças ou degradações não
+previstas no sistema. 
+Os modelos empíricos baseados em dados, ou histórico, também se
+baseiam em medidas correlacionadas dentro do sistema, mas essas correlações ficam
+implícitas, capturadas por técnicas de inteligência artificial e aprendizado de
+máquinas
+durante a análise de dados de medições livres de falhas, coletados
+durante situações normais de operação da planta. Apesar de serem normalmente limitados a
+trabalharem em pontos de operação da planta semelhantes aos quais foram treinados, os
+modelos empíricos possuem diversos benefícios práticos, como: aplicabilidade livre de contexto, ou
+seja, a essência dos modelos podem ser aplicados a quaisquer tipos de sistemas, sem a
+necessidade de conhecimentos específicos sobre este; simplicidade de desenvolvimento, uma
+vez que não existe a necessidade de modelos explícitos, o que torna-se um atrativo quando
+se trata de sistemas complexos; e flexibilidade de configuração,
+facilitando a configuração dos modelos para atender a novos requisitos de
+desempenho ou a mudanças na própria planta. 
+
+Esta dissertação tem como foco o desenvolvimento e implementação de um sistema de
+monitoramento do desempenho de sensores de poços de petróleo, cujas técnicas são baseadas
+em técnicas de aprendizado de máquina e modelos empíricos construídos com histórico de
+dados.  Como as técnicas baseadas em modelos empíricos são livres de contexto, este
+trabalho possui potencial aplicação para diversas outros setores industriais.
+
+
+\section{Definição do problema e abordagens existentes}
+
+%\textcolor{red}{Problema de drift em sensores em geral, citando a literatura.
+%Aboradagem escolhida para este trabalho e a justificativa para tal. UPDATE: focar no
+%problema de validação de sensores de forma geral, não somente em drift. Falhas abruptas
+%também podem ser inseridas nos sinais (seguir tabela 5.5 da tese do Mauro Vitor)}
+
+% TODO:
+% -> Explicitar diferença entre predição e estimação
+
+Como apresentado em \cite{MauroVitordeOliveira2005}, a validação de sinal pode ser
+definida como a detecção, isolamento e caracterização de sinais falhos. Em sistemas OLM, a
+validação de sinais também é referida como a identificação de falhas em sensores
+acompanhada da estimativa ou predição das medições corretas, durante o funcionamento da
+planta ou processo.
+
+Os sensores de poços são passíveis a vários tipos de falhas, como mudanças abruptas,
+polarização (\textit{bias}), picos etc. O principal tipo de falha tratado neste trabalho é
+o \textit{drift} ou desvio de medição. Na literatura, o \textit{drift} é normalmente
+definido como um desvio lento, continuo ou incremental, das medições de um sensor ao longo
+do tempo.
+
+% TODO: verificar utilidade deste texto
+%Uma das dificuldades da identificação de falhas em sensores é discernir entre a ocorrência de
+%uma falha e a ocorrência de mudanças no processo ou na planta. Poços de petróleo possuem
+%características dinâmicas que mudam ao longo da vida produtiva dos mesmos, afetando a
+%correlação entre as variáveis medidas pelos sensores. Na prática, isso implica em
+%insegurança na interpretação dos dados pelo operador, produção abaixo da capacidade real,
+%desgaste prematuro de equipamentos, maior risco de acidentes e, consequentemente, maiores
+%custos.
+
+A abordagem por modelos empíricos baseados em dados normalmente assume uma premissa
+fundamental: as variáveis medidas pelos sensores são correlacionadas, enquanto as
+possíveis falhas nesses instrumentos são descorrelacionadas. Essa premissa implica que
+%comparando-se situações normais e de falhas,
+%ocorre uma mudança na correlação entre os dados gerados pelos sensores
+existem diferenças entre as correlações dos dados gerados em situações normais e as dos
+dados gerados em situações de falhas.
+%em situações de falha de sensores, a correlação entre os dados gerados pelos sensores é
+%diferente da correlação verdadeira entre as variáveis.
+Os modelos são
+normalmente desenvolvidos utilizando histórico de medições livres de erros, capturando a
+correlação verdadeira entre as variáveis. Depois de construídos, esses modelos conseguem
+gerar estimativas das medições corretas dos sensores, as quais são comparadas com as
+medições reais afim de se identificar e isolar possíveis falhas.
+Casos de sucesso no emprego de tais técnicas na indústria já foram reportados, como
+é o caso das plantas de energia nuclear \cite{Ma2011}.
+
+Normalmente, os sistemas de monitoramento de desempenho de sensores baseados em modelos
+empíricos segue o esquema apresentado na Fig. \ref{fig:chap1_ddfdd}.  Supondo uma matriz
+de dados de treinamento $\mathbf{X} \in \Re^{n \times p}$, onde $n$ é número de amostras
+de treino e $p$ é a quantidade de variáveis amostradas, um modelo empírico $f$ é treinado
+usando $\mathbf{X}$. Quando novas medições $\mathbf{r} \in \Re^{1\times p}$ tornam-se
+disponíveis, estimações de $\mathbf{r}$ são obtidas por $\hat{\mathbf{r}} = f(\mathbf{r})$
+e resíduos são gerados como $\mathbf{d} = \mathbf{r} - \hat{\mathbf{r}}$. A ocorrência de
+\textit{drift} nas medições causa mudanças nas relações entre as variáveis de
+$\mathbf{r}$, o que resulta em mudanças estatísticas anormais nos resíduos. Então,
+avaliando estatisticamente os resíduos podem-se estabelecer as condições de operação ou
+saúde dos sensores \cite{Ma2011}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.9\textwidth]{figuras/data_driven_fdd.eps}
+    \caption{Esquema de funcionamento de sistemas baseados em modelos empíricos para
+    monitoramento de desempenho de sensores. Adaptado de \cite{Ma2011}.}
+    \label{fig:chap1_ddfdd}
+\end{figure}
+
+Inicialmente vários trabalhos empregaram redes neurais para o
+desenvolvimento de modelos, mas atualmente as técnicas baseadas em kernel estão entre as
+mais utilizadas. 
+
+Em \cite{Hines1998}, um sistema de monitoramento de desempenho de
+sensores foi implementado utilizando basicamente
+uma rede neural auto-associativa (AANN) como modelo empírico e o algoritmo SPRT
+(\textit{Sequential Probability Ratio Test}) para a análise das propriedades estatísticas
+dos resíduos.
+O sistema foi avaliado em dados de plantas nucleares, envolvendo problemas como
+\textit{drifts} e erros grosseiros nos sensores.
+%As estimações geradas pela rede eram
+%comparadas às leituras dos sensores para a formação
+%dos resíduos, cujas propriedades estatísticas, analisadas pelo módulo estatístico com o
+%algoritmo SPRT (\textit{Sequential Probability Ratio Test}),
+%indicavam a ocorrência de falhas ou \textit{drifts}.
+
+\abreviatura{AANN}{Redes neurais artificiais auto-associativas}
+\abreviatura{SPRT}{Sequential Probability Ratio Test}
+
+Em \cite{Gribok2000} foi realizada uma comparação entre diferentes técnicas estatísticas
+para a predição de dados de plantas nucleares. Entre as técnicas utilizadas, encontram-se
+redes neurais, mínimos quadrados ordinários, regressão kernel, MSET (\textit{Multivariate
+State Estimation Techniques}) e SVM (\textit{Support Vector Machines}). Os resultados
+apontaram as técnicas baseadas em kernel como promissoras.
+
+\abreviatura{MSET}{Multivariate State Estimation Techniques}
+\abreviatura{SVM}{Support Vector Machines}
+
+Em \cite{Zavaljevski2000} foi realizada a validação de sensores de reatores nucleares
+utilizando uma combinação de kernels MSET e do método SVM. As predições eram comparadas
+com os dados dos sensores para a formação de resíduos, cujas propriedades estatísticas
+eram analisadas usando SPRT para a detecção de falhas.
+
+Em \cite{Garvey2007} foram apresentados os resultados da aplicação da técnica de regressão
+kernel auto-associativa (AAKR) a conjuntos de sensores de plantas nucleares. Diferentes
+métricas são apresentadas para a avaliação de desempenho dos modelos AAKR e a detecção de
+\textit{drifts} é realizada pela análise de incerteza dos modelos.
+
+\abreviatura{AAKR}{Regressão kernel auto-associativa}
+
+Em \cite{Davies2007} foi feito um estudo sobre o uso de redes neurais para a predição de
+dados de sensores de fundo de poços de petróleo e estimação de parâmetros de
+reservatórios. A detecção de sensores degradados foi realizada por análises de limites
+(\textit{thresholds}) dos valores dos resíduos.
+
+Em \cite{Takruri2008} foi proposto um novo algoritmo para correção de medições de redes de
+sensores sem fio. O algoritmo foi concebido para trabalhar de forma descentralizada, sendo
+executado por cada sensor correlacionado de uma rede. Cada sensor recebe as leituras de
+sensores correlacionados, com as quais infere a própria leitura utilizando um modelo SVM.
+A leitura inferida e a leitura real são utilizadas por um filtro de Kalman (KF) que possui um
+modelo genérico de \textit{drift}, gerando uma estimação da leitura correta, ou
+verdadeira, do sensor em questão.
+
+\abreviatura{KF}{Filtro de Kalman}
+
+Neste trabalho, os modelos empíricos foram desenvolvidos utilizando AAKR ou SVM. A técnica
+AAKR possui implementação simples e esforço mínimo para o desenvolvimento de modelos,
+quando comparado às demais técnicas. A técnica SVM possui característica inferencial, o
+treinamento dos modelos é mais simples, comparado às redes neurais, e gera resultados
+estáveis.
+
+
+
+\section{Objetivos e Contribuições}
+
+Esta dissertação tem como principais objetivos:
+
+\begin{itemize}
+    \item Desenvolver um sistema de validação de sensores baseado em modelos
+        empíricos e técnicas de aprendizado de máquina;
+    \item Ensaiar diferentes técnicas de modelagem empírica e configurações do sistema;
+    \item Ensaiar e avaliar o sistema de validação de sensores para dados de poços de
+        produção de petróleo;
+    \item Apresentar um esquema de funcionamento do sistema de validação de sensores
+        dentro de uma arquitetura mais genérica para sistemas de monitoramento e
+        manutenção baseado em condição.
+\end{itemize}
+
+Como principais contribuições deste trabalho, podem-se destacar:
+
+\begin{itemize}
+    \item Aplicação ao cenário de poços de produção de petróleo técnicas recentes de
+        modelagem empírica baseada em histórico de dados;
+    \item Apresentação de uma estrutura modular para implementação do sistema de validação
+        de sensores dentro de uma arquitetura mais geral para monitoramento e manutenção
+        baseado em condição;
+    \item Emprego de um modelo de estimação de \textit{drift} ao resíduo gerado entre um
+        modelo empírico de predição auto-associativo e as leituras dos sensores.
+\end{itemize}
+
+
+\section{Estrutura da Dissertação}
+
+No Capítulo \ref{chap:estrutura_sis}, é apresentada a estrutura do sistema de validação de
+sensores e estabelecida uma relação entre essa estrutura e uma arquitetura mais geral para
+sistemas CBM.
+Em seguida, no Capítulo \ref{chap:drift}, são apresentadas as técnicas de modelagem
+empírica e de monitoramento, ressaltando suas abordagens ao problema de validação de
+sensores.
+A descrição do sistema de validação de sensores implementado e sua avaliação em diferentes
+cenários de ensaios são apresentadas no Capítulo \ref{chap:ensaios}.
+Finalizando o trabalho, o Capítulo \ref{chap:conclusoes} apresenta as conclusões sobre o
+desempenho do sistema de validação e dos modelos empíricos desenvolvidos e as
+perspectivas de trabalhos futuros.
+
+
+\chapter{Estrutura de Sistemas de Monitoramento e Validação de Sensores}
+\label{chap:estrutura_sis}
+
+\textcolor{blue}{Conceitos gerais sobre monitoramento baseado em condição, importância de uma estrutura
+modular e bem definida.}
+
+Em esquemas de manutenção baseados em CBM, as condições de funcionamento de equipamentos e
+sistemas são monitoradas com o intuito de otimizar as ações de manutenção. As manutenções
+preventivas deixam de ser periódicas, passando a serem agendadas de forma dinâmica, de
+acordo com evidências de real necessidade. A implementação de estratégias desse tipo pode
+reduzir o tempo de inatividade de plantas de produção, melhorar o desempneho de sistemas e
+o gerênciamento de recursos humanos limitados, prolongar a vida útil de equipamentos,
+reduzir custos e tornar a produção gradualmente mais efetiva.
+
+A tendência atual de utilização de centros integrados remotos, localizados em
+terra, para suporte à operação, manutenção e otimização de unidades marítimas de produção
+de petróleo
+tem incentivado a utilização de ferramentas de manutenção baseadas na condição.
+%Esses
+%centros possuem equipes altamente capacitadas que são responsáveis pelo monitoramento do
+%desempenho e diagnóstico de possíveis falhas em equipamentos críticos (compressores,
+%bombas, turbinas, etc), visando a redução do número de paradas não programadas e o aumento
+%da vida útil dos mesmos.
+Esses centros possuem equipes altamente capacitadas que, munidas com as informações
+certas e no momento adequado, são capazes de avaliar o desempenho e realizar diagnósticos
+sobre equipamentos críticos (compressores, bombas, turbinas, etc).
+Ferramentas CBM podem garantir o enriquecimento dos dados provenientes de plataformas ao
+mesmo tempo que reduz a quantidade de informações a serem analisadas pelas equipes,
+causando um consequente aumento da segurança e confiabilidade nas tomadas de decisão, além
+de reduzir custos materias e humanos.
+
+Apesar dos benefícios obtidos com a estratégia CBM, sérias dificuldades são frequentemente
+encontradas para implementá-la de forma plena \cite{Campos2009}.  A quantidade de dados
+coletados torna-se normalmente muito grande.  Pode haver a necessidade de coleta de dados
+provindos de sistemas geograficamente dispersos. Os dados precisam ser integrados para
+proverem informações úteis. Com o passar do tempo, pode ser necessário a aquisição de
+dados de novas fontes e integrá-los com o restante para se obter mais informações
+significativas. Finalmente, torna-se indispensável a disponibilidade de conhecimentos
+especialistas para converter os dados gerados em informações úteis para manutenção.
+
+No caso da indústria de petróleo, a implementação de um sistema CBM que envolvesse todas
+as etapas do processo de produção tornaria-se altamente complexo, mesmo utilizando-se
+técnicas simples para o processamento de sinais, monitoramento e detecção. Daí vem a
+necessidade de uma metodologia de desenvolvimento que permitisse a implementação do
+sistema de manutenção de forma bem estruturada, dentro de uma arquitetura flexível e
+robusta.
+A padronização da especificação de uma interface dentro da comunidade CBM poderia,
+idealmente, direcionar os fornecedores de soluções CBM a produzirem componentes de
+hardware e software intercambiáveis. Múltiplos desenvolvedores poderiam atuar na solução
+de um mesmo sistema. Entre os potenciais benefícios de um padrão não proprietário, robusto
+e largamente adotado, podem-se citar:
+
+\begin{itemize}
+    \item facilidade para atualização de componentes de sistema;
+    \item aumento do número de fornecedores, resultando em mais opções de tecnologia;
+    \item desenvolvimento tecnológico mais rápido;
+    \item redução de custos e preços.
+\end{itemize}
+
+
+
+\subsection{OSA-CBM}
+
+\textcolor{blue}{Existência da OSA-CBM e breve descrição sobre a respectiva
+arquitetura.
+Como o trabalho da dissertação, um sistema de monitoramento de calibração, se relaciona
+com a estrutura OSA-CBM.}
+
+Recentemente, uma associação entre indústrias, fabricantes, universidades e a Marinha
+Norte-Americana desenvolveu uma arquitetura aberta para sistemas de manutenção baseados em
+CBM, conhecida como OSA-CBM (\textit{Open System Architecture Condition-Based
+Maintenance}).
+O foco principal dessa aliança foi desenvolver uma
+arquitetura para sistemas CBM que facilitasse a interoperabilidade entre componentes de
+\textit{hardware} e \textit{software}.
+%módulos de software CBM
+%\cite{Lebold2003}.
+%Dessa forma, um sistema CBM poderia ser dividido em diferentes módulos padronizados que se
+%comunicam entre si.
+
+\abreviatura{OSA-CBM}{Open System Architecture Condition-Based Maintenance}
+
+No OSA-CBM, a arquitetura de um sistema CBM é dividido em diferentes camadas funcionais,
+cujos conteúdos devem ser implementados seguindo as interfaces definidas pelo padrão.
+Atualmente, as camadas funcionais, ou módulos, somam um total de 6, seguindo a norma
+ISO-13374. As camadas são: aquisição
+de dados, processamento de sinais, monitoramento de condição, avaliação de
+saúde (diagnóstico), a de prognóstico e a de suporte a tomada de decisão.
+Cada camada possui a capacidade de requisitar dados de outras camadas funcionais quando
+necessário, apesar do fluxo de dados normalmente ocorrer entre as camadas adjacentes. Na
+Fig. ?? é apresentado um esquema da organização dos módulos da arquitetura.
+
+\textcolor{red}{Figura do report da OSA 3.1.0 Primer}
+
+Os primeiros três blocos são específicos para determinadas tecnologias e provêem as
+seguintes funções \cite{PennStateUniversity2006}:
+
+\textcolor{red}{Copiar do artigo citado}
+
+A Fig. ?? ilustra um exemplo mais prático da estrutura de um sistema CBM.
+
+\textcolor{red}{Figura do artigo Souza2008, no artigo do rio automacao}
+
+
+
+
+%Isso
+%tanto permite a integração de vários diferentes componentes 
+
+
+
+\subsection{Detecção e Correção de Drift sob a OSA-CBM}
+
+A maneira como os algoritmos de detecção de drift se inserem dentro da arquitetura
+OSA-CBM.
+
+\chapter{Processamento de Sinais para Detecção e Correção de Drift}
+\label{chap:drift}
+
+% Definição formal de drift de sensores.
+% Teoria geral sobre o emprego de modelos empíricos para validação de medidas de sensores.
+% Diferenças entre identificação de sistemas (density estimation) e a regressão por modelos
+% empíricos (livro ``Learning from data'').
+% Explicação básica sobre detecção por métodos estatísticos.
+
+Como discutido no Capítulo 1, o monitoramento do desempenho de sensores é composto
+basicamente por três etapas: predição das leituras dos sensores por um modelo empírico, a
+geração de resíduos e a avaliação desses resíduos gerados. A seguir são apresentados
+detalhes sobre a metodologia adotada em cada etapa.
+
+\section{Modelos Empíricos para Predição}
+
+% Listar modelos estudados e as razões da escolha destes.
+% -> Premissas
+
+Antes da predição das leituras de sensores propriamente dita, é necessário construir um
+modelo empírico baseado no histórico de sensores correlacionados.
+Independente da técnica utilizada para modelagem e predição, existem alguns passos básicos
+comuns empregados para o desenvolvimento de modelos empíricos baseados em histórico.
+
+A seguir são descritos os passos básicos para o desenvolvimento de um modelo baseado em
+histórico de dados e as técnicas empregadas para modelagem/predição neste trabalho.
+
+\subsection{Metodologia para Desenvolvimento de Modelos Empíricos}
+
+O desenvolvimento dos modelos baseados em histórico pode ser dividido nos seguintes passos
+básicos: aquisição e certificação da qualidade dos dados de treinamento, agrupamento ótimo
+de sensores, seleção dos dados de treinamento, construção e otimização dos modelos, e
+avaliação e \textcolor{red}{análise de incerteza} dos modelos.
+
+
+\subsubsection{Aquisição e Qualidade dos Dados}
+
+Como apresentado por Hines \cite{Hines2006},
+o primeiro passo para o desenvolvimento de um modelo é a coleta de dados representativos.
+Os dados devem ser cuidadosamente analisados para se garantir sua qualidade. Dados
+espúrios, anomalias e condições de falhas de equipamentos devem ser corrigidos ou
+simplesmente excluídos do conjunto de dados selecionado para treinamento do modelo. Apesar
+de existirem procedimentos automáticos para remoção de erros, a inspeção visual ainda é
+muito importante para se garantir a qualidade dos dados.
+
+Além disso, os dados devem cobrir completamente os futuros
+pontos de operação e estarem livres de pontos de operação atípicos. Como as técnicas de
+modelagem empírica baseada em dados aprendem sua relação funcional a partir dos dados de
+treinamento, os modelos são incapazes de gerarem predições confiáveis fora da região de
+operação dos dados de treinamento. Se estados de operação anômalos, como \textit{drift} em
+um sensor ou falha em equipamento, são incluídos no conjunto de treinamento, os
+modelos irão incorporar essas condições como comportamentos normais.
+
+% Neste trabalho, a análise dos dados de treinamento foi realizada por inspeção visual.
+
+\subsubsection{Agrupamento Ótimo de Sensores}
+
+Este passo consiste na seleção de quais variáveis, ou sensores, serão incorporados no
+modelo. Para técnicas de redundância, o processo de seleção é simples, uma vez que apenas
+sensores redundantes são incluídos em um modelo. No caso de técnicas não redundantes, o
+conjunto de sensores que se deseja monitorar deve ser separado em grupos menores altamente
+correlacionados. A prática tem mostrado que agrupamentos ótimos normalmente contém menos
+de 30 sensores e que a adição de sinais irrelevantes acaba por aumentar a variância das
+predições de um modelo, enquanto a ausência de sinais relevantes tende a causar um
+\textit{bias} \cite{Hines2006}. A otimização do agrupamento de sensores tende a reduzir a
+incerteza de predição do modelo.
+
+Um indicador de agrupamento normalmente utilizado é o coeficiente de correlação
+(covariância entre os sinais dividida pelo produto dos desvios padrão de cada um) para
+cada par de sensores. Se o coeficiente de correlação ultrapassa um determinado valor,
+então o correspondente par de sensores deve participar do mesmo grupo. Entretanto, este
+método não garante a otimalidade de agrupamento, pois variáveis que são fortemente
+correlacionadas fisicamente podem apresentar baixos coeficientes de correlação devido a
+ilusões estatísticas de conjunto de dados tendenciosos (\textit{biased}).
+
+Alguns métodos
+automáticos para agrupamento de variáveis também têm apresentados bons resultados. Como
+apresentado por An \cite{An2011}, técnicas como a \textit{stepwise grouping} podem
+realizar bons agrupamentos de sensores. Basicamente, a \textit{stepwise grouping} realiza
+os agrupamentos de forma incremental, ou seja, adiciona-se um novo sensor a grupo,
+constroi-se um modelo a partir dessa junção e compara-se a qualidade da predição desse novo
+modelo em relação ao modelo anterior, sem a nova variável. Caso a qualidade da predição
+tenha sido melhorada, a nova variável permanece no grupo; caso constrário, a variável é
+descartada, permanecendo o agrupamento anterior. O procedimento é realizado até que todos
+so sensores possíveis tenham sido analisados.
+
+
+
+
+
+\subsubsection{Seleção dos Dados de Treinamento}
+
+Para a maioria dos modelos empíricos, os dados devem ser separados em pelo menos dois
+conjuntos, o de treinamento e o de validação. Os dados de treinamento são usados pelo
+modelo para o aprendizado das relações entre os sensores e otimização de seus parâmetros.
+Os dados de validação servem para avaliar o desempenho do modelo construído. Hines
+\cite{Hines2007} normalmente divide os dados em três conjuntos, treinamento, verificação e
+validação. A diferença consiste na separação de um conjunto específico para otimização dos
+parâmetros do modelo, o conjunto de verificação.
+
+\textcolor{red}{Importância da escolha de dados significativos, livre de erros, etc}
+
+% TODO: talvez seja mover para a próxima subseção
+%Os modelos baseados em regressão por kernel, como o AAKR, requerem que um
+%subconjunto dos dados de treinamento seja armazenado como uma matriz de memória usada para
+%as futuras predições. A seleção desse subconjunto possui efeitos consideráveis no
+%desempenho do modelo; armazenando poucas observações, as predições são degradadas por
+%falta de informação; armazenando uma quantidade excessiva, o custo computacional de cada
+%predição torna-se muito alto.
+
+\subsubsection{Construção e Otimização dos Modelos}
+%%%%%%%%%%%%%%%
+% Falar sobre o objetivo dos modelos de predição, diferenciando-os da identificação de
+% sistemas. (Learning from data)
+% * Figura esquemática.
+% * Minimização de um função custo
+% * Detalhes sobre o AAKR (hines)
+% * Detalhes sobre o SVM (Smola)
+%%%%%%%%%%%%%%%
+
+%Diferentemente da identificação de sistemas, os modelos empíricos de predição normalmente
+%são construídos 
+%%visando minimizar uma função custo
+%com o objetivo de ``imitar'' as saídas de um sistema de forma mais precisa possível
+%\cite{cherkassky2007learning}.
+%A identificação de sistemas não depende da distribuição probabilística das observações de
+%entrada, mas bons modelos de predição são normalmente dependentes dessa distruição, que
+%geralmente é desconhecida. %% USAR FIGURA
+
+%Considere o esquema apresentado na Figura . Segundo as técnicas de aprendizado
+%preditivo, um modelo preditivo deve capturar as correlações entre as variáveis
+%$\mathbf{r} \in \Re^p$.
+
+A construção de um modelo empírico normalmente busca minimizar o erro (ou uma função de
+perda)
+entre a predição $f(\mathbf{r})$ do modelo e a saída $y$ do sistema para uma dada entrada
+$\mathbf{r}$.
+A medida de qualidade que normalmente se adota é a minimização do erro quadrático médio
+(MSE), como a Eq.~(\ref{eq:mse}), onde $n$ é a quantidade de observações utilizadas para a
+construção do modelo.
+\begin{equation}
+    \mbox{MSE} = \frac{1}{n} \sum \limits^n_{i=0} (y_i - f(\mathbf{r}_i)) 
+    \label{eq:mse}
+\end{equation}
+
+\abreviatura{MSE}{Erro quadrático médio}
+
+\noindent Ou seja, diferentemente da identificação de sistemas, os modelos empíricos de
+predição normalmente são construídos 
+%visando minimizar uma função custo
+com o objetivo de ``imitar'' as saídas de um sistema para uma determinada entrada.
+%\cite{cherkassky2007learning}.
+Entretanto, a construção do modelo é realizada a partir de um número finito $n$ de
+observações $\mathbf{r}$, consequentemente o modelo só pode ser uma estimação da solução
+ótima.
+
+Segundo Cherkassky~\cite{cherkassky2007learning}, existe o seguinte consenso: para métodos
+flexíveis de aprendizado  com um número finito de amostras (como os métodos baseados em
+kernel utilizados neste trabalho), as predições com melhor desempenho são obtidas por
+modelos de complexidade ótima.
+Deve-se preferir modelos mais simples a modelos complexos e otimizar a relação entre
+complexidade e acurácia do modelo para o conjunto de dados de treinamento.
+
+Detalhes sobre as configuração, flexibilidade e otimização dos modelos são descritas nas
+\textcolor{red}{seções relativas} às técnicas adotadas neste trabalho.
+
+%% Flexibilidade x Complexidade
+%% Minimização da incerteza
+
+\subsubsection{Avaliação}
+
+Uma vez que o modelo tenha sido treinado e otimizado com o conjunto de dados de
+treinamento, o conjunto de validação é utilizado para avaliar o desempenho do modelo
+desenvolvido.
+Segundo Hines~\cite{Hines2008a}, tradicionalmente o desempenho de sistemas de
+monitoramento de calibração de sensores é mensurada a partir de três indicadores:
+acurácia, auto-sensibilidade e sensibilidade cruzada.
+A acurácia mensura a habilidade do modelo para gerar predições corretas e precisas das
+leituras dos sensores.
+A auto-sensibilidade indica a habilidade do modelo para gerar predições corretas de um
+determinado sensor quando as leituras deste estão incorretas devido a algum tipo de falha.
+Já a sensibilidade cruzada mensura o efeito dos dados de um sensor defeituoso sobre as
+predições dos demais sensores.
+
+Apesar desses indicadores qualificarem características essenciais de todo sistema de
+monitoramento de calibração, a inspeção visual das predições é de fundamental importância.
+Modelos com bons índices de qualidade podem gerar predições insatisfatórias, como sinais
+muito suavizados, representando uma estimação muito grosseira da realidade e, por isso,
+sem valor prático para a tomada de decisões.
+
+É importante destacar ainda a possível necessidade de retreinamento do modelo com dados
+mais atualizados da planta. Mudanças no ponto de operação, nas condições de equipamentos
+ou nas características do meio podem afetar significativamente na forma como as variáveis
+mensuradas pelos sensores se correlacionam. Assim, dependendo da instensidade da mudança,
+dados atualizados podem ser simplesmete incorporados ao conjunto de treinamento anterior
+ou devem compor um conjunto completamente novo.
+
+%% FIXME: put near of the models' descriptions
+%Ela é definida como o MSE entre as predições do modelo e os valores
+%reais das leituras dos sensores. Por corresponder a uma medida do erro, baixos valores de
+%acurácia são desejáveis. O cálculo da acurácia é realizado pela Eq.~(\ref{eq:mse}) para
+%modelos inferenciais, ou pela Eq.~(\ref{eq:}) para modelos auto-associativos
+%mas considerando $n$ o número de amostras do conjunto de dados de validação.
+
+%% Describe the metrics and its equations
+%% Say something about visual inspection to judge the quality
+
+\subsection{Técnicas de Modelagem Baseada em Histórico}
+
+%% Present the quality metrics for each technique
+
+%Duas das técnicas de modelagem baseada em histórico que têm apresentado aplicações em
+%sistemas de monitoramento do desempenho de sensores~\cite{Gribok2000}: a regressão por
+%kernel auto-associativa (AAKR) e a \textit{support vector machines} (SVM).
+
+A seguir são descritas as duas técnicas utilizadas para a construção dos modelos
+empíricos, AAKR e SVM.
+
+\subsubsection{AAKR}
+
+AAKR é uma técnica não paramétrica para modelagem baseada em histórico de dados livres de
+falhas. As predições do modelo se baseiam na similaridade entre as leituras correntes do
+sensores e o histórico armazenado.
+%Baseando-se na similaridade entre o vetor de leituras de um conjunto de sensores e o
+%conjunto de vetores do histórico, armazenado como uma memória, o modelo AAKR 
+
+Considerando $\mathbf{X}$ a matriz de histórico de dados, ou memória, os vetores de
+observações livres de erros são representados por $\mathbf{X}_{i,j}$, ou seja, a i-ésima
+observação da j-ésima variável. Para $n$ vetores de memória e $p$ variáveis, a matriz
+$\mathbf{X}$ é definida como
+
+$$
+{\mathbf{X}} = \left[ {\begin{array}{*{20}{c}}
+{{X_{1,1}}}&{{X_{1,2}}}& \cdots &{{X_{1,p}}}\\
+{{X_{2,1}}}&{{X_{2,2}}}& \cdots &{{X_{2,p}}}\\
+ \vdots & \vdots & \ddots & \vdots \\
+{{X_{{n},1}}}&{{X_{{n},2}}}& \cdots &{{X_{{n},p}}}
+\end{array}} \right] \mbox{.}
+$$
+
+\textcolor{red}{Continue\ldots}
+
+
+\subsubsection{SVM}
+
+\textcolor{red}{Usar relatório da Petrobras}
+
+\subsection{Geração de Resíduos}
+
+Os resíduos correspondem à diferença entre as predições do modelos e as medições dos
+sensores correspondentes.
+Considerando o sistema sensoriado operando na região de treinamento do modelo,
+as predições são virtualmente iguais às medidas realizadas pelos sensores quando estes se
+encontram funcionando corretamente, e os resíduos tendem a apresentar média zero e
+variância semelhante a do sensor.
+Anomalias nas medições dos sensores, como \textit{drift}, \textit{outliers}, mudanças
+abruptas, aumento da variância (errático) etc., causam mudanças nas características
+estatísticas esperadas nos resíduos e normalmente podem ser detectadas por técnicas
+estatísticas de detecção, como apresentado na Seção~\ref{sec:deteccao_drift}.
+%podem ser detectadas a partir da análise dos resíduos.
+%Os resíduos podem representar também uma estimativa do \textit{drift} nas medições, uma
+%vez que ele causa um desvio gradual em ambos os sinais.
+
+No caso específico da detecção de \textit{drift}, uma outra aplicação dos resíduos é
+alimentar um Filtro de Kalman responsável por acompanhar a amplitude do
+\textit{drift} ao longo do tempo~\cite{Takruri2008}.
+Um possível modelo matemático usado para estimar a amplitude do \textit{drift} $d_p$ de um
+sensor $p$ é apresentado na Eq. (\ref{eq:kf_dmodel}), onde $v^k$ é considerado um ruído
+Gaussiano de média zero e variância $V$.
+
+\begin{equation}
+    {d}^k = {d}^{k-1} + {v}^k, \quad {v}^k \sim \mathcal{N} ({0}, {V})
+    \label{eq:kf_dmodel}
+\end{equation}
+
+Em \emph{rastreamento de alvos} (\textit{target tracking}), a Equação (\ref{eq:kf_dmodel})
+é conhecida como o modelo matemático do comportamento dinâmico do alvo.
+No caso de detecção de \textit{drift}, o objetivo é rastrear ou acompanhar a amplitude do
+\textit{drift} de um sensor.
+Se for assumido que um sensor apresenta \textit{drifts} de forma suave, vagarosamente
+crescente, linear ou exponencial, pode-se considerar o modelo da Eq. (\ref{eq:kf_dmodel})
+como uma aproximação razoável.
+Uma outra consideração deste modelo é descorrelação entre \textit{drifts} de diferentes
+sensores, mesmo sendo as variáveis de processo correlacionadas.
+
+\textcolor{red}{Continuar a partir do artigo IFAC\ldots}
+
+
+\subsection{Detecção de Anomalias/Drift}
+\label{sec:deteccao_drift}
+
+SPRT, detecção pela incerteza.
+
+
+\chapter{Aplicação do Sistema Implementado a Dados de Poços de Petróleo}
+\label{chap:ensaios}
+
+Descrição do sistema completo implementado, ou seja, sistema integrando os modelos
+empíricos de predição e o módulo estatístico de decisão. Palavras: predictive learning.
+
+\subsection{Descrição dos Dados}
+
+Seção semelhante a do artigo submetido para o ifac. 
+
+\subsubsection{Simulação}
+
+\subsubsection{Dados Reais}
+
+\subsection{Resultados}
+
+\subsubsection{Simulação}
+
+\subsubsection{Dados Reais}
+
+
+\chapter{Conclusões}
+\label{chap:conclusoes}
+
+Revisão da importância do monitoramento de calibração.
+Revisão da sistema implementado e sua relação com a estrutura OSA-CBM.
+Revisão dos experimentos realizados e os resultados obtidos. Resumir as vantagens e
+desvantagens da abordagem escolhida, analisar de forma crítica as contribuições da
+dissertação.
+
+Perspectivas de trabalhos futuros.
