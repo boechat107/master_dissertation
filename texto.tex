@@ -95,8 +95,7 @@ trabalho possui potencial aplicação para diversas outros setores industriais.
 %problema de validação de sensores de forma geral, não somente em drift. Falhas abruptas
 %também podem ser inseridas nos sinais (seguir tabela 5.5 da tese do Mauro Vitor)}
 
-% TODO:
-% -> Explicitar diferença entre predição e estimação
+\textcolor{red}{TODO:} Explicitar diferença entre predição e estimação.
 
 Como apresentado em \cite{MauroVitordeOliveira2005}, a validação de sinal pode ser
 definida como a detecção, isolamento e caracterização de sinais falhos. Em sistemas OLM, a
@@ -388,6 +387,9 @@ OSA-CBM.
 % empíricos (livro ``Learning from data'').
 % Explicação básica sobre detecção por métodos estatísticos.
 
+\textcolor{red}{TODO:} Dividir as etapas em pré-processamento, processamento e
+pós-processmaneto. Incluir o KF na etapa de pós-processamento.
+
 Como discutido no Capítulo 1, o monitoramento do desempenho de sensores é composto
 basicamente por três etapas: predição das leituras dos sensores por um modelo empírico, a
 geração de resíduos e a avaliação desses resíduos gerados. A seguir são apresentados
@@ -424,6 +426,10 @@ simplesmente excluídos do conjunto de dados selecionado para treinamento do mode
 de existirem procedimentos automáticos para remoção de erros, a inspeção visual ainda é
 muito importante para se garantir a qualidade dos dados.
 
+\textcolor{red}{FIXME:} que dados são esses? treinamento? tomar cuidado com essa palavra. Filtragem dos
+dados para redução de complexidade do modelo, remoção de dados espúrios. Normalização dos dados.
+Pontos de operação podem ser identificados por técnicas de clusterização/classificação.
+
 Além disso, os dados devem cobrir completamente os futuros
 pontos de operação e estarem livres de pontos de operação atípicos. Como as técnicas de
 modelagem empírica baseada em dados aprendem sua relação funcional a partir dos dados de
@@ -435,6 +441,10 @@ modelos irão incorporar essas condições como comportamentos normais.
 % Neste trabalho, a análise dos dados de treinamento foi realizada por inspeção visual.
 
 \subsubsection{Agrupamento Ótimo de Sensores}
+
+\textcolor{red}{TODO:} tese do Mauro possui bons comentários a respeito, sec 2.2.1.
+No caso de grupos com grande quantidade de variáveis, pode-se usar técnicas de redução de
+espaços, como o PCA.
 
 Este passo consiste na seleção de quais variáveis, ou sensores, serão incorporados no
 modelo. Para técnicas de redundância, o processo de seleção é simples, uma vez que apenas
@@ -511,6 +521,8 @@ parâmetros do modelo, o conjunto de verificação.
 %Considere o esquema apresentado na Figura . Segundo as técnicas de aprendizado
 %preditivo, um modelo preditivo deve capturar as correlações entre as variáveis
 %$\mathbf{r} \in \Re^p$.
+
+\textcolor{red}{TODO:} Escolha da arquitetura do modelo, hetero ou auto-associativa.
 
 A construção de um modelo empírico normalmente busca minimizar o erro (ou uma função de
 perda)
@@ -599,6 +611,8 @@ empíricos, AAKR e SVM.
 
 \subsubsection{AAKR}
 
+\textcolor{red}{FIXME:} Diagrama explicitando a arquitetura auto-associativa.
+
 AAKR é uma técnica não paramétrica para modelagem baseada em histórico de dados livres de
 falhas. As predições do modelo se baseiam na similaridade entre as leituras correntes do
 sensores e o histórico armazenado.
@@ -626,7 +640,9 @@ $$
 
 \textcolor{red}{Usar relatório da Petrobras}
 
-\subsection{Geração de Resíduos}
+\section{Geração de Resíduos}
+
+\textcolor{red}{Mesclar esta Seção com a detecção de anomalias}
 
 Os resíduos correspondem à diferença entre as predições do modelos e as medições dos
 sensores correspondentes.
@@ -667,19 +683,76 @@ sensores, mesmo sendo as variáveis de processo correlacionadas.
 \textcolor{red}{Continuar a partir do artigo IFAC\ldots}
 
 
-\subsection{Detecção de Anomalias/Drift}
+\section{Avaliação dos Resídos e Detecção de Anomalias/Drift}
 \label{sec:deteccao_drift}
 
-SPRT, detecção pela incerteza.
+\textcolor{red}{TODO:} SPRT, detecção pela incerteza. Present some possible methods to
+detect anomalies, like autocorrelation, densidade de potência etc.
+
+A detecção de anomalias nos sensores é baseada na análise do erro entre as predições do
+modelo e as medidas produzidas por eles, ou seja, o resíduo $d$ calculado pela Eq.
+(\ref{eq:residuo}), onde $f(\mathbf{r})$ é a estimativa da medida $y$, medida produzida pelo
+sensor que se deseja monitorar, a partir das medidas $\mathbf{r}$ de sensores
+correlacionados.
+
+\begin{equation}
+    d = y - f(\mathbf{r})
+    \label{eq:residuo}
+\end{equation}
+
+Considerando o sistema sensoriado operando na região de treinamento do modelo,
+as predições são virtualmente iguais às medidas realizadas pelos sensores quando estes se
+encontram funcionando corretamente, e os resíduos tendem a apresentar média zero e
+variância semelhante a do sensor.
+Anomalias nas medições dos sensores, como \textit{drift}, \textit{outliers}, mudanças
+abruptas, aumento da variância (errático) etc., causam mudanças nas características
+estatísticas esperadas nos resíduos e normalmente podem ser detectadas por técnicas
+estatísticas de detecção~\cite{MauroVitordeOliveira2005}.
+Dentre essas técnicas, podem-se citar: verificação de limites das propriedades
+estatísticas, como média e a variância; auto-correlação dos resíduos; densidade de
+potência dos resíduos; e o método SPRT.
+
+No caso da detecção específica de \textit{drifts}, a verificação da incerteza das pedições
+do modelo também pode ser empregada~\cite{Hines2008a}. Os métodos analíticos para os
+cálculos de incerteza são específicos para cada técnica de modelagem empírica, enquanto
+métodos baseados em simulações Monte Carlo são gerais, mas podem ser computacionalmente
+custosos.
+
+Pela simplicidade de implementação e abrangência de anomalias passíveis de detecção, neste
+trabalho emprega-se o método SPRT, descrito a seguir.
+
+\subsection{SPRT}
+
+\textcolor{red}{TODO:} Seguir artigo IFAC
 
 
 \chapter{Aplicação do Sistema Implementado a Dados de Poços de Petróleo}
 \label{chap:ensaios}
 
-Descrição do sistema completo implementado, ou seja, sistema integrando os modelos
-empíricos de predição e o módulo estatístico de decisão. Palavras: predictive learning.
+% Descrição do sistema completo implementado, ou seja, sistema integrando os modelos
+% empíricos de predição e o módulo estatístico de decisão.
+% Palavras: predictive learning.
 
-\subsection{Descrição dos Dados}
+Neste capítulo são apresentados os sistemas implementados para monitoramento e validação
+de sensores de poços de petróleo, além dos resultados da avaliação destes sistemas para
+diferentes conjuntos de dados, gerados a partir de simulações ou a partir de sensores
+reais.
+
+\section{Sistemas de Validação de Sensores}
+
+\textcolor{red}{TODO:} 3 ou 4 sistemas serão implementados? Figuras e diagramas
+
+Descrevem-se a seguir \textcolor{red}{três} diferentes sistemas de validação de sensores
+implementados neste trabalho, os quais se diferem pela técnica de modelagem e/ou pelo
+emprego do KF.
+
+\subsection{Sistema 1 --- AAKR-SPRT}
+
+\subsection{sistema 2 --- AAKR-KF-SPRT}
+
+\subsection{Sistema 3 --- SVM-SPRT}
+
+\section{Descrição dos Dados}
 
 Seção semelhante a do artigo submetido para o ifac. 
 
@@ -687,9 +760,33 @@ Seção semelhante a do artigo submetido para o ifac.
 
 \subsubsection{Dados Reais}
 
-\subsection{Resultados}
+\section{Ensaios}
 
-\subsubsection{Simulação}
+Testes sem o filtro de Kalman com AAKR e SVM. Verificar qualidade das predições.
+Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
+variáveis.
+Testes com sinais filtrados (fácil para o caso de simulação).
+
+\subsection{Simulação}
+
+\subsubsection{AAKR-SPRT}
+
+%TODO:reescrever.
+O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
+Fig.<++>. Nota-se que modelos com menor MSE apresentam maior equilíbrio entre acurácia e
+capacidade de generalização, ou seja, são aqueles localizados entre modelos com pequena
+largura de banda e alta variância e modelos com largura de banda maiores e estimações
+polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
+menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
+do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = <++>$ e
+<++> vetores de memória.
+
+\textcolor{red}{Figura:} comportamento do mse para diferentes valores de bandwidth.
+
+Pela análise dos resíduos gerados entre a predição do modelo selecionado e os dados de
+otimização, os parâmetros selecionados para o algoritmo SPRT foram:
+\textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
+probabilidade de alarmes perdidos igual a $10\%$.
 
 \subsubsection{Dados Reais}
 
