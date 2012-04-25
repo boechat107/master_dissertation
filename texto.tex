@@ -767,7 +767,7 @@ Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
 variáveis.
 Testes com sinais filtrados (fácil para o caso de simulação).
 
-\subsection{Simulação}
+\subsection{Construção dos Modelos e Otimização de Parâmetros --- Dados de Simulação}
 
 \subsubsection{AAKR-SPRT}
 
@@ -788,7 +788,16 @@ otimização, os parâmetros selecionados para o algoritmo SPRT foram:
 \textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
 probabilidade de alarmes perdidos igual a $10\%$.
 
-\subsubsection{Dados Reais}
+\subsubsection{AAKR-KF-SPRT}
+
+Como os parâmetros $h = ?$ e $n_m = ?$ geraram o modelo com o melhor balanço entre
+acurácia e capacidade de generalização para os dados de treinamento, tais valores também
+foram adotados para o modelo AAKR do sistema AAKR-KF-SPRT. A busca pelos melhores valores
+no espaço dos parâmetros $\mathbf{Q}$ e $\mathbf{V}$ do KF resultou nos valores
+$\mathbf{Q} = \mathbf{I} \; ?$ e $\mathbf{V} = \mathbf{I} \; ?$; a Figura ?? apresenta o
+comportamento do MSE para os diferentes valores dos parâmetros do KF.
+
+
 
 
 \chapter{Conclusões}
