@@ -760,42 +760,154 @@ Seção semelhante a do artigo submetido para o ifac.
 
 \subsubsection{Dados Reais}
 
-\section{Ensaios}
+\section{Ensaio --- Construção dos Modelos Empíricos}
 
 Testes sem o filtro de Kalman com AAKR e SVM. Verificar qualidade das predições.
 Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
 variáveis.
 Testes com sinais filtrados (fácil para o caso de simulação).
 
-\subsection{Construção dos Modelos e Otimização de Parâmetros --- Dados de Simulação}
+\subsection{Dados de Simulação}
 
-\subsubsection{AAKR-SPRT}
+\subsubsection{AAKR}
 
-%TODO:reescrever.
 O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
-Fig.<++>. Nota-se que modelos com menor MSE apresentam maior equilíbrio entre acurácia e
-capacidade de generalização, ou seja, são aqueles localizados entre modelos com pequena
-largura de banda e alta variância e modelos com largura de banda maiores e estimações
-polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
-menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
-do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = <++>$ e
-<++> vetores de memória.
+Fig.~\ref{fig:mse_aakr_sim}.
+Modelos com valores altos de $h$ apresentaram grandes valores de MSE total, independente
+da quantidade de vetores de memória, $n_m$.
+Maiores valores de $n_m$ combinados com menores valores de $h$ tenderam a apresentar
+modelos com menor MSE total.
+Porém, apesar de não ser perceptível pela Fig.~\ref{fig:mse_aakr_sim}, para valores muito
+pequenos de $h$ ocorreram leves acréscimos no MSE total, para todos as quantidades
+$n_m$.
+Para evitar \textit{overfitting} e o armazenamento de grandes quantidades de dados
+desnecessariamente, escolheu-se $h = 0.1$ e $n_m = 600$ (20\% da quantidade amostras dos
+dados de treinamento).
 
-\textcolor{red}{Figura:} comportamento do mse para diferentes valores de bandwidth.
+%Nota-se que modelos com menor MSE apresentam maior equilíbrio entre acurácia e
+%capacidade de generalização, ou seja, são aqueles localizados entre modelos com pequena
+%largura de banda e alta variância e modelos com largura de banda maiores e estimações
+%polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
+%menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
+%do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = <++>$ e
+%<++> vetores de memória.
 
-Pela análise dos resíduos gerados entre a predição do modelo selecionado e os dados de
-otimização, os parâmetros selecionados para o algoritmo SPRT foram:
-\textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
-probabilidade de alarmes perdidos igual a $10\%$.
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
+    \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
+    vetores de memória $n_m$ para o modelo AAKR aplicado aos dados de simulação para
+otimização.}
+    \label{fig:mse_aakr_sim}
+\end{figure}
 
-\subsubsection{AAKR-KF-SPRT}
+\subsubsection{SVM}
 
-Como os parâmetros $h = ?$ e $n_m = ?$ geraram o modelo com o melhor balanço entre
-acurácia e capacidade de generalização para os dados de treinamento, tais valores também
-foram adotados para o modelo AAKR do sistema AAKR-KF-SPRT. A busca pelos melhores valores
-no espaço dos parâmetros $\mathbf{Q}$ e $\mathbf{V}$ do KF resultou nos valores
-$\mathbf{Q} = \mathbf{I} \; ?$ e $\mathbf{V} = \mathbf{I} \; ?$; a Figura ?? apresenta o
-comportamento do MSE para os diferentes valores dos parâmetros do KF.
+\begin{table}[!htb]
+    \centering
+    \caption{\label{}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+da variável $PT_f$ dos dados de simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+        \midrule
+        0.06 & 0.125 & 0.5 & 33 & 0.42\\
+        0.08 & 1 & 1 & 25 & 0.66 \\
+        0.1 & 256 & 2 & 20 & 0.93\\
+        0.5 & 0.125 & 16 & 0 & 33.19\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+O resultado para $\varepsilon = 0.5$ corresponde a uma média.
+
+
+\subsection{Dados Reais}
+
+\subsubsection{AAKR}
+
+O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
+Fig.~\ref{fig:mse_aakr_real}.
+Para este conjunto de dados, menores valores de $h$ realmente geraram menores valores de
+MSE total, exceto para quantidades $n_m$ muito pequenas.
+Entretanto, modelos com $h < 0.07$ apresentaram problemas
+numéricos para a predição dos dados de otimização, pois valores muito pequenos de
+$h$ geram modelos com baixa capacidade de generalização, onde os denominadores da Eq. ??
+são muito próximos de zero.
+Para diminuir a possibilidade de problemas numéricos por baixa capacidade de generalização
+e ao mesmo tempo obter baixos valores de MSE total, adotou-se $h = 0.15$.
+%Considerou-se $h = 0.15$ como um valor equilibrado entre acurácia e capacidade de
+%generalização.
+%Portanto, assim como ocorreu com os dados de simulação, 
+%modelos com menor MSE apresentam maior equilíbrio entre acurácia e
+%capacidade de generalização.
+
+Em relação ao número de vetores de memória, foi escolhido $n_m = 4800$, que corresponde a
+$20\%$ do conjunto de dados de treinamento. Maiores valores de $n_m$ apresentaram
+impacto insignificante na redução do MSE (alterações a partir da quarta casa decimal).
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.7\textwidth]{figuras/mse_aakr_real.eps}
+    \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
+    vetores de memória $n_m$ para o modelo AAKR aplicado aos dados reais para
+otimização.}
+    \label{fig:mse_aakr_real}
+\end{figure}
+
+
+\subsubsection{SVM}
+
+As Figuras ?? apresentam o desempenho, em termos do MSE, de diferentes modelos SVM,
+variando os parâmetros $C$, $\gamma$ e $\varepsilon$. 
+
+\subsubsection{Comentários}
+
+Para ambas as técnicas, o processo de otimização dos modelos norteada pelo MSE foi
+fortemente influenciada pela largura de banda da função kernel.
+Nos modelos AAKR, o MSE
+total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
+ocasionaram problemas numéricos.
+Nos modelos SVM,
+
+
+\section{Ensaio --- Verificação de Acurácia}
+
+\subsection{Dados de Simulação}
+
+\subsubsection{AAKR}
+
+\subsubsection{SVM}
+
+
+\section{Ensaio --- Análise de Sensibilidade e Detecção de \textit{Drifts}}
+
+\subsection{Dados Reais}
+
+\subsubsection{AAKR}
+
+\subsubsection{SVM}
+
+
+\section{Ensaio --- Estimação de \textit{Drifts} com o KF}
+
+
+
+% \textcolor{red}{Figura:} comportamento do mse para diferentes valores de bandwidth.
+% 
+% Pela análise dos resíduos gerados entre a predição do modelo selecionado e os dados de
+% otimização, os parâmetros selecionados para o algoritmo SPRT foram:
+% \textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
+% probabilidade de alarmes perdidos igual a $10\%$.
+% 
+% \subsubsection{AAKR-KF-SPRT}
+% 
+% Como os parâmetros $h = ?$ e $n_m = ?$ geraram o modelo com o melhor balanço entre
+% acurácia e capacidade de generalização para os dados de treinamento, tais valores também
+% foram adotados para o modelo AAKR do sistema AAKR-KF-SPRT. A busca pelos melhores valores
+% no espaço dos parâmetros $\mathbf{Q}$ e $\mathbf{V}$ do KF resultou nos valores
+% $\mathbf{Q} = \mathbf{I} \; ?$ e $\mathbf{V} = \mathbf{I} \; ?$; a Figura ?? apresenta o
+% comportamento do MSE para os diferentes valores dos parâmetros do KF.
 
 
 
