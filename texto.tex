@@ -390,12 +390,188 @@ OSA-CBM.
 \textcolor{red}{TODO:} Dividir as etapas em pré-processamento, processamento e
 pós-processmaneto. Incluir o KF na etapa de pós-processamento.
 
-Como discutido no Capítulo 1, o monitoramento do desempenho de sensores é composto
-basicamente por três etapas: predição das leituras dos sensores por um modelo empírico, a
-geração de resíduos e a avaliação desses resíduos gerados. A seguir são apresentados
-detalhes sobre a metodologia adotada em cada etapa.
+Pode-se dividir o processo de validação de sensores em três etapas principais:
+pré-processamento, processamento e pós-processamento dos sinais.
+Cada uma dessas etapas são detalhadas a seguir.
 
-\section{Modelos Empíricos para Predição}
+%Como discutido no Capítulo 1, o monitoramento do desempenho de sensores é composto
+%basicamente por três etapas: predição das leituras dos sensores por um modelo empírico, a
+%geração de resíduos e a avaliação desses resíduos gerados. A seguir são apresentados
+%detalhes sobre a metodologia adotada em cada etapa.
+
+\section{Pré-processamento dos Sinais}
+
+A etapa de pré-processamento dos sinais consiste na preparação dos dados que serão
+utilizados pelos modelos empíricos, tanto para o treinamento quanto para a predição.
+O condicionamento dos dados às técnicas de modelagem normalmente são
+necessárias para que os modelos consigam extrair dos sinais as informações corretas e
+realmente relevantes para futuras predições.
+
+Pode-se dividir a etapa de pré-processamento em quatro tarefas: limpeza dos dados,
+normalização, seleção das variáveis de entrada do modelo e seleção das amostras de
+treinamento.
+
+\subsection{Limpeza dos Dados}
+
+A limpeza dos dados consiste na filtragem e remoção de dados espúrios.
+
+A filtragem dos sinais tem por objetivo retirar ou reduzir os ruídos normalmente presentes
+nas medições dos sensores.
+``O uso de sinais filtrados tende a facilitar o processo de treinamento dos modelos, uma vez
+que se reduz a complexidade dos sinais a serem aprendidos pelo modelo''
+\cite{MauroVitordeOliveira2005}.
+Entretanto, é importante garantir que o processo de filtragem não remova informações
+``verdadeiras'' sobre a variável mensurada, o que poderia comprometer o desempenho dos
+modelos.
+
+Dados espúrios ou \textit{outliers} são dados inconsistentes com a maioria das medidas
+coletadas.
+Medidas espúrias são normalmente causadas por erros grosseiros na medição, erros no
+armazenamento, e/ou outros eventos anormais.
+Tais dados não representativos podem afetar seriamente os
+modelos~\cite{cherkassky2007learning} e devem ser corrigidos ou simplesmente removidos do
+conjunto de dados utilizados para treinamento.
+
+% \subsubsection{Aquisição e Qualidade dos Dados}
+% 
+% Como apresentado por Hines \cite{Hines2006},
+% o primeiro passo para o desenvolvimento de um modelo é a coleta de dados representativos.
+% Os dados devem ser cuidadosamente analisados para se garantir sua qualidade. Dados
+% espúrios, anomalias e condições de falhas de equipamentos devem ser corrigidos ou
+% simplesmente excluídos do conjunto de dados selecionado para treinamento do modelo. Apesar
+% de existirem procedimentos automáticos para remoção de erros, a inspeção visual ainda é
+% muito importante para se garantir a qualidade dos dados.
+% 
+% \textcolor{red}{FIXME:} que dados são esses? treinamento? tomar cuidado com essa palavra. Filtragem dos
+% dados para redução de complexidade do modelo, remoção de dados espúrios. Normalização dos dados.
+% Pontos de operação podem ser identificados por técnicas de clusterização/classificação.
+% 
+% Além disso, os dados devem cobrir completamente os futuros
+% pontos de operação e estarem livres de pontos de operação atípicos. Como as técnicas de
+% modelagem empírica baseada em dados aprendem sua relação funcional a partir dos dados de
+% treinamento, os modelos são incapazes de gerarem predições confiáveis fora da região de
+% operação dos dados de treinamento. Se estados de operação anômalos, como \textit{drift} em
+% um sensor ou falha em equipamento, são incluídos no conjunto de treinamento, os
+% modelos irão incorporar essas condições como comportamentos normais.
+
+% Neste trabalho, a análise dos dados de treinamento foi realizada por inspeção visual.
+
+\subsection{Normalização}
+
+A normalização dos dados consiste em tornar igual a escala de valores dos sinais de todos
+os sensores envolvidos.
+Diferentes variáveis mensuradas pelos sensores naturalmente possuem diferentes escalas, ou
+seja, suas próprias unidades de medida.
+Para algumas técnicas de modelagem, a escala das variáveis não representa um problema,
+entretanto, outros métodos, principalmente os baseados em distância, são sensíveis às
+escalas das variáveis de entrada.
+Nestes métodos, variáveis caracterizando pressão, por exemplo, possuiriam maior influência
+quando expressadas em Pascal que em kgf/m$^2$.
+
+Para técnicas de aprendizagem de máquina, uma das formas comuns de se normalizar sinais é
+escalá-los no hipercubo $[0,1]^p$, onde $p$ é o número de variáveis de entrada do modelo.
+Neste caso, a normalização de uma amostra $r_p \in \Re$ obtida de um sensor $p$ é dada
+pela Eq.~(\ref{eq:scaling}), onde $r_{norm,p}$ é o valor normalizado de $r_p$ e
+$r_{max,p}$ e $r_{min,p}$ são os valores máximos e mínimos dos dados de treinamento
+relativos ao sensor $p$.
+
+\begin{equation}
+    r_{norm,p} = \frac{r_p - r_{min,p}}{r_{max,p} - r_{min,p}}
+    \label{eq:scaling}
+\end{equation}
+
+
+\subsection{Seleção das Variáveis de Entrada}
+
+Este passo consiste na seleção de quais variáveis, ou sensores, serão incorporados no
+modelo, com o objetivo de agrupar aquelas que possuem certo grau de correlação.
+Como os modelos empíricos baseiam suas predições nas correlações das variáveis de entrada,
+o agrupamento é uma tarefa de fundamental importância.
+A adição de variáveis não relevantes (sem correlação com a variável a ser predita) tende a
+gerar modelos instáveis, cujas predições apresentam alta variância.
+Entretanto, para algumas técnicas de regressão, variáveis altamente correlacionadas podem
+causar singularidade na matriz de dados entrada e, consequentemente, predições de baixa
+qualidade.
+Além disso, quanto maior o número de variáveis de entrada de um modelo empírico de
+regressão, maior deve ser o número de amostras de treinamento para que o modelo cubra o
+mínimo possível do espaço de entrada.
+
+Para os casos de redundância de \textit{hardware} com técnicas de regressão que suportam
+colinearidades, o processo de seleção é simples, uma vez que apenas
+sensores redundantes são incluídos em um modelo.
+Para os casos onde redundâncias não necessariamente existem, o
+conjunto de sensores que se deseja monitorar deve ser separado em grupos menores altamente
+correlacionados.
+Hines~\cite{Hines2006} apresenta que agrupamentos ótimos normalmente contém menos
+de 30 sensores e que a adição de sinais irrelevantes acaba por aumentar a variância das
+predições de um modelo, enquanto a ausência de sinais relevantes tende a causar
+polarização.
+
+Um indicador de agrupamento normalmente utilizado é o coeficiente de correlação
+(covariância entre os sinais dividida pelo produto dos desvios padrão de cada um) para
+cada par de sensores. Se o coeficiente de correlação ultrapassa um determinado valor,
+então o correspondente par de sensores deve participar do mesmo grupo. Entretanto, este
+método não garante a otimalidade de agrupamento, pois variáveis que são fortemente
+correlacionadas fisicamente podem apresentar baixos coeficientes de correlação devido a
+ilusões estatísticas de conjunto de dados polarizados.
+Normalmente, esse método é utilizado acompanhado de senso de engenharia, ou seja,
+selecionam-se as variáveis considerando também conhecimentos especialistas sobre a
+dinâmica do processo.
+
+Técnicas de exploração do espaço de possibilidades também podem ser empregadas para o
+agrupamento das variáveis, como algoritmos genéticos~\cite{MauroVitordeOliveira2005} e a
+\textit{stepwise grouping}~\cite{An2011}.
+Basicamente, essas técnicas tentam minimizar o número de tentativas possíveis para se
+alcançar um solução ótima ou subótima de agrupamento.
+Cada tentativa implica na criação de um diferente modelo e na avaliação da qualidade das
+predições geradas por ele.
+Através de uma heurística, reduz-se o espaço de possibilidades de combinação das
+variáveis para, finalmente, selecionar aquele agrupamento que gera o modelo com melhor
+qualidade de predição.
+
+% Como
+% apresentado por An \cite{An2011}, técnicas como a \textit{stepwise grouping} podem
+% realizar bons agrupamentos de sensores. Basicamente, a \textit{stepwise grouping} realiza
+% os agrupamentos de forma incremental, ou seja, adiciona-se um novo sensor a grupo,
+% constroi-se um modelo a partir dessa junção e compara-se a qualidade da predição desse novo
+% modelo em relação ao modelo anterior, sem a nova variável. Caso a qualidade da predição
+% tenha sido melhorada, a nova variável permanece no grupo; caso constrário, a variável é
+% descartada, permanecendo o agrupamento anterior. O procedimento é realizado até que todos
+% so sensores possíveis tenham sido analisados.
+
+
+\subsection{Seleção das Amostras de Treinamento}
+
+Dois aspectos principais, intrinsicamente relacionados, devem ser considerados para a
+seleção das amostras para o treinamento dos modelos: quantidade e representatividade.
+Geralmente, a quantidade de variáveis de entrada do modelo dita uma quantidade mínima de
+amostras necessárias para se ``capturar'' a correlação entre elas.
+% Com poucas observações, tende-se a obter predições degradadas por falta de informação; com
+% quantidade excessiva, o custo computacional de cada predição torna-se muito alto.
+Entretanto, essas amostras precisam representar as condições de operação que se espera
+encontrar quando o modelo estiver funcional.
+
+% Para a maioria dos modelos empíricos, os dados devem ser separados em pelo menos dois
+% conjuntos, o de treinamento e o de validação. Os dados de treinamento são usados pelo
+% modelo para o aprendizado das relações entre os sensores e otimização de seus parâmetros.
+% Os dados de validação servem para avaliar o desempenho do modelo construído. Hines
+% \cite{Hines2007} normalmente divide os dados em três conjuntos, treinamento, verificação e
+% validação. A diferença consiste na separação de um conjunto específico para otimização dos
+% parâmetros do modelo, o conjunto de verificação.
+% 
+% \textcolor{red}{Importância da escolha de dados significativos, livre de erros, etc}
+
+% TODO: talvez seja mover para a próxima subseção
+%Os modelos baseados em regressão por kernel, como o AAKR, requerem que um
+%subconjunto dos dados de treinamento seja armazenado como uma matriz de memória usada para
+%as futuras predições. A seleção desse subconjunto possui efeitos consideráveis no
+%desempenho do modelo; armazenando poucas observações, as predições são degradadas por
+%falta de informação; armazenando uma quantidade excessiva, o custo computacional de cada
+%predição torna-se muito alto.
+
+
+
+\section{Processamento dos Sinais}
 
 % Listar modelos estudados e as razões da escolha destes.
 % -> Premissas
@@ -415,89 +591,6 @@ básicos: aquisição e certificação da qualidade dos dados de treinamento, agrupam
 de sensores, seleção dos dados de treinamento, construção e otimização dos modelos, e
 avaliação e \textcolor{red}{análise de incerteza} dos modelos.
 
-
-\subsubsection{Aquisição e Qualidade dos Dados}
-
-Como apresentado por Hines \cite{Hines2006},
-o primeiro passo para o desenvolvimento de um modelo é a coleta de dados representativos.
-Os dados devem ser cuidadosamente analisados para se garantir sua qualidade. Dados
-espúrios, anomalias e condições de falhas de equipamentos devem ser corrigidos ou
-simplesmente excluídos do conjunto de dados selecionado para treinamento do modelo. Apesar
-de existirem procedimentos automáticos para remoção de erros, a inspeção visual ainda é
-muito importante para se garantir a qualidade dos dados.
-
-\textcolor{red}{FIXME:} que dados são esses? treinamento? tomar cuidado com essa palavra. Filtragem dos
-dados para redução de complexidade do modelo, remoção de dados espúrios. Normalização dos dados.
-Pontos de operação podem ser identificados por técnicas de clusterização/classificação.
-
-Além disso, os dados devem cobrir completamente os futuros
-pontos de operação e estarem livres de pontos de operação atípicos. Como as técnicas de
-modelagem empírica baseada em dados aprendem sua relação funcional a partir dos dados de
-treinamento, os modelos são incapazes de gerarem predições confiáveis fora da região de
-operação dos dados de treinamento. Se estados de operação anômalos, como \textit{drift} em
-um sensor ou falha em equipamento, são incluídos no conjunto de treinamento, os
-modelos irão incorporar essas condições como comportamentos normais.
-
-% Neste trabalho, a análise dos dados de treinamento foi realizada por inspeção visual.
-
-\subsubsection{Agrupamento Ótimo de Sensores}
-
-\textcolor{red}{TODO:} tese do Mauro possui bons comentários a respeito, sec 2.2.1.
-No caso de grupos com grande quantidade de variáveis, pode-se usar técnicas de redução de
-espaços, como o PCA.
-
-Este passo consiste na seleção de quais variáveis, ou sensores, serão incorporados no
-modelo. Para técnicas de redundância, o processo de seleção é simples, uma vez que apenas
-sensores redundantes são incluídos em um modelo. No caso de técnicas não redundantes, o
-conjunto de sensores que se deseja monitorar deve ser separado em grupos menores altamente
-correlacionados. A prática tem mostrado que agrupamentos ótimos normalmente contém menos
-de 30 sensores e que a adição de sinais irrelevantes acaba por aumentar a variância das
-predições de um modelo, enquanto a ausência de sinais relevantes tende a causar um
-\textit{bias} \cite{Hines2006}. A otimização do agrupamento de sensores tende a reduzir a
-incerteza de predição do modelo.
-
-Um indicador de agrupamento normalmente utilizado é o coeficiente de correlação
-(covariância entre os sinais dividida pelo produto dos desvios padrão de cada um) para
-cada par de sensores. Se o coeficiente de correlação ultrapassa um determinado valor,
-então o correspondente par de sensores deve participar do mesmo grupo. Entretanto, este
-método não garante a otimalidade de agrupamento, pois variáveis que são fortemente
-correlacionadas fisicamente podem apresentar baixos coeficientes de correlação devido a
-ilusões estatísticas de conjunto de dados tendenciosos (\textit{biased}).
-
-Alguns métodos
-automáticos para agrupamento de variáveis também têm apresentados bons resultados. Como
-apresentado por An \cite{An2011}, técnicas como a \textit{stepwise grouping} podem
-realizar bons agrupamentos de sensores. Basicamente, a \textit{stepwise grouping} realiza
-os agrupamentos de forma incremental, ou seja, adiciona-se um novo sensor a grupo,
-constroi-se um modelo a partir dessa junção e compara-se a qualidade da predição desse novo
-modelo em relação ao modelo anterior, sem a nova variável. Caso a qualidade da predição
-tenha sido melhorada, a nova variável permanece no grupo; caso constrário, a variável é
-descartada, permanecendo o agrupamento anterior. O procedimento é realizado até que todos
-so sensores possíveis tenham sido analisados.
-
-
-
-
-
-\subsubsection{Seleção dos Dados de Treinamento}
-
-Para a maioria dos modelos empíricos, os dados devem ser separados em pelo menos dois
-conjuntos, o de treinamento e o de validação. Os dados de treinamento são usados pelo
-modelo para o aprendizado das relações entre os sensores e otimização de seus parâmetros.
-Os dados de validação servem para avaliar o desempenho do modelo construído. Hines
-\cite{Hines2007} normalmente divide os dados em três conjuntos, treinamento, verificação e
-validação. A diferença consiste na separação de um conjunto específico para otimização dos
-parâmetros do modelo, o conjunto de verificação.
-
-\textcolor{red}{Importância da escolha de dados significativos, livre de erros, etc}
-
-% TODO: talvez seja mover para a próxima subseção
-%Os modelos baseados em regressão por kernel, como o AAKR, requerem que um
-%subconjunto dos dados de treinamento seja armazenado como uma matriz de memória usada para
-%as futuras predições. A seleção desse subconjunto possui efeitos consideráveis no
-%desempenho do modelo; armazenando poucas observações, as predições são degradadas por
-%falta de informação; armazenando uma quantidade excessiva, o custo computacional de cada
-%predição torna-se muito alto.
 
 \subsubsection{Construção e Otimização dos Modelos}
 %%%%%%%%%%%%%%%
@@ -789,7 +882,7 @@ dados de treinamento).
 %largura de banda e alta variância e modelos com largura de banda maiores e estimações
 %polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
 %menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
-%do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = <++>$ e
+%do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = $ e
 %<++> vetores de memória.
 
 \begin{figure}[!htb]
@@ -805,12 +898,13 @@ otimização.}
 
 \begin{table}[!htb]
     \centering
-    \caption{\label{}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-da variável $PT_f$ dos dados de simulação.}
+    \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+da variável PT$_f$ dos dados de simulação.}
     \begin{tabular}{ccccc}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
+        0.04 & 512 & 8 & 73 & 0.26\\
         0.06 & 0.125 & 0.5 & 33 & 0.42\\
         0.08 & 1 & 1 & 25 & 0.66 \\
         0.1 & 256 & 2 & 20 & 0.93\\
@@ -821,6 +915,23 @@ da variável $PT_f$ dos dados de simulação.}
 
 O resultado para $\varepsilon = 0.5$ corresponde a uma média.
 
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+da variável PT$_f$ dos dados de simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+        \midrule
+        0.1 & 32 & 32 & 473 & 4.53\\
+        0.2 & 2048 & 0.5 & 22 & 4.74 \\
+        0.22 & 1024 & 1 & 15 & 4.92 \\
+        0.25 & 2048 & 0.25 & 9 & 5.43 \\
+        0.3 & 16 & 0.25 & 3 & 7.34 \\
+        0.5 & 0.25 & 4 & 3 & 32.63\\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsection{Dados Reais}
 
@@ -869,6 +980,8 @@ Nos modelos AAKR, o MSE
 total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
 ocasionaram problemas numéricos.
 Nos modelos SVM,
+
+Não houve uma escolha automática das variáveis, usou-se senso de engenharia.
 
 
 \section{Ensaio --- Verificação de Acurácia}
