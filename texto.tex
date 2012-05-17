@@ -89,6 +89,7 @@ trabalho possui potencial aplicação para diversas outros setores industriais.
 
 
 \section{Definição do problema e abordagens existentes}
+\label{sec:problemDefinition}
 
 %\textcolor{red}{Problema de drift em sensores em geral, citando a literatura.
 %Aboradagem escolhida para este trabalho e a justificativa para tal. UPDATE: focar no
@@ -137,7 +138,7 @@ Casos de sucesso no emprego de tais técnicas na indústria já foram reportados, c
 
 Normalmente, os sistemas de monitoramento de desempenho de sensores baseados em modelos
 empíricos segue o esquema apresentado na Fig. \ref{fig:chap1_ddfdd}.  Supondo uma matriz
-de dados de treinamento $\mathbf{X} \in \Re^{n \times p}$, onde $n$ é número de amostras
+de dados de treinamento $\mathbf{X} \in \mathbb{R}^{n \times p}$, onde $n$ é número de amostras
 de treino e $p$ é a quantidade de variáveis amostradas, um modelo empírico $f$ é treinado
 usando $\mathbf{X}$. Quando novas medições $\mathbf{r} \in \Re^{1\times p}$ tornam-se
 disponíveis, estimações de $\mathbf{r}$ são obtidas por $\hat{\mathbf{r}} = f(\mathbf{r})$
@@ -391,7 +392,8 @@ OSA-CBM.
 pós-processmaneto. Incluir o KF na etapa de pós-processamento.
 
 Pode-se dividir o processo de validação de sensores em três etapas principais:
-pré-processamento, processamento e pós-processamento dos sinais.
+pré-processamento, processamento, pós-processamento dos sinais e o monitoramento de
+condição.
 Cada uma dessas etapas são detalhadas a seguir.
 
 %Como discutido no Capítulo 1, o monitoramento do desempenho de sensores é composto
@@ -576,23 +578,332 @@ encontrar quando o modelo estiver funcional.
 % Listar modelos estudados e as razões da escolha destes.
 % -> Premissas
 
-Antes da predição das leituras de sensores propriamente dita, é necessário construir um
-modelo empírico baseado no histórico de sensores correlacionados.
-Independente da técnica utilizada para modelagem e predição, existem alguns passos básicos
-comuns empregados para o desenvolvimento de modelos empíricos baseados em histórico.
+O processamento dos sinais é a etapa de predição propriamnente dita. A partir de novas
+amostras das variáveis de entrada, o modelo empírico gera predições sobre a variável de
+saída.
+Os principais aspectos a serem considerados nesta etapa são: a escolha do tipo de
+estrutura do modelo, a escolha da técnica de regressão e a construção/otimização do
+modelo.
 
-A seguir são descritos os passos básicos para o desenvolvimento de um modelo baseado em
-histórico de dados e as técnicas empregadas para modelagem/predição neste trabalho.
+% Antes da predição das leituras de sensores propriamente dita, é necessário construir um
+% modelo empírico baseado no histórico de sensores correlacionados.
+% Independente da técnica utilizada para modelagem e predição, existem alguns passos básicos
+% comuns empregados para o desenvolvimento de modelos empíricos baseados em histórico.
+% 
+% A seguir são descritos os passos básicos para o desenvolvimento de um modelo baseado em
+% histórico de dados e as técnicas empregadas para modelagem/predição neste trabalho.
 
-\subsection{Metodologia para Desenvolvimento de Modelos Empíricos}
+\subsection{Seleção do Tipo de Estrutura}
 
-O desenvolvimento dos modelos baseados em histórico pode ser dividido nos seguintes passos
-básicos: aquisição e certificação da qualidade dos dados de treinamento, agrupamento ótimo
-de sensores, seleção dos dados de treinamento, construção e otimização dos modelos, e
-avaliação e \textcolor{red}{análise de incerteza} dos modelos.
+Normalmente, a estrutura dos modelos pode ser classificada em três diferentes tipos:
+inferencial, hetero-associativa ou auto-associativa.
+
+Um modelo inferencial utiliza um conjunto de variáveis de entrada $[r_1, \cdots, r_n]$
+para inferir o valor de uma única variável de saída $y$.
+Esse modelo pode ser expandido para um estrutura hetero-associativa, onde um conjunto de
+variáveis de entrada $[r_1, \cdots, r_p]$ é usado para predizer os valores de um conjunto
+de variáveis de saída $[y_1, \cdots, y_q]$.
+
+Um modelo auto-associativo é normalmente treinado para emular as próprias variáveis de
+entrada, ou seja, um conjunto de variáveis $[r_1, \cdots, r_p]$ é usado para
+gerar predições $[\hat{r}_1, \cdots, \hat{r}_p]$, que correspondem aos valores
+``corrigidos'' das variáveis de entrada de acordo com o conjunto de dados de treinamento
+usado para a contrução do modelo.
+Dessa forma, se as variáveis de entrada possuem a mesma correlação existente nos dados de
+treinamento, os valores de saída do modelo auto-associativo tendem a ser iguais aos
+valores de entrada.
+Pequenas alterações nessas correlações, como as causadas por algumas falhas em sensores,
+tendem a ser corrigidas pela correlação capturada pelo modelo através dos dados de
+treinamento.
 
 
-\subsubsection{Construção e Otimização dos Modelos}
+\subsection{Técnicas de Regressão}
+
+%% Present the quality metrics for each technique
+
+%Duas das técnicas de modelagem baseada em histórico que têm apresentado aplicações em
+%sistemas de monitoramento do desempenho de sensores~\cite{Gribok2000}: a regressão por
+%kernel auto-associativa (AAKR) e a \textit{support vector machines} (SVM).
+
+As duas técnicas de regressão abordadas neste trabalho são: AAKR e SVM.
+
+\subsubsection{AAKR}
+%TODO: Figuras explicativas
+
+A regressão por kernel auto-associativa é uma técnica não paramétrica para modelagem
+baseada em histórico de dados, cujas predições se baseiam na similaridade entre as
+entradas do modelo e um histórico de dados armazenado.
+A arquitetura do modelo AAKR apresentada a seguir é uma variação da regressão inferencial
+multivariável por kernel, apresentada por Wand e Jones \cite{wand1995kernel}.
+%Baseando-se na similaridade entre o vetor de leituras de um conjunto de sensores e o
+%conjunto de vetores do histórico, armazenado como uma memória, o modelo AAKR 
+
+Considerando $\mathbf{X}$ uma matriz de histórico de amostras livres de erros, ou memória,
+$X_{i,j}$ representa a i-ésima observação da j-ésima variável/sensor.
+Para $n_m$ vetores de memória e $p$ variáveis, a matriz $\mathbf{X}$ é definida como
+
+$$
+{\mathbf{X}} = \left[ {\begin{array}{*{20}{c}}
+{{X_{1,1}}}&{{X_{1,2}}}& \cdots &{{X_{1,p}}}\\
+{{X_{2,1}}}&{{X_{2,2}}}& \cdots &{{X_{2,p}}}\\
+ \vdots & \vdots & \ddots & \vdots \\
+{{X_{{n_m},1}}}&{{X_{{n_m},2}}}& \cdots &{{X_{{n_m},p}}}
+\end{array}} \right] \mbox{.}
+$$
+
+As entradas do modelo são definidas pelo vetor de amostras $\mathbf{r}$, definido por
+
+$$
+{\mathbf{r}} = \left[ {\begin{array}{*{20}{c}}
+{{r_1}}&{{r_2}}& \cdots &{{r_p}}
+\end{array}} \right] \mbox{.}
+$$
+
+A predição do valor corrigido de $\mathbf{r}$ é calculada como uma média ponderada das
+observações livres de erros contidas em $\mathbf{X}$.
+O funcionamento do modelo AAKR é composto de três passos básicos.
+Primeiro, calcula-se as distâncias entre $\mathbf{r}$ e cada linha da matriz de memória
+$\mathbf{X}$.
+Dentre as possíveis métricas de distância, a distância Euclidiana é a mais comumente
+utilizada, dada pela Eq.~(\ref{eq:aakr_distance}), onde $d_i$ é a distancia Euclidiana
+entre o vetor de memória $\mathbf{X}_i$ e a entrada $\mathbf{r}$.
+
+\begin{equation}
+    {d_i}\left( {{{\mathbf{X}}_i},{\mathbf{r}}} \right) = \sqrt {{{\left(
+    {{X_{i,1}} - {r_1}} \right)}^2} + {{\left( {{X_{i,2}} - {r_2}} \right)}^2} +  \cdots
+    {{\left( {{X_{i,p}} - {r_p}} \right)}^2}} 
+    \label{eq:aakr_distance}
+\end{equation}
+
+\noindent Este cálculo é repetido para todos os $n_m$ vetores de memória da matriz $\mathbf{X}$,
+resultando em um vetor coluna de distâncias
+
+$$
+{\mathbf{d}} = \left[ {\begin{array}{*{20}{c}}
+{{d_1}}\\
+{{d_2}}\\
+ \vdots \\
+{{d_{{n_m}}}}
+\end{array}} \right] .
+$$
+
+Em seguida, as distâncias são convertidas em medidas de similaridade ou pesos através
+da função kernel, como a Gaussiana apresentada na Eq.~(\ref{eq:gauss_kernel}), onde
+$w_i$ é o i-ésimo peso relativo a i-ésima distância $d_i$ e $h$ é a largura de banda da
+função kernel $K$.
+
+\begin{equation}
+    {w_i} = K_h ({d_i}) = \frac{1}{{\sqrt {2\pi {h^2}} }}{\; \exp
+    \left(- \frac{{d_{_i}^2}}{{{h^2}}} \right) } \mbox{,}
+    \label{eq:gauss_kernel}
+\end{equation}
+
+Por fim, através da Eq.~(\ref{eq:aakr_var_pred}), os pesos são combinados com os vetores
+de memória para produzir uma estimativa $\hat{r}_j$ de cada variável $r_j$.
+Calculando as estimativas para $j = 1, 2, \cdots, p$, obtém-se a saída do modelo, a
+predição $\hat{\mathbf{r}}$.
+Alternativamente, definindo $a = {\sum\limits_{i = 1}^{{n_m}} {{w_i}} }$, o estimador AAKR
+pode ser apresentado pela Eq.~(\ref{eq:aakrPred}).
+
+\begin{equation}
+    \hat{r}_j = \frac{\sum\limits_{i = 1}^{n_m} {w_i}\cdot
+        X_{i,j}  }{{\sum\limits_{i = 1}^{{n_m}} {{w_i}} }}
+    \label{eq:aakr_var_pred}
+\end{equation}
+
+\begin{equation}
+    {\hat \mathbf{r}} = \frac{{{{\mathbf{w}}^T}{\mathbf{X}}}}{a}
+    \label{eq:aakrPred}
+\end{equation}
+
+\paragraph{Seleção dos vetores de memória}
+
+A seleção dos vetores de memória é uma tarefa crítica para o desenvolvimento de modelos
+não paramétricos como o AAKR \cite{HinesGarvey2008}, onde as predições do modelo se
+baseiam na similaridade entre suas entradas e cada um dos vetores de memória.
+Um conjunto de dados de treinamento muito grande tornaria muito elevado o custo
+computacional de cada predição.
+O que normalmente se faz é selecionar um subconjunto dos dados de treinamento, visando
+diminuir o custo computacional sem perder informações significantes sobre a correlação
+entre as variáveis.
+
+Basicamente, duas questões devem ser consideradas para a seleção dos vetores de memória: 
+qual é a \emph{quantidade} adequada e \emph{como} realizar essa seleção.
+Em relação à quantidade, normalmente existe um número crítico para cada conjunto de dados:
+quantidades menores pioram o desempenho do modelo drasticamente, quantidades maiores
+melhoram discretamente o desempenho ao custo de aumentos drásticos no tempo
+computacional~\cite{HinesGarvey2008}.
+Em relação à forma de seleção dos vetores, dois métodos simples e comumente utilizados são
+a seleção por mínimos-máximos e a seleção por ordenamento dos vetores.
+
+O método de seleção por mínimos-máximos é dividido em duas etapas.
+Primeiro, particiona-se o conjunto de dados em $n_b$ bandas, de acordo com a
+Eq.~(\ref{eq:aakrMinMax}), onde $n_m$ é o número de vetores a serem selecionados e
+$p$ é a quantidade de variáveis nos dados.
+Em seguida, para cada banda gerada, selecionam-se os vetores que contenham os valores
+máximos e mínimos de cada variável, sem repetição de vetores.
+
+\begin{equation}
+    n_b = \frac{n_m}{2p}
+    \label{eq:aakrMinMax}
+\end{equation}
+
+No método de seleção por ordenamento de vetores, primeiramente ordenam-se os vetores de
+treinamento de acordo com a norma Euclidiana.
+A Equação~(\ref{eq:aakrVecOrd}) apresenta o cálculo da norma Euclidiana $N_i$ para um
+vetor $\mathbf{X}_i$ de treinamento.
+Em seguida, selecionam-se $n_m$ vetores amostrando de forma periódica.
+É importante destacar que este método é intrinsecamente relacionado com a localização da
+origem do espaço da matriz de dados de treinamento, o que torna importante escalar as
+variáveis antes da utilização deste método de seleção.
+
+\begin{equation}
+    N_i = \sqrt{X_{i,1}^2 + X_{i,2}^2 + \cdots + X_{i,p}^2}
+    \label{eq:aakrVecOrd}
+\end{equation}
+
+Um outra forma de realizar a seleção dos vetores de memória é a combinação dos dois
+métodos anteriores.
+Como normalmente o método de seleção por mínimos-máximos não obtém o número $n_m$ de
+vetores desejado (um mesmo vetor pode conter os valores máximos ou mínimos de mais de uma
+variável), usa-se o método de ordenamento de vetores para selecionar a quantidade de
+vetores necessária para se obter $n_m$.
+
+\subsubsection{SVM}
+
+Na técnica de SVM para regressão, uma matriz de dados de entrada $\mathbf{r} \in
+\Re^{p}$, de $p$ variáveis independentes, é usada para estimar uma
+função $f(\mathbf{r})$ que correlaciona as $p$ variáveis de $\mathbf{r}$ com uma variável
+dependente $y \in \Re$ a partir de $n$ observações independentes e identicamente
+distribuídas.
+Dessa forma, um modelo SVM apresenta estrutura do tipo inferencial.
+
+A técnica corresponde à minimização da Eq.~(\ref{eq:DF_svm_minimize}),
+onde $f(\mathbf{r}) = \left< \mathbf{w,r} \right> + b$, com $w \in X$ (espaço de
+características) e $b \in \Re$, é o estimador da função de dependência entre $\mathbf{r}$
+e $y$.
+A Equação~(\ref{eq:DF_svm_minimize}) pode ser reescrita como a Eq.~(\ref{eq:DF_svm_fx}).
+Essa formulação torna a solução esparsa no sentido que erros menores que $\varepsilon$ são
+ignorados, ou seja, a solução torna-se ``$\varepsilon$-insensível''.
+
+\begin{equation}
+    \frac{1}{2} || \mathbf{w}||^2 + C \sum\limits^n_{i=1} \left( \xi_i + \xi^{*} \right)
+    \label{eq:DF_svm_minimize}
+\end{equation}
+
+$$
+    \mbox{Sujeito a}
+    \left\{
+    \begin{array}{rl}
+        y_i - \left<\mathbf{w}, \mathbf{r}_i \right> - b & \le \varepsilon
+        + \xi_i \\
+        \left<\mathbf{w}, \mathbf{r}_i \right> + b - y_i & \le \varepsilon +
+        \xi_i^* \\
+        \xi_i, \xi_i^* & \ge 0
+    \end{array}
+    \right\}
+$$
+
+\begin{equation}
+    f(\mathbf{r}) = \sum\limits_{j=1}^p w_j \; r_j + b .
+    \label{eq:DF_svm_fx}
+\end{equation}
+
+O primeiro termo da equação (\ref{eq:DF_svm_minimize}) é um termo de regularização que
+evita o mau condicionamento do problema de estimação, contribuindo na simplicidade do
+estimador da função.
+O segundo termo é a função de perda $\varepsilon$-insensível, a qual
+mede o quanto os valores estimados estão próximos dos valores $y$. As variáveis $\xi_i$ e
+$\xi_i^*$ são chamadas de variáveis de folga, que determinam o grau de penalização
+aplicados às estimativas com erros maiores que $\varepsilon$.
+A Figura
+\ref{fig:DF_svm_insensibilidade} ilustra a zona de insensibilidade formada por $\varepsilon$
+e a penalização efetuada pelas variáveis de folga. Por isso, qualquer erro absoluto menor
+que $\varepsilon$ não necessita de valores diferentes de zero para as variáveis $\xi_i,
+\xi_i^*$ na função objetiva, o que causa a esparsividade da solução.
+A constante $C$ determina o custo-benefício entre a complexidade da função $f$ e a
+quantidade tolerada de desvios maiores que $\varepsilon$.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.6\textwidth]{./figuras/svm_etube.eps}
+    \caption{Zona de insensibilidade e penalização no modelo SVM \cite{Smola2004}.}
+    \label{fig:DF_svm_insensibilidade}
+\end{figure}
+
+Escrevendo a Eq.~(\ref{eq:DF_svm_minimize}) na forma dual e resolvendo por diferenciação
+em relação às variáveis primais, o problema resulta em maximizar a função $W(\alpha^*,
+\alpha)$ na Eq.~(\ref{eq:DF_svm_dual}).
+
+\begin{equation}
+    W(\alpha^*, \alpha) = - \varepsilon \sum\limits_{i=1}^n (\alpha_i + \alpha_i^*) +
+    \sum\limits_{i=1}^n  y_i (\alpha_i - \alpha_i^*)  - \frac{1}{2}
+    \sum\limits_{i,j=1}^n (\alpha_i - \alpha_i^*) (\alpha_j - \alpha_j^*) \; K(r_i, r_j)
+    \label{eq:DF_svm_dual}
+\end{equation}
+
+$$
+    \mbox{Sujeito a}
+    \left\{
+    \begin{array}{c}
+        \sum\limits_{i=1}^n (\alpha_i^* - \alpha_i)  = 0\\
+        0 \le \alpha_i, \alpha_i^* \le C
+    \end{array}
+    \right\}
+$$
+
+\noindent A função $f(\mathbf{r})$ passa a ser dada pela Eq.~(\ref{eq:DF_svm_func_dual}),
+onde $\alpha, \alpha^*$ são multiplicadores de Lagrange e $K(\mathbf{r}, \mathbf{r}_i)$ é
+a função kernel que substitui os produtos internos dos dados de entrada e permite lidar
+com não linearidades eventualmente presente nos dados.
+Os vetores $\mathbf{r}_i$ são
+chamados de ``vetores suporte'' e $N_{sv}$ (normalmente $N_{sv} << n$) é o número de
+vetores suporte correspondentes à quantidade de valores de $y$ que estão pelo menos
+$\varepsilon$ afastados de suas estimativas $f(\mathbf{r})$.
+
+\begin{equation}
+    f(\mathbf{r}) = \sum\limits_{i=1}^{N_{sv}} (\alpha_i^* - \alpha_i) \;
+    K(\mathbf{r}, \mathbf{r}_i) + b
+    \label{eq:DF_svm_func_dual}
+\end{equation}
+
+
+As condições de Kuhn-Tucker demandam que o produto entre as variáveis duais e as
+restrições devem desaparecer para otimalidade. Por isso, para $|f(\mathbf{r}_i) - y_i| \ge
+\varepsilon$, os multiplicadores de Lagrange são diferentes de zero; e para pontos dentro
+da região $\varepsilon$-insensível, os coeficientes $\alpha_i^*, \alpha_i$ devem
+desaparecer. Os vetores com coeficientes diferentes de zero são os chamados vetores
+suporte. Basicamente, os vetores suporte são os vetores que suportam a ``superfície de
+decisão'' ou o ``hiperplano'' que melhor se adequa aos dados, de acordo com o critério
+especificado na Eq.~(\ref{eq:DF_svm_minimize}).
+
+A configuração do modelo SVM consiste na escolha da função kernel e de seus parâmetros, e
+na especificação de $\varepsilon$ e $C$.
+Uma função kernel largamente utilizada para regressão é a função de base radial (RBF),
+apresentada na Eq.~(\ref{eq:DF_svm_kernel}),
+onde $\gamma$ é a largura de banda, o parâmetro de configuração.
+
+\begin{equation}
+    K(\mathbf{r}, \mathbf{r}_i) = \exp \left( - \frac{||\mathbf{r}-\mathbf{r}_i||^2}{2 \gamma^2} \right)
+    \label{eq:DF_svm_kernel}
+\end{equation}
+
+\abreviatura{RBF}{Função de base radial}
+
+A constante $C$ determina o custo-benefício entre a complexidade do modelo (suavidade) e o
+grau de tolerância dos desvios maiores que $\varepsilon$ em (\ref{eq:DF_svm_minimize})
+\cite{Cherkassky2004}.
+Valores muito grandes de $C$ tornam o problema sem restrição; valores pequenos atribuem
+mais peso para a regularização.
+O parâmetro $\varepsilon$ controla a largura da zona de insensibilidade, usada para
+adequar os dados de treinamento.
+O valor de $\varepsilon$ é o parâmetro que possui maior efeito sobre o número de vetores
+suporte.
+Quanto maior for $\varepsilon$, menos vetores suporte são utilizados e mais ``suave''
+torna-se a função $f$.
+
+
+\subsection{Construção e Otimização dos Modelos}
 %%%%%%%%%%%%%%%
 % Falar sobre o objetivo dos modelos de predição, diferenciando-os da identificação de
 % sistemas. (Learning from data)
@@ -615,12 +926,32 @@ avaliação e \textcolor{red}{análise de incerteza} dos modelos.
 %preditivo, um modelo preditivo deve capturar as correlações entre as variáveis
 %$\mathbf{r} \in \Re^p$.
 
-\textcolor{red}{TODO:} Escolha da arquitetura do modelo, hetero ou auto-associativa.
+Partindo-se de uma técnica de regressão, constroi-se um modelo empírico a partir de um
+conjunto de amostras de treinamento, compostas por pares entrada/saída.
+As amostras de treinamento são exemplares de valores das variáveis de entrada juntamente
+com os valores das variáveis de saída que se espera do modelo.
+No caso de um modelo SVM, as amostras são compostas pelos valores de $p$ variáveis de
+entrada e um valor correspondente à variável de saída.  Para um modelo AAKR, os pares
+entrada/saída possuem o mesmo valor.
 
-A construção de um modelo empírico normalmente busca minimizar o erro (ou uma função de
-perda)
-entre a predição $f(\mathbf{r})$ do modelo e a saída $y$ do sistema para uma dada entrada
-$\mathbf{r}$.
+Para ambas as técnicas, a complexidade dos modelos podem ser especificadas por parâmetros
+e deve ser ajustada para que se adeque à complexidade dos dados de treinamento.
+Se o modelo não é flexível, ele não será capaz de modelar as relações dos dados de
+treinamento; se o modelo é excessivamente complexo, o problema de sobreajustamento
+(\textit{overfitting}) dos dados poderá ocorrer, incluindo ruídos na modelagem.
+Considerando o uso de funções kernel do tipo Gaussiana ou RBF, a complexidade dos modelos
+SVM é determinada pelos parâmetros $C$, $\varepsilon$ e $\gamma$; nos modelos AAKR, pelo
+parâmetro $h$.
+Em muitas aplicações, esses valores podem são encontrados por tentativa e erro, ou
+\textit{grid search}, onde treinam-se vários modelos com diferentes permutações de valores
+de configuração e avalia-se a qualidade das predições destes atráves de um novo conjunto
+de amostras.
+O modelo com a configuração de melhor desempenho é adotado como o modelo final para o
+sistema de validação.
+
+A construção de um modelo empírico normalmente busca minimizar o erro (ou risco de
+predição) entre a predição $f(\mathbf{r})$ do modelo e a saída $y$ do sistema para uma
+dada entrada $\mathbf{r}$.
 A medida de qualidade que normalmente se adota é a minimização do erro quadrático médio
 (MSE), como a Eq.~(\ref{eq:mse}), onde $n$ é a quantidade de observações utilizadas para a
 construção do modelo.
@@ -631,113 +962,37 @@ construção do modelo.
 
 \abreviatura{MSE}{Erro quadrático médio}
 
-\noindent Ou seja, diferentemente da identificação de sistemas, os modelos empíricos de
-predição normalmente são construídos 
-%visando minimizar uma função custo
-com o objetivo de ``imitar'' as saídas de um sistema para uma determinada entrada.
-%\cite{cherkassky2007learning}.
-Entretanto, a construção do modelo é realizada a partir de um número finito $n$ de
-observações $\mathbf{r}$, consequentemente o modelo só pode ser uma estimação da solução
-ótima.
+% TODO: identificação de sistemas x predição 
+%Diferentemente da identificação de sistemas, os modelos empíricos de
+%predição normalmente são construídos 
+%%visando minimizar uma função custo
+%com o objetivo de ``imitar'' as saídas de um sistema para uma determinada entrada.
+%%\cite{cherkassky2007learning}.
+%Entretanto, a construção do modelo é realizada a partir de um número finito $n$ de
+%observações $\mathbf{r}$, consequentemente o modelo só pode ser uma estimação da solução
+%ótima.
 
-Segundo Cherkassky~\cite{cherkassky2007learning}, existe o seguinte consenso: para métodos
+Segundo Cherkassky e Mulier~\cite{cherkassky2007learning}, existe o seguinte consenso: para métodos
 flexíveis de aprendizado  com um número finito de amostras (como os métodos baseados em
 kernel utilizados neste trabalho), as predições com melhor desempenho são obtidas por
 modelos de complexidade ótima.
 Deve-se preferir modelos mais simples a modelos complexos e otimizar a relação entre
 complexidade e acurácia do modelo para o conjunto de dados de treinamento.
 
-Detalhes sobre as configuração, flexibilidade e otimização dos modelos são descritas nas
-\textcolor{red}{seções relativas} às técnicas adotadas neste trabalho.
-
 %% Flexibilidade x Complexidade
 %% Minimização da incerteza
 
-\subsubsection{Avaliação}
 
-Uma vez que o modelo tenha sido treinado e otimizado com o conjunto de dados de
-treinamento, o conjunto de validação é utilizado para avaliar o desempenho do modelo
-desenvolvido.
-Segundo Hines~\cite{Hines2008a}, tradicionalmente o desempenho de sistemas de
-monitoramento de calibração de sensores é mensurada a partir de três indicadores:
-acurácia, auto-sensibilidade e sensibilidade cruzada.
-A acurácia mensura a habilidade do modelo para gerar predições corretas e precisas das
-leituras dos sensores.
-A auto-sensibilidade indica a habilidade do modelo para gerar predições corretas de um
-determinado sensor quando as leituras deste estão incorretas devido a algum tipo de falha.
-Já a sensibilidade cruzada mensura o efeito dos dados de um sensor defeituoso sobre as
-predições dos demais sensores.
+\section{Pós-processamento dos Sinais}
 
-Apesar desses indicadores qualificarem características essenciais de todo sistema de
-monitoramento de calibração, a inspeção visual das predições é de fundamental importância.
-Modelos com bons índices de qualidade podem gerar predições insatisfatórias, como sinais
-muito suavizados, representando uma estimação muito grosseira da realidade e, por isso,
-sem valor prático para a tomada de decisões.
+A etapa de pós-processamento dos sinais consiste na estimação dos desvios entre as
+predições dos modelos empíricos e as variáveis que se deseja estimar.
+A partir das estimativas dos desvios, é possível realizar uma ``pré-correção'' das
+leituras provenientes dos sensores que servem como entrada dos modelos empíricos,
+permitindo que as predições fiquem mais próximas dos verdadeiros valores das variáveis.
 
-É importante destacar ainda a possível necessidade de retreinamento do modelo com dados
-mais atualizados da planta. Mudanças no ponto de operação, nas condições de equipamentos
-ou nas características do meio podem afetar significativamente na forma como as variáveis
-mensuradas pelos sensores se correlacionam. Assim, dependendo da instensidade da mudança,
-dados atualizados podem ser simplesmete incorporados ao conjunto de treinamento anterior
-ou devem compor um conjunto completamente novo.
-
-%% FIXME: put near of the models' descriptions
-%Ela é definida como o MSE entre as predições do modelo e os valores
-%reais das leituras dos sensores. Por corresponder a uma medida do erro, baixos valores de
-%acurácia são desejáveis. O cálculo da acurácia é realizado pela Eq.~(\ref{eq:mse}) para
-%modelos inferenciais, ou pela Eq.~(\ref{eq:}) para modelos auto-associativos
-%mas considerando $n$ o número de amostras do conjunto de dados de validação.
-
-%% Describe the metrics and its equations
-%% Say something about visual inspection to judge the quality
-
-\subsection{Técnicas de Modelagem Baseada em Histórico}
-
-%% Present the quality metrics for each technique
-
-%Duas das técnicas de modelagem baseada em histórico que têm apresentado aplicações em
-%sistemas de monitoramento do desempenho de sensores~\cite{Gribok2000}: a regressão por
-%kernel auto-associativa (AAKR) e a \textit{support vector machines} (SVM).
-
-A seguir são descritas as duas técnicas utilizadas para a construção dos modelos
-empíricos, AAKR e SVM.
-
-\subsubsection{AAKR}
-
-\textcolor{red}{FIXME:} Diagrama explicitando a arquitetura auto-associativa.
-
-AAKR é uma técnica não paramétrica para modelagem baseada em histórico de dados livres de
-falhas. As predições do modelo se baseiam na similaridade entre as leituras correntes do
-sensores e o histórico armazenado.
-%Baseando-se na similaridade entre o vetor de leituras de um conjunto de sensores e o
-%conjunto de vetores do histórico, armazenado como uma memória, o modelo AAKR 
-
-Considerando $\mathbf{X}$ a matriz de histórico de dados, ou memória, os vetores de
-observações livres de erros são representados por $\mathbf{X}_{i,j}$, ou seja, a i-ésima
-observação da j-ésima variável. Para $n$ vetores de memória e $p$ variáveis, a matriz
-$\mathbf{X}$ é definida como
-
-$$
-{\mathbf{X}} = \left[ {\begin{array}{*{20}{c}}
-{{X_{1,1}}}&{{X_{1,2}}}& \cdots &{{X_{1,p}}}\\
-{{X_{2,1}}}&{{X_{2,2}}}& \cdots &{{X_{2,p}}}\\
- \vdots & \vdots & \ddots & \vdots \\
-{{X_{{n},1}}}&{{X_{{n},2}}}& \cdots &{{X_{{n},p}}}
-\end{array}} \right] \mbox{.}
-$$
-
-\textcolor{red}{Continue\ldots}
-
-
-\subsubsection{SVM}
-
-\textcolor{red}{Usar relatório da Petrobras}
-
-\section{Geração de Resíduos}
-
-\textcolor{red}{Mesclar esta Seção com a detecção de anomalias}
-
-Os resíduos correspondem à diferença entre as predições do modelos e as medições dos
+Como dito na Seção \ref{sec:problemDefinition},
+os resíduos correspondem à diferença entre as predições do modelos e as medições dos
 sensores correspondentes.
 Considerando o sistema sensoriado operando na região de treinamento do modelo,
 as predições são virtualmente iguais às medidas realizadas pelos sensores quando estes se
@@ -747,37 +1002,68 @@ Anomalias nas medições dos sensores, como \textit{drift}, \textit{outliers}, mud
 abruptas, aumento da variância (errático) etc., causam mudanças nas características
 estatísticas esperadas nos resíduos e normalmente podem ser detectadas por técnicas
 estatísticas de detecção, como apresentado na Seção~\ref{sec:deteccao_drift}.
-%podem ser detectadas a partir da análise dos resíduos.
-%Os resíduos podem representar também uma estimativa do \textit{drift} nas medições, uma
-%vez que ele causa um desvio gradual em ambos os sinais.
 
-No caso específico da detecção de \textit{drift}, uma outra aplicação dos resíduos é
-alimentar um Filtro de Kalman responsável por acompanhar a amplitude do
-\textit{drift} ao longo do tempo~\cite{Takruri2008}.
-Um possível modelo matemático usado para estimar a amplitude do \textit{drift} $d_p$ de um
-sensor $p$ é apresentado na Eq. (\ref{eq:kf_dmodel}), onde $v^k$ é considerado um ruído
-Gaussiano de média zero e variância $V$.
+A seguir, apresenta-se a construção de um filtro de Kalman para a correção de sensores que
+apresentem \textit{drift}.
+
+\subsection{Filtro de Kalman}
+
+Um possível modelo matemático usado para estimar a amplitude do \textit{drift} $d$ de um
+sensor é apresentado na Eq. (\ref{eq:kf_dmodel}), onde $v^{(k)}$ é considerado um ruído
+Gaussiano de média zero e variância $\sigma_v$. 
 
 \begin{equation}
-    {d}^k = {d}^{k-1} + {v}^k, \quad {v}^k \sim \mathcal{N} ({0}, {V})
+    {d}^{(k)} = {d}^{(k-1)} + {v}^{(k)}, \quad {v}^{(k)} \sim \mathcal{N} ({0}, \sigma_v)
     \label{eq:kf_dmodel}
 \end{equation}
 
-Em \emph{rastreamento de alvos} (\textit{target tracking}), a Equação (\ref{eq:kf_dmodel})
-é conhecida como o modelo matemático do comportamento dinâmico do alvo.
+Em rastreamento de alvos (\textit{target tracking}), a Equação (\ref{eq:kf_dmodel})
+é conhecida como o modelo matemático do comportamento dinâmico do alvo~\cite{Takruri2008}.
 No caso de detecção de \textit{drift}, o objetivo é rastrear ou acompanhar a amplitude do
 \textit{drift} de um sensor.
-Se for assumido que um sensor apresenta \textit{drifts} de forma suave, vagarosamente
+Se for assumido que um sensor apresenta desvios de forma suave, vagarosamente
 crescente, linear ou exponencial, pode-se considerar o modelo da Eq. (\ref{eq:kf_dmodel})
 como uma aproximação razoável.
-Uma outra consideração deste modelo é descorrelação entre \textit{drifts} de diferentes
+Uma outra consideração deste modelo é a descorrelação entre \textit{drifts} de diferentes
 sensores, mesmo sendo as variáveis de processo correlacionadas.
 
-\textcolor{red}{Continuar a partir do artigo IFAC\ldots}
+A observação do desvio no sensor estimado, dado por $$z = r - \hat{r},$$ não
+corresponde ao valor verdadeiro do desvio, uma vez que este valor não está disponível.
+Então, pode-se descrever a equação de medição como a Eq.~(\ref{eq:kf_observ}), onde
+${q}^{(k)}$ é um ruído Gaussiano de variância $\sigma_q$.
 
+\begin{equation}
+    {z} = {d}^{(k)} +{q}^{(k)}, \quad {q}^{(k)} \sim
+    \mathcal{N} ({0}, \sigma_q)
+    \label{eq:kf_observ}
+\end{equation}
 
-\section{Avaliação dos Resídos e Detecção de Anomalias/Drift}
+Quando uma nova observação $r$ e a estimação de seu valor corrigido $\hat{r}$ estiverem
+disponíveis, os seguintes passos são executados para se obter uma nova estimação do desvio
+$d^{(k)}$ eventualmente presente no sensor:
+
+\begin{enumerate}
+    \item predição, $$\hat{d}^{(k|k-1)} = \hat{d}^{(k-1)}$$
+    \item MSE mínimo da predição, $$M^{(k|k-1)} = M^{(k-1)} + \sigma_v$$
+    \item ganho de Kalman, $$K = \frac{M^{(k|k-1)}}{\sigma_q + M^{(k|k-1)}}$$
+    \item correção da estimativa, $$\hat{d}^{(k|k)} = \hat{d}^{(k|k-1)} + K (z -
+        \hat{d}^{(k|k-1)})$$
+    \item mínimo MSE, $$M^{(k|k)} = (1 - K) M^{(k|k-1)}.$$
+\end{enumerate}
+
+As estimativas do desvio de um sensor podem ser usadas pelo menos de duas formas: indicar
+a ocorrência de desvios intoleráveis e a consequente necessidade de manutenção do sensor;
+e corrigir as leituras do sensor antes mesmo de serem utilizadas para predição pelo modelo
+empírico, o que teoricamente proporcionaria predições mais próximas do valor verdadeiro da
+variável mensurada.
+
+\section{Monitoramento de Condição}
 \label{sec:deteccao_drift}
+
+A etapa de monitoramento da condição, como o próprio nome sugere, visa monitorar a
+condição de funcionamento dos sensores, detectando a ocorrência de eventos e mudanças de
+estado.
+As indicações das ocorrências de falhas e anomalias
 
 \textcolor{red}{TODO:} SPRT, detecção pela incerteza. Present some possible methods to
 detect anomalies, like autocorrelation, densidade de potência etc.
@@ -845,6 +1131,47 @@ emprego do KF.
 
 \subsection{Sistema 3 --- SVM-SPRT}
 
+
+
+\section{Avaliação}
+
+Uma vez que o modelo tenha sido treinado e otimizado com o conjunto de dados de
+treinamento, o conjunto de validação é utilizado para avaliar o desempenho do modelo
+desenvolvido.
+Segundo Hines~\cite{Hines2008a}, tradicionalmente o desempenho de sistemas de
+monitoramento de calibração de sensores é mensurada a partir de três indicadores:
+acurácia, auto-sensibilidade e sensibilidade cruzada.
+A acurácia mensura a habilidade do modelo para gerar predições corretas e precisas das
+leituras dos sensores.
+A auto-sensibilidade indica a habilidade do modelo para gerar predições corretas de um
+determinado sensor quando as leituras deste estão incorretas devido a algum tipo de falha.
+Já a sensibilidade cruzada mensura o efeito dos dados de um sensor defeituoso sobre as
+predições dos demais sensores.
+
+Apesar desses indicadores qualificarem características essenciais de todo sistema de
+monitoramento de calibração, a inspeção visual das predições é de fundamental importância.
+Modelos com bons índices de qualidade podem gerar predições insatisfatórias, como sinais
+muito suavizados, representando uma estimação muito grosseira da realidade e, por isso,
+sem valor prático para a tomada de decisões.
+
+É importante destacar ainda a possível necessidade de retreinamento do modelo com dados
+mais atualizados da planta. Mudanças no ponto de operação, nas condições de equipamentos
+ou nas características do meio podem afetar significativamente na forma como as variáveis
+mensuradas pelos sensores se correlacionam. Assim, dependendo da instensidade da mudança,
+dados atualizados podem ser simplesmete incorporados ao conjunto de treinamento anterior
+ou devem compor um conjunto completamente novo.
+
+%% FIXME: put near of the models' descriptions
+%Ela é definida como o MSE entre as predições do modelo e os valores
+%reais das leituras dos sensores. Por corresponder a uma medida do erro, baixos valores de
+%acurácia são desejáveis. O cálculo da acurácia é realizado pela Eq.~(\ref{eq:mse}) para
+%modelos inferenciais, ou pela Eq.~(\ref{eq:}) para modelos auto-associativos
+%mas considerando $n$ o número de amostras do conjunto de dados de validação.
+
+%% Describe the metrics and its equations
+%% Say something about visual inspection to judge the quality
+
+
 \section{Descrição dos Dados}
 
 Seção semelhante a do artigo submetido para o ifac. 
@@ -883,7 +1210,7 @@ dados de treinamento).
 %polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
 %menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
 %do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = $ e
-%<++> vetores de memória.
+% vetores de memória.
 
 \begin{figure}[!htb]
     \centering
@@ -896,6 +1223,21 @@ otimização.}
 
 \subsubsection{SVM}
 
+Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
+\ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
+Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
+grade, variando-se os valores em potências de 2.
+Nota-se que o valor de $\varepsilon$ parece ser o principal determinante da quantidade de
+vetores suporte armazenados pelo modelo.
+Menores valores de $\varepsilon$ implicaram em maiores números de vetores suporte e
+menores valores do MSE.
+Entretanto, maior número de vetores suporte indicam modelos mais complexos, e modelos
+excessivamente complexos tendem a incluir ruídos na modelagem.
+Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
+toleráveis são normalmente as melhores opções.
+Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
+\ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
+
 \begin{table}[!htb]
     \centering
     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
@@ -904,8 +1246,9 @@ da variável PT$_f$ dos dados de simulação.}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
+        0.03 & 128 & 4 & 122 & 0.19 \\
         0.04 & 512 & 8 & 73 & 0.26\\
-        0.06 & 0.125 & 0.5 & 33 & 0.42\\
+        \rowcolor{gray} 0.06 & 0.125 & 0.5 & 33 & 0.42\\
         0.08 & 1 & 1 & 25 & 0.66 \\
         0.1 & 256 & 2 & 20 & 0.93\\
         0.5 & 0.125 & 16 & 0 & 33.19\\
@@ -913,25 +1256,56 @@ da variável PT$_f$ dos dados de simulação.}
     \end{tabular}
 \end{table}
 
-O resultado para $\varepsilon = 0.5$ corresponde a uma média.
-
 \begin{table}[!htb]
     \centering
     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-da variável PT$_f$ dos dados de simulação.}
+da variável PT$_t$ dos dados de simulação.}
     \begin{tabular}{ccccc}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
         0.1 & 32 & 32 & 473 & 4.53\\
         0.2 & 2048 & 0.5 & 22 & 4.74 \\
-        0.22 & 1024 & 1 & 15 & 4.92 \\
+        \rowcolor{gray} 0.22 & 1024 & 1 & 15 & 4.92 \\
         0.25 & 2048 & 0.25 & 9 & 5.43 \\
         0.3 & 16 & 0.25 & 3 & 7.34 \\
         0.5 & 0.25 & 4 & 3 & 32.63\\
         \bottomrule
     \end{tabular}
 \end{table}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+da variável PT$_m$ dos dados de simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-5}$)\\
+        \midrule
+        0.005 & 0.125 & 1024 & 280 & 1.068 \\
+        0.008 & 0.125 & 128 & 38 & 1.057 \\
+        \rowcolor{gray} 0.009 & 0.125 & 32 & 15 & 1.054 \\
+        0.01 & 0.125 & 0.125 & 4 & 1.095\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+da variável PT$_g$ dos dados de simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
+        \midrule
+        0.1 & 8 & 32 & 220 & 3.23 \\
+        \rowcolor{gray} 0.15 & 512 & 0.5 & 31 & 3.31 \\
+        0.2 & 512 & 0.125 & 9 & 4.05 \\
+        0.5 & 0.125 & 8 & 0 & 28.17 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 
 \subsection{Dados Reais}
 
@@ -971,6 +1345,54 @@ otimização.}
 
 As Figuras ?? apresentam o desempenho, em termos do MSE, de diferentes modelos SVM,
 variando os parâmetros $C$, $\gamma$ e $\varepsilon$. 
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:svm_real_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+do sensor PDG dos dados reais.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
+        \midrule
+        0.5 & 0.5 & 1 & 19621 & 7.19 \\
+        0.8 & 32 & 0.25 & 17109 & 7.12 \\
+        1 & 0.25 & 0.5 & 15886 & 6.97 \\
+        \rowcolor{gray} 2 & 0.5 & 2 & 10662 & 7.00 \\
+        5 & 0.25 & 2 & 2221 & 8.86 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:svm_real_v2}Relação entre parâmetros do modelo SVM e o impacto no
+MSE na predição do sensor TPT dos dados reais.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
+        \midrule
+        0.8 & 0.03125 & 0.03125 & 16775 & 4.36 \\
+        1.5 & 0.0625 & 0.5 & 10535 & 4.30 \\
+        2 & 0.0625 & 0.5 & 6922 & 4.25 \\
+        \rowcolor{gray}3 & 0.03125 & 0.5 & 3026 & 4.19 \\
+        4 & 0.03125 & 0.25 & 1087 & 4.22 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:svm_real_v3}Relação entre parâmetros do modelo SVM e o impacto no
+MSE na predição do sensor PT$_m$ dos dados reais.}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
+        \midrule
+        2 & 128 & 0.125 & 143 & 0.80 \\
+
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsubsection{Comentários}
 
