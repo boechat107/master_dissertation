@@ -991,17 +991,17 @@ A partir das estimativas dos desvios, é possível realizar uma ``pré-correção'' d
 leituras provenientes dos sensores que servem como entrada dos modelos empíricos,
 permitindo que as predições fiquem mais próximas dos verdadeiros valores das variáveis.
 
-Como dito na Seção \ref{sec:problemDefinition},
-os resíduos correspondem à diferença entre as predições do modelos e as medições dos
-sensores correspondentes.
-Considerando o sistema sensoriado operando na região de treinamento do modelo,
-as predições são virtualmente iguais às medidas realizadas pelos sensores quando estes se
-encontram funcionando corretamente, e os resíduos tendem a apresentar média zero e
-variância semelhante a do sensor.
-Anomalias nas medições dos sensores, como \textit{drift}, \textit{outliers}, mudanças
-abruptas, aumento da variância (errático) etc., causam mudanças nas características
-estatísticas esperadas nos resíduos e normalmente podem ser detectadas por técnicas
-estatísticas de detecção, como apresentado na Seção~\ref{sec:deteccao_drift}.
+%Como dito na Seção \ref{sec:problemDefinition},
+%os resíduos correspondem à diferença entre as predições do modelos e as medições dos
+%sensores correspondentes.
+%Considerando o sistema sensoriado operando na região de treinamento do modelo,
+%as predições são virtualmente iguais às medidas realizadas pelos sensores quando estes se
+%encontram funcionando corretamente, e os resíduos tendem a apresentar média zero e
+%variância semelhante a do sensor.
+%Anomalias nas medições dos sensores, como \textit{drift}, \textit{outliers}, mudanças
+%abruptas, aumento da variância (errático) etc., causam mudanças nas características
+%estatísticas esperadas nos resíduos e normalmente podem ser detectadas por técnicas
+%estatísticas de detecção, como apresentado na Seção~\ref{sec:deteccao_drift}.
 
 A seguir, apresenta-se a construção de um filtro de Kalman para a correção de sensores que
 apresentem \textit{drift}.
@@ -1060,19 +1060,14 @@ variável mensurada.
 \section{Monitoramento de Condição}
 \label{sec:deteccao_drift}
 
-A etapa de monitoramento da condição, como o próprio nome sugere, visa monitorar a
-condição de funcionamento dos sensores, detectando a ocorrência de eventos e mudanças de
-estado.
-As indicações das ocorrências de falhas e anomalias
-
-\textcolor{red}{TODO:} SPRT, detecção pela incerteza. Present some possible methods to
-detect anomalies, like autocorrelation, densidade de potência etc.
+A etapa de monitoramento da condição visa monitorar a condição de funcionamento dos
+sensores, detectando a ocorrência de eventos e mudanças de estado.
 
 A detecção de anomalias nos sensores é baseada na análise do erro entre as predições do
 modelo e as medidas produzidas por eles, ou seja, o resíduo $d$ calculado pela Eq.
-(\ref{eq:residuo}), onde $f(\mathbf{r})$ é a estimativa da medida $y$, medida produzida pelo
-sensor que se deseja monitorar, a partir das medidas $\mathbf{r}$ de sensores
-correlacionados.
+(\ref{eq:residuo}), onde $y$ é representa uma medida realizada pelo sensor que se deseja
+monitorar e $f(\mathbf{r})$ é uma estimativa dessa medida a partir das medidas
+$\mathbf{r}$ de sensores correlacionados.
 
 \begin{equation}
     d = y - f(\mathbf{r})
@@ -1091,18 +1086,87 @@ Dentre essas técnicas, podem-se citar: verificação de limites das propriedades
 estatísticas, como média e a variância; auto-correlação dos resíduos; densidade de
 potência dos resíduos; e o método SPRT.
 
-No caso da detecção específica de \textit{drifts}, a verificação da incerteza das pedições
-do modelo também pode ser empregada~\cite{Hines2008a}. Os métodos analíticos para os
-cálculos de incerteza são específicos para cada técnica de modelagem empírica, enquanto
-métodos baseados em simulações Monte Carlo são gerais, mas podem ser computacionalmente
-custosos.
+No caso da detecção específica de \textit{drifts}, a verificação da incerteza das
+predições do modelo também pode ser empregada~\cite{Hines2008a}.
+Os métodos analíticos para os cálculos de incerteza são específicos para cada técnica de
+modelagem empírica, enquanto métodos baseados em simulações Monte Carlo são gerais, mas
+podem ser computacionalmente custosos.
 
-Pela simplicidade de implementação e abrangência de anomalias passíveis de detecção, neste
+Pela simplicidade de implementação e abrangência de anomalias detectáveis, neste
 trabalho emprega-se o método SPRT, descrito a seguir.
 
 \subsection{SPRT}
 
-\textcolor{red}{TODO:} Seguir artigo IFAC
+O método conhecido por SPRT, desenvolvido por Wald~\cite{wald1947sequential}, consiste em
+testes estatísticos de hipóteses e tem sido aplicado frequentemente para a detecção de
+anomalias em sistemas.
+No caso de detecção de falhas em sensores, duas hipóteses são testadas a cada nova amostra
+de dados do sistema: modo normal de operação, ou $H_0$, e modo degradado de operação, ou
+$H_1$.
+Aplicado aos resíduos gerados pela Eq.~(\ref{eq:residuo}), para cada nova amostra
+$d^{(i)}$ do resíduo gerado para o sensor monitorado, uma das duas possíveis hipóteses é
+aceita através da execução do seguinte procedimento:
+
+\begin{enumerate}
+    \item cálculo do logaritmo da razão de verossimilhança, dado pela
+        Eq.~(\ref{eq:loglikelihood});
+        \begin{equation}
+            \Lambda^{(i)} = \ln \frac{P(d^{(i)} | H_1)}{P(d^{(i)} | H_0)}
+            \label{eq:loglikelihood}
+        \end{equation}
+    \item cálculo da soma acumulativa de $\Lambda$, dado pela
+        Eq.~(\ref{eq:cumulative_loglikelihood});
+        \begin{equation}
+            S^{(i)} = S^{(i-1)} + \Lambda^{(i)}
+            \label{eq:cumulative_loglikelihood}
+        \end{equation}
+    \item verificação da regra de parada, um esquema simples de verificação de limites:
+        \begin{itemize}
+            \item se $\ln A < S^{(i)} < \ln B$, continua-se o monitoramento e o cálculo de
+                $S^{(i+1)} = S^{(i)} + \Lambda^{(i+1)}$ (passo 2);
+            \item se $S^{(i)}_p \le \ln A$, $H_0$ é aceita;
+            \item se $S^{(i)}_p \ge \ln B$, $H_1$ é aceita e um aviso ou alarme é emitido.
+        \end{itemize}
+\end{enumerate}
+
+\noindent $P(d^{(i)} | H_1)$ é a probabilidade de observar $d^{(i)}$ dado que $H_1$ é
+verdadeira. $A$ e $B$ são respectivamente o limite inferior e superior, cujos valores
+podem ser definidos pela probabilidade de ocorrência de falsos alarmes, $\alpha$, e pela
+probabilidade de ocorrência de alarmes perdidos, $\beta$, como 
+$$
+A = \frac{\beta}{1 - \alpha}, \quad B = \frac{1 - \beta}{\alpha}.
+$$
+
+Supondo os resíduos como Gaussianos, normalmente o modo $H_0$ corresponde a um
+sinal com média zero e variância semelhante a do sensor em questão, enquanto o modo $H_1$
+corresponde a uma média diferente de zero ou a uma mudança no valor da variância.
+Neste trabalho, assume-se que o \textit{drift} corresponda a uma mudança $\pm M$ na média
+dos resíduos, enquanto a variância $\sigma^2$ se mantem inalterada.
+Portanto, a função de distribuição de probabilidade dos resíduos de um sensor para o modo
+$H_0$ é dada pela Eq.~(\ref{eq:pdf}).
+
+\begin{equation}
+    P(d^{(i)} | H_0) = \frac{1}{2 \pi \sigma^2} \exp \left(\frac{-{d^{(i)}}^2}{2 \sigma^2}
+    \right)
+    \label{eq:pdf}
+\end{equation}
+
+Considerando o modo degradado $H_1$ representado por mudanças positivas ($+M$) ou
+negativas ($-M$) na média, o logaritmo da razão de verossimilhança é dado pela
+Eq.~(\ref{eq:pdfM}).
+Como sugerido por Hines e Garvey~\cite{Hines2008a}, o valor de $M$ pode ser determinado
+numericamente aplicando o SPRT em conjuntos de dados livres de falhas e localizando um
+valor de $M$ que resulte em uma probabilidade de alarmes falsos semelhante a $\alpha$.
+
+\begin{equation}
+    \Lambda^i =
+    \left\{
+        \begin{array}{ll}
+            M / \sigma^2 (d^i - M/2), \quad \mbox{for a positive change} \\
+            M / \sigma^2 (- d^i - M/2), \quad \mbox{for a negative change}
+        \end{array}\right.
+    \label{eq:pdfM}
+\end{equation}
 
 
 \chapter{Aplicação do Sistema Implementado a Dados de Poços de Petróleo}
@@ -1182,6 +1246,8 @@ Seção semelhante a do artigo submetido para o ifac.
 
 \section{Ensaio --- Construção dos Modelos Empíricos}
 
+\textcolor{red}{Escrever introdução}
+
 Testes sem o filtro de Kalman com AAKR e SVM. Verificar qualidade das predições.
 Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
 variáveis.
@@ -1235,8 +1301,13 @@ Entretanto, maior número de vetores suporte indicam modelos mais complexos, e mo
 excessivamente complexos tendem a incluir ruídos na modelagem.
 Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
 toleráveis são normalmente as melhores opções.
+
 Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
 \ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
+Foram priorizados modelos cujo número de vetores suporte fosse próximo ao número de vetores
+de memória do modelo AAKR, ou seja, próximo de 20\% do número de amostras do conjunto de
+treinamento..
+
 
 \begin{table}[!htb]
     \centering
@@ -1246,15 +1317,53 @@ da variável PT$_f$ dos dados de simulação.}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
-        0.03 & 128 & 4 & 122 & 0.19 \\
-        0.04 & 512 & 8 & 73 & 0.26\\
-        \rowcolor{gray} 0.06 & 0.125 & 0.5 & 33 & 0.42\\
-        0.08 & 1 & 1 & 25 & 0.66 \\
-        0.1 & 256 & 2 & 20 & 0.93\\
-        0.5 & 0.125 & 16 & 0 & 33.19\\
+        0.03 & 0.0625 & 2 & 813 & 0.752\\
+        \rowcolor{gray}0.05 & 0.5 0.25 & 234 & 0.778 \\
+        0.07 & 0.0625 & 0.5 & 58 & 0.816\\
+        0.1 & 2 & 0.5 & 50 & 1.20 \\
+        0.15 & 1 & 1 & 27 & 2.54 \\
+        0.2 & 2 & 2 & 15 & 3.90 \\
         \bottomrule
     \end{tabular}
 \end{table}
+
+
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_f$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.05 & 1 & 0.5 & 50 & 0.296 \\
+%         \rowcolor{gray}0.06 & 1 & 1 & 30 & 0.365 \\
+%         0.07 & 0.5 & 1 & 27 & 0.473 \\
+%         0.08 & 0.5 & 1 & 24 & 0.581 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_f$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.03 & 128 & 4 & 122 & 0.19 \\
+%         0.04 & 512 & 8 & 73 & 0.26\\
+%         \rowcolor{gray} 0.06 & 0.125 & 0.5 & 33 & 0.42\\
+%         0.08 & 1 & 1 & 25 & 0.66 \\
+%         0.1 & 256 & 2 & 20 & 0.93\\
+%         0.5 & 0.125 & 16 & 0 & 33.19\\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
 
 \begin{table}[!htb]
     \centering
@@ -1264,15 +1373,49 @@ da variável PT$_t$ dos dados de simulação.}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
-        0.1 & 32 & 32 & 473 & 4.53\\
-        0.2 & 2048 & 0.5 & 22 & 4.74 \\
-        \rowcolor{gray} 0.22 & 1024 & 1 & 15 & 4.92 \\
-        0.25 & 2048 & 0.25 & 9 & 5.43 \\
-        0.3 & 16 & 0.25 & 3 & 7.34 \\
-        0.5 & 0.25 & 4 & 3 & 32.63\\
+        0.05 & 32 & 2 & 1149 & 2.974 \\
+        \rowcolor{gray}0.1 & 1 & 8 & 246 & 2.991 \\
+        0.15 & 0.5 & 2 & 36 & 3.125 \\
+        0.2 & 4 & 0.125 & 7 & 3.408 \\
         \bottomrule
     \end{tabular}
 \end{table}
+
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_t$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.06 & 32 & 2 & 1176 & 4.51\\
+%         0.1 & 32 & 2 & 480 & 4.52 \\
+%         1.8 & 16 0.5 & 44 & 4.78 \\
+%         \rowcolor{gray}0.2 & 64 & 0.5 & 24 & 4.84 \\
+%         0.5 & 16 & 1 & 2 & 29.91 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_t$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.1 & 32 & 32 & 473 & 4.53\\
+%         0.2 & 2048 & 0.5 & 22 & 4.74 \\
+%         \rowcolor{gray} 0.22 & 1024 & 1 & 15 & 4.92 \\
+%         0.25 & 2048 & 0.25 & 9 & 5.43 \\
+%         0.3 & 16 & 0.25 & 3 & 7.34 \\
+%         0.5 & 0.25 & 4 & 3 & 32.63\\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
 
 \begin{table}[!htb]
     \centering
@@ -1280,15 +1423,52 @@ da variável PT$_t$ dos dados de simulação.}
 da variável PT$_m$ dos dados de simulação.}
     \begin{tabular}{ccccc}
         \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-5}$)\\
+        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
-        0.005 & 0.125 & 1024 & 280 & 1.068 \\
-        0.008 & 0.125 & 128 & 38 & 1.057 \\
-        \rowcolor{gray} 0.009 & 0.125 & 32 & 15 & 1.054 \\
-        0.01 & 0.125 & 0.125 & 4 & 1.095\\
+        0.05 & 0.25 & 16 & 1220 & 3.572 \\
+        \rowcolor{gray}0.1 & 8 & 4 & 331 & 3.555 \\
+        0.15 & 0.5 & 8 & 52 & 3.624 \\
+        0.2 & 8 & 0.5 & 17 & 4.145 \\
         \bottomrule
     \end{tabular}
 \end{table}
+
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_m$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-5}$)\\
+%         \midrule
+%         0.006 & 64 & $2^{-19}$ & 202 & 1.2381 \\
+%         0.007 & 32 & $2^{-16}$ & 54 & 1.0092 \\
+%         0.008 & 128 & $2^{-17}$ & 26 & 1.0616 \\
+%         0.009 & 128 & $2^{-16}$ & 14 & 1.0356 \\
+%         \rowcolor{gray}0.01 & 16 & $2^{-10}$ & 4 & 1.0092 \\
+%         0.011 & 128 & $2^{-16}$ & 8 & 1.6152 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_m$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-5}$)\\
+%         \midrule
+%         0.005 & 0.125 & 1024 & 280 & 1.068 \\
+%         0.008 & 0.125 & 128 & 38 & 1.057 \\
+%         \rowcolor{gray} 0.009 & 0.125 & 32 & 15 & 1.054 \\
+%         0.01 & 0.125 & 0.125 & 4 & 1.095\\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
 
 \begin{table}[!htb]
     \centering
@@ -1298,13 +1478,45 @@ da variável PT$_g$ dos dados de simulação.}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
         \midrule
-        0.1 & 8 & 32 & 220 & 3.23 \\
-        \rowcolor{gray} 0.15 & 512 & 0.5 & 31 & 3.31 \\
-        0.2 & 512 & 0.125 & 9 & 4.05 \\
-        0.5 & 0.125 & 8 & 0 & 28.17 \\
+        0.1 & 0.125 & 8 & 525 & 5.642 \\
+        \rowcolor{gray}0.12 & 32 & 2 & 316 & 5.694 \\
+        0.15 & 0.25 & 4 & 133 & 5.764 \\
+        0.2 & 32 & 1 & 29 & 5.814 \\
         \bottomrule
     \end{tabular}
 \end{table}
+
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_g$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
+%         \midrule
+%         0.1 & 8 & 4 & 210 & 3.19 \\
+%         \rowcolor{gray}0.15 & 16 & 1 & 38 & 3.27 \\
+%         0.2 & 256 & 0.0625 & 12 & 3.96 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \begin{table}[!htb]
+%     \centering
+%     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_g$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
+%         \midrule
+%         0.1 & 8 & 32 & 220 & 3.23 \\
+%         \rowcolor{gray} 0.15 & 512 & 0.5 & 31 & 3.31 \\
+%         0.2 & 512 & 0.125 & 9 & 4.05 \\
+%         0.5 & 0.125 & 8 & 0 & 28.17 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
 
 
 \subsection{Dados Reais}
@@ -1317,8 +1529,8 @@ Para este conjunto de dados, menores valores de $h$ realmente geraram menores va
 MSE total, exceto para quantidades $n_m$ muito pequenas.
 Entretanto, modelos com $h < 0.07$ apresentaram problemas
 numéricos para a predição dos dados de otimização, pois valores muito pequenos de
-$h$ geram modelos com baixa capacidade de generalização, onde os denominadores da Eq. ??
-são muito próximos de zero.
+$h$ geram modelos com baixa capacidade de generalização, onde os denominadores da
+Eq.~\ref{eq:aakr_var_pred} são muito próximos de zero.
 Para diminuir a possibilidade de problemas numéricos por baixa capacidade de generalização
 e ao mesmo tempo obter baixos valores de MSE total, adotou-se $h = 0.15$.
 %Considerou-se $h = 0.15$ como um valor equilibrado entre acurácia e capacidade de
@@ -1343,8 +1555,15 @@ otimização.}
 
 \subsubsection{SVM}
 
-As Figuras ?? apresentam o desempenho, em termos do MSE, de diferentes modelos SVM,
-variando os parâmetros $C$, $\gamma$ e $\varepsilon$. 
+Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
+\ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
+Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
+grade, variando-se os valores em potências de 2.
+Nota-se que o comportamento dos modelos é semelhante para o conjunto de dados de
+simulação: o valor de $\varepsilon$ apresenta-se como principal determinante do número de
+vetores suporte e do limite inferior do MSE.
+Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
+\ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
 
 \begin{table}[!htb]
     \centering
@@ -1388,29 +1607,141 @@ MSE na predição do sensor PT$_m$ dos dados reais.}
         \toprule
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
         \midrule
+        0.1 & 0.03125 & 32 & 20834 & 0.48 \\
+        0.5 & 0.03125 & 8 & 10117 & 0.47 \\
+        \rowcolor{gray}1 & 0.015625 & 0.25 & 2852 & 0.50 \\
         2 & 128 & 0.125 & 143 & 0.80 \\
-
         \bottomrule
     \end{tabular}
 \end{table}
 
-\subsubsection{Comentários}
-
-Para ambas as técnicas, o processo de otimização dos modelos norteada pelo MSE foi
-fortemente influenciada pela largura de banda da função kernel.
-Nos modelos AAKR, o MSE
-total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
-ocasionaram problemas numéricos.
-Nos modelos SVM,
-
-Não houve uma escolha automática das variáveis, usou-se senso de engenharia.
+% \subsubsection{Comentários}
+% 
+% Para ambas as técnicas, o processo de otimização dos modelos norteada pelo MSE foi
+% fortemente influenciada pela largura de banda da função kernel.
+% Nos modelos AAKR, o MSE
+% total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
+% ocasionaram problemas numéricos.
+% Nos modelos SVM,
+% 
+% Não houve uma escolha automática das variáveis, usou-se senso de engenharia.
 
 
 \section{Ensaio --- Verificação de Acurácia}
 
+% Supondo que exista uma seção descrevendo os critérios de avaliação.
+
+
 \subsection{Dados de Simulação}
 
 \subsubsection{AAKR}
+
+As predições do modelo AAKR para os dados de validação são apresentados na
+Fig.~\ref{fig:pred_mse_sim_aakr}.
+Nota-se que as predições correspondem à expectativa de serem bem similares aos valores
+originados obtidos na simulação, uma vez que os dados não possuem falhas de sensores.
+Os valores de MSE para as predições de cada variável do modelo são apresentados na
+Tab.~\ref{tab:mse_aakr_sim}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{figuras/pred_sim_aakr.eps}
+    \caption{Predição do modelo AAKR para o conjunto de dados de validação gerados por
+    simulação.}
+    \label{fig:pred_mse_sim_aakr}
+\end{figure}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:mse_aakr_sim}Resultados do cálculo do MSE para as predições do
+modelo AAKR para o conjunto de dados de validação gerados por simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+        MSE & $1.0 \times 10^{-3}$ & $2.2 \times 10^{-3}$ & $2.4 \times 10^{-3}$ &
+        $2.5 \times 10^{-3}$ \\
+        \midrule
+        MSE médio & \multicolumn{4}{l}{$2.0 \times 10^{-3}$} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsubsection{SVM}
+
+As predições dos modelos SVM para os dados de validação são apresentados na
+Fig.~\ref{fig:pred_mse_sim_svm}.
+Nota-se que as predições estão próximas dos valores originados pela simulação, exceto por
+uma maior variância nas predições da variável PT$_f$.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{figuras/pred_sim_svm.eps}
+    \caption{Predição do modelo SVM para o conjunto de dados de validação gerados por
+    simulação.}
+    \label{fig:pred_mse_sim_svm}
+\end{figure}
+
+
+Os valores de MSE para as predições de cada variável, ou modelo, são apresentados na
+Tab.~\ref{tab:mse_svm_sim}.
+Em comparação ao modelo AAKR, as predições do modelo SVM apresentaram maior MSE, ou seja,
+menor acurácia nas predições, exceto para a variável PT$_m$.
+
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:mse_svm_sim}Resultados do cálculo do MSE para as predições do
+modelo SVM para o conjunto de dados de validação gerados por simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+        MSE & $0.749 \times 10^{-3}$ & $5.43 \times 10^{-3}$ & $3.996 \times 10^{-3}$ &
+        $5.621 \times 10^{-3}$ \\
+        \midrule
+        MSE médio & \multicolumn{4}{l}{$3.949 \times 10^{-3}$} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\subsection{Dados Reais}
+
+\subsubsection{AAKR}
+
+As predições do modelo AAKR para os dados reais de validação são apresentados na
+Fig.~\ref{fig:pred_mse_real_aakr}.
+Nota-se que as predições apresentaram um comportamento mais suave que os sinais
+verdadeiros e não acompanharam tão bem as mudanças bruscas de valores.
+Tais características parecem corresponder ao agrupamento pobre de variáveis, uma vez que
+o sistema sensoriado apresenta alta complexidade e não linearidade no relacionamento entre
+as variáveis.
+Para lidar com casos deste tipo, normalmente é necessário formar agrupamentos com maior
+quantidade de variáveis correlacionadas ou, pelo menos, agrupar variáveis que apresentem
+forte correlação.
+
+Os valores de MSE para as predições de cada variável do modelo são apresentados na
+Tab.~\ref{tab:mse_aakr_real}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{figuras/pred_real_aakr.eps}
+    \caption{Predição do modelo AAKR para o conjunto de dados reais de validação.}
+    \label{fig:pred_mse_real_aakr}
+\end{figure}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:mse_aakr_real}Resultados do cálculo do MSE para as predições do
+modelo AAKR para o conjunto de dados reais de validação.}
+    \begin{tabular}{cccc}
+        \toprule
+        & PDG & TPT & PT$_m$ \\
+        MSE & $7.9 \times 10^{-3}$ & $4.0 \times 10^{-3}$ & $2.3 \times 10^{-3}$\\
+        \midrule
+        MSE médio & \multicolumn{3}{l}{$4.7 \times 10^{-3}$} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsubsection{SVM}
 
