@@ -1620,10 +1620,10 @@ modelo AAKR para o conjunto de dados reais de validação.}
         & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
         & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
         \midrule
-        \multirow{4}{*}{Saídas} & PT$_f$ & & 0.1415 & 0.2225 & 0.2079 & 0.1906\\
-        & PT$_t$ & 1.5432 & & 0.5252 & 0.4385 & 0.8356 \\
-        & PT$_m$ & 1.8827 & 0.6805 & & 0.5350 & 1.0327 \\
-        & PT$_g$ & 3.4492 & 1.2468 & 1.1739 & & 1.9566 \\
+        \multirow{4}{*}{Saídas} & PT$_f$ & & 0.1411 & 0.1102 & 0.0343 & 0.0952\\
+        & PT$_t$ & 0.5922 & & 0.3272 & 0.2890 & 0.4028 \\
+        & PT$_m$ & 0.6395 & 0.3618 & & 0.2704 & 0.4239 \\
+        & PT$_g$ & 0.2836 & 0.4161 & 0.5620 & & 0.4206 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -1652,10 +1652,24 @@ modelo SVM aplicado aos dados de simulação.}
         \toprule
         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
         \midrule
-        $M$ & 0.2 & 0.4 &  &  \\
+        $M$ & 0.2 & 0.4 & 0.4 & 0.5 \\
         \bottomrule        
     \end{tabular}
 \end{table}
+
+Apesar da ocorrência de alarmes nas demais variáveis, grandes quantidades de decisões
+$H_1$ consecutivas só ocorreram na variável PT$_f$.
+
+\begin{figure}[!htb]
+    \begin{center}
+        \hspace*{-3cm}
+        \includegraphics[width=1.4\textwidth]{figuras/sim_drift_detect_d1.eps}
+    \end{center}
+    \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos SVM
+    aplicados aos dados simulados de validação, com inserção de desvio artificial em
+PT$_f$.}
+    \label{fig:sim_drift_detec_d1}
+\end{figure}
 
 \subsection{Dados Reais}
 
