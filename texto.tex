@@ -1302,13 +1302,6 @@ excessivamente complexos tendem a incluir ruídos na modelagem.
 Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
 toleráveis são normalmente as melhores opções.
 
-Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
-\ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
-Foram priorizados modelos cujo número de vetores suporte fosse próximo ao número de vetores
-de memória do modelo AAKR, ou seja, próximo de 20\% do número de amostras do conjunto de
-treinamento..
-
-
 \begin{table}[!htb]
     \centering
     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
@@ -1318,51 +1311,13 @@ da variável PT$_f$ dos dados de simulação.}
         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
         \midrule
         0.03 & 0.0625 & 2 & 813 & 0.752\\
-        \rowcolor{gray}0.05 & 0.5 0.25 & 234 & 0.778 \\
-        0.07 & 0.0625 & 0.5 & 58 & 0.816\\
+        \rowcolor{gray}0.05 & 0.5 & 0.25 & 234 & 0.778 \\
         0.1 & 2 & 0.5 & 50 & 1.20 \\
-        0.15 & 1 & 1 & 27 & 2.54 \\
         0.2 & 2 & 2 & 15 & 3.90 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-
-
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_f$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.05 & 1 & 0.5 & 50 & 0.296 \\
-%         \rowcolor{gray}0.06 & 1 & 1 & 30 & 0.365 \\
-%         0.07 & 0.5 & 1 & 27 & 0.473 \\
-%         0.08 & 0.5 & 1 & 24 & 0.581 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
-
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_f$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.03 & 128 & 4 & 122 & 0.19 \\
-%         0.04 & 512 & 8 & 73 & 0.26\\
-%         \rowcolor{gray} 0.06 & 0.125 & 0.5 & 33 & 0.42\\
-%         0.08 & 1 & 1 & 25 & 0.66 \\
-%         0.1 & 256 & 2 & 20 & 0.93\\
-%         0.5 & 0.125 & 16 & 0 & 33.19\\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
 
 
 \begin{table}[!htb]
@@ -1382,41 +1337,6 @@ da variável PT$_t$ dos dados de simulação.}
 \end{table}
 
 
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_t$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.06 & 32 & 2 & 1176 & 4.51\\
-%         0.1 & 32 & 2 & 480 & 4.52 \\
-%         1.8 & 16 0.5 & 44 & 4.78 \\
-%         \rowcolor{gray}0.2 & 64 & 0.5 & 24 & 4.84 \\
-%         0.5 & 16 & 1 & 2 & 29.91 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_t$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.1 & 32 & 32 & 473 & 4.53\\
-%         0.2 & 2048 & 0.5 & 22 & 4.74 \\
-%         \rowcolor{gray} 0.22 & 1024 & 1 & 15 & 4.92 \\
-%         0.25 & 2048 & 0.25 & 9 & 5.43 \\
-%         0.3 & 16 & 0.25 & 3 & 7.34 \\
-%         0.5 & 0.25 & 4 & 3 & 32.63\\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
 \begin{table}[!htb]
     \centering
     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
@@ -1432,42 +1352,6 @@ da variável PT$_m$ dos dados de simulação.}
         \bottomrule
     \end{tabular}
 \end{table}
-
-
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_m$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-5}$)\\
-%         \midrule
-%         0.006 & 64 & $2^{-19}$ & 202 & 1.2381 \\
-%         0.007 & 32 & $2^{-16}$ & 54 & 1.0092 \\
-%         0.008 & 128 & $2^{-17}$ & 26 & 1.0616 \\
-%         0.009 & 128 & $2^{-16}$ & 14 & 1.0356 \\
-%         \rowcolor{gray}0.01 & 16 & $2^{-10}$ & 4 & 1.0092 \\
-%         0.011 & 128 & $2^{-16}$ & 8 & 1.6152 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
-
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_m$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-5}$)\\
-%         \midrule
-%         0.005 & 0.125 & 1024 & 280 & 1.068 \\
-%         0.008 & 0.125 & 128 & 38 & 1.057 \\
-%         \rowcolor{gray} 0.009 & 0.125 & 32 & 15 & 1.054 \\
-%         0.01 & 0.125 & 0.125 & 4 & 1.095\\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
 
 
 \begin{table}[!htb]
@@ -1486,37 +1370,12 @@ da variável PT$_g$ dos dados de simulação.}
     \end{tabular}
 \end{table}
 
+Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
+\ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
+Foram priorizados modelos cujo número de vetores suporte fosse próximo ao número de vetores
+de memória do modelo AAKR, ou seja, próximo de 20\% do número de amostras do conjunto de
+treinamento.
 
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_g$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
-%         \midrule
-%         0.1 & 8 & 4 & 210 & 3.19 \\
-%         \rowcolor{gray}0.15 & 16 & 1 & 38 & 3.27 \\
-%         0.2 & 256 & 0.0625 & 12 & 3.96 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-
-% \begin{table}[!htb]
-%     \centering
-%     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_g$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
-%         \midrule
-%         0.1 & 8 & 32 & 220 & 3.23 \\
-%         \rowcolor{gray} 0.15 & 512 & 0.5 & 31 & 3.31 \\
-%         0.2 & 512 & 0.125 & 9 & 4.05 \\
-%         0.5 & 0.125 & 8 & 0 & 28.17 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
 
 
 \subsection{Dados Reais}
@@ -1670,8 +1529,8 @@ modelo AAKR para o conjunto de dados de validação gerados por simulação.}
 
 As predições dos modelos SVM para os dados de validação são apresentados na
 Fig.~\ref{fig:pred_mse_sim_svm}.
-Nota-se que as predições estão próximas dos valores originados pela simulação, exceto por
-uma maior variância nas predições da variável PT$_f$.
+Nota-se que as predições estão próximas dos valores originados pela simulação, uma
+indicação visual da qualidade das predições do modelo.
 
 \begin{figure}[!htb]
     \centering
@@ -1684,8 +1543,8 @@ uma maior variância nas predições da variável PT$_f$.
 
 Os valores de MSE para as predições de cada variável, ou modelo, são apresentados na
 Tab.~\ref{tab:mse_svm_sim}.
-Em comparação ao modelo AAKR, as predições do modelo SVM apresentaram maior MSE, ou seja,
-menor acurácia nas predições, exceto para a variável PT$_m$.
+Em comparação ao modelo AAKR, em geral as predições do modelo SVM apresentaram maior MSE,
+ou seja, menor acurácia nas predições, exceto para a variável PT$_f$.
 
 
 \begin{table}[!htb]
@@ -1695,7 +1554,7 @@ modelo SVM para o conjunto de dados de validação gerados por simulação.}
     \begin{tabular}{ccccc}
         \toprule
         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-        MSE & $0.749 \times 10^{-3}$ & $5.43 \times 10^{-3}$ & $3.996 \times 10^{-3}$ &
+        MSE & $0.749 \times 10^{-3}$ & $3.392 \times 10^{-3}$ & $3.996 \times 10^{-3}$ &
         $5.621 \times 10^{-3}$ \\
         \midrule
         MSE médio & \multicolumn{4}{l}{$3.949 \times 10^{-3}$} \\
@@ -1748,11 +1607,57 @@ modelo AAKR para o conjunto de dados reais de validação.}
 
 \section{Ensaio --- Análise de Sensibilidade e Detecção de \textit{Drifts}}
 
+\subsection{Dados de Simulação}
+
+\subsubsection{SVM}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:cross_sens_svm_sim}Resultados do cálculo da sensibilidade cruzada
+    dos modelos SVM para o conjunto de testes gerados por simulação.}
+    \begin{tabular}{llccccc}
+        \toprule
+        & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
+        & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
+        \midrule
+        \multirow{4}{*}{Saídas} & PT$_f$ & & 0.1415 & 0.2225 & 0.2079 & 0.1906\\
+        & PT$_t$ & 1.5432 & & 0.5252 & 0.4385 & 0.8356 \\
+        & PT$_m$ & 1.8827 & 0.6805 & & 0.5350 & 1.0327 \\
+        & PT$_g$ & 3.4492 & 1.2468 & 1.1739 & & 1.9566 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
 \subsection{Dados Reais}
 
 \subsubsection{AAKR}
 
 \subsubsection{SVM}
+
+
+\section{Ensaio --- Detecção de Desvios}
+
+\subsection{Dados de Simulação}
+
+\subsubsection{AAKR}
+
+\subsubsection{SVM}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:sim_svm_sprtconf}Valores de mudança na média $M$ das variáveis do
+modelo SVM aplicado aos dados de simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+        \midrule
+        $M$ & 0.2 & 0.4 &  &  \\
+        \bottomrule        
+    \end{tabular}
+\end{table}
+
+\subsection{Dados Reais}
 
 
 \section{Ensaio --- Estimação de \textit{Drifts} com o KF}
