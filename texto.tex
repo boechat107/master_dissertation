@@ -322,14 +322,11 @@ e largamente adotado, podem-se citar:
     \item redução de custos e preços.
 \end{itemize}
 
+A seguir são apresentadas uma breve descrição sobre a arquitetura de sistemas de
+manutenção baseados em CBM adotada como diretriz, a OSA-CBM, e uma proposta de
+configuração de um sistema de validação de sensores dentro dessa arquitetura.
 
-
-\subsection{OSA-CBM}
-
-\textcolor{blue}{Existência da OSA-CBM e breve descrição sobre a respectiva
-arquitetura.
-Como o trabalho da dissertação, um sistema de monitoramento de calibração, se relaciona
-com a estrutura OSA-CBM.}
+\section{OSA-CBM}
 
 Recentemente, uma associação entre indústrias, fabricantes, universidades e a Marinha
 Norte-Americana desenvolveu uma arquitetura aberta para sistemas de manutenção baseados em
@@ -347,34 +344,78 @@ arquitetura para sistemas CBM que facilitasse a interoperabilidade entre compone
 
 No OSA-CBM, a arquitetura de um sistema CBM é dividido em diferentes camadas funcionais,
 cujos conteúdos devem ser implementados seguindo as interfaces definidas pelo padrão.
-Atualmente, as camadas funcionais, ou módulos, somam um total de 6, seguindo a norma
+Atualmente, as camadas funcionais, ou módulos, somam um total de seis, seguindo a norma
 ISO-13374. As camadas são: aquisição
 de dados, processamento de sinais, monitoramento de condição, avaliação de
 saúde (diagnóstico), a de prognóstico e a de suporte a tomada de decisão.
 Cada camada possui a capacidade de requisitar dados de outras camadas funcionais quando
 necessário, apesar do fluxo de dados normalmente ocorrer entre as camadas adjacentes. Na
-Fig. ?? é apresentado um esquema da organização dos módulos da arquitetura.
+Fig.~\ref{fig:osa_arq} é apresentado um esquema da organização dos módulos da arquitetura.
 
-\textcolor{red}{Figura do report da OSA 3.1.0 Primer}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.7\textwidth]{figuras/arte/osa_cbm_camadas.eps}
+    \caption{Arquitetura conceitual de sistemas baseados na arquitetura OSA-CBM
+        \cite{PennStateUniversity2006}.}
+    \label{fig:osa_arq}
+\end{figure}
 
-Os primeiros três blocos são específicos para determinadas tecnologias e provêem as
-seguintes funções \cite{PennStateUniversity2006}:
+Os primeiros três blocos são específicos para determinadas tecnologias (monitoramento de
+vibração, temperatura etc.) e provêem as seguintes funções \cite{PennStateUniversity2006}:
 
-\textcolor{red}{Copiar do artigo citado}
+\begin{description}
+    \item[Aquisição de dados:] converção da saída de um transdutor ou sensor em um dado
+        digital que represente uma medida física ou uma informação relacionada (como
+        tempo, qualidade dos dados etc.).
 
-A Fig. ?? ilustra um exemplo mais prático da estrutura de um sistema CBM.
+    \item[Processamento de sinal:] análises de sinal, cômputo de indicadores e derivação
+        de leituras virtuais de sensores.
 
-\textcolor{red}{Figura do artigo Souza2008, no artigo do rio automacao}
+    \item[Monitoramento de condição:] criação e manutenção de perfis de comportamento
+        normal do sistema, procura por anomalias a cada novo dado adquirido e determinação
+        da zona de anormalidade no qual o sistema pode se encontrar.
+\end{description}
+
+Os três blocos restantes combinam conceitos humanos com tecnologias de monitoramento para
+se determinar o estado de funcionamento corrente do sistema, realizar predições de falhas
+e recomendações de possíveis ações a serem tomadas por operadores e mantenedores do
+sistema. Podem-se citar as funções:
+
+\begin{description}
+    \item[Avaliação de saúde (diagnóstico):] diagnóstico das falhas e avaliação da
+        condição de operação do sistema de acordo com todas as informações de estado.
+
+    \item[Prognóstico:] previsão dos estados de operação, modos de falhas e vida útil de
+        equipamentos/sistemas baseado na condição de operação corrente e no planejamento
+        de carga do sistema.
+
+    \item[Tomada de decisão:] fornecer possíveis ações relativas à manutenção e a mudanças
+        de operação necessárias para otimizar a vida útil e desempenho do processo,
+        equipamento ou sistema.
+\end{description}
 
 
+A Fig. \ref{fig:osa_arq_pratico}, adaptada de Souza \cite{Souza2008}, ilustra um exemplo
+mais prático da estrutura de um sistema CBM, apresentando algumas possíveis técnicas
+presentes em cada uma das camadas.
+A arquitetura é dividida em duas aplicações, aplicação servidor e aplicação cliente,
+conectadas entre si por uma rede, onde compartilham informações.
+A aplicação servidor é responsável por prover as funcionalidades das seis camadas do
+modelo OSA-CBM, realizando a captura dos dados e o processamento inteligente.
+A aplicação cliente é responsável pela apresentação, através de uma interface
+gráfica, de dados técnicos e resultados provenientes do processamento realizado pela
+aplicação servidor.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.7\textwidth]{figuras/arq-conceitual-sistema.eps}
+    \caption{Arquitetura conceitual de sistemas baseados na arquitetura OSA-CBM. Adaptada
+        de \cite{Souza2008}.}
+    \label{fig:osa_arq_pratico}
+\end{figure}
 
 
-%Isso
-%tanto permite a integração de vários diferentes componentes 
-
-
-
-\subsection{Detecção e Correção de Drift sob a OSA-CBM}
+\section{Detecção e Correção de Drift sob a OSA-CBM}
 
 A maneira como os algoritmos de detecção de drift se inserem dentro da arquitetura
 OSA-CBM.
@@ -1609,6 +1650,40 @@ modelo AAKR para o conjunto de dados reais de validação.}
 
 \subsection{Dados de Simulação}
 
+\subsubsection{AAKR}
+
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:auto_sens_aakr_sim}Resultados do cálculo da auto-sensibilidade
+    do modelo AAKR para o conjunto de testes gerados por simulação.}
+    \begin{tabular}{cccc}
+        \toprule
+        PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+        \midrule
+        0.1038 & 0.2794 & 0.3169 & 0.3700 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:cross_sens_aakr_sim}Resultados do cálculo da sensibilidade cruzada
+    do modelo AAKR para o conjunto de testes gerados por simulação.}
+    \begin{tabular}{llccccc}
+        \toprule
+        & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
+        & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
+        \midrule
+        \multirow{4}{*}{Saídas} & PT$_f$ & & 0.0984 & 0.0976 & 0.0952 & 0.0971 \\
+        & PT$_t$ & 0.2973 & & 0.2775 & 0.2707 & 0.2818\\
+        & PT$_m$ & 0.3253 & 0.3184 & & 0.3118 & 0.3185\\
+        & PT$_g$ & 0.3779 & 0.3748 & 0.3738 & & 0.3755\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 \subsubsection{SVM}
 
 \begin{table}[!htb]
@@ -1641,6 +1716,31 @@ modelo AAKR para o conjunto de dados reais de validação.}
 \subsection{Dados de Simulação}
 
 \subsubsection{AAKR}
+
+\begin{table}[!htb]
+    \centering
+    \caption{\label{tab:sim_aakr_sprtconf}Valores de mudança na média $M$ das variáveis do
+modelo AAKR aplicado aos dados de simulação.}
+    \begin{tabular}{ccccc}
+        \toprule
+        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+        \midrule
+        $M$ & 0.3 & 0.4 & 0.4 & 0.5 \\
+        \bottomrule        
+    \end{tabular}
+\end{table}
+
+\begin{figure}[!htb]
+    \begin{center}
+        \hspace*{-3cm}
+        \includegraphics[width=1.4\textwidth]{figuras/sim_aakr_drift_detect_d1.eps}
+    \end{center}
+    \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos AAKR
+    aplicados aos dados simulados de validação, com inserção de desvio artificial em
+PT$_f$.}
+    \label{fig:sim_aakr_drift_detec_d1}
+\end{figure}
+
 
 \subsubsection{SVM}
 
