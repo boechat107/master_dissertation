@@ -96,7 +96,7 @@ trabalho possui potencial aplicação para diversas outros setores industriais.
 %problema de validação de sensores de forma geral, não somente em drift. Falhas abruptas
 %também podem ser inseridas nos sinais (seguir tabela 5.5 da tese do Mauro Vitor)}
 
-\textcolor{red}{TODO:} Explicitar diferença entre predição e estimação.
+% \textcolor{red}{TODO:} Explicitar diferença entre predição e estimação.
 
 Como apresentado em \cite{MauroVitordeOliveira2005}, a validação de sinal pode ser
 definida como a detecção, isolamento e caracterização de sinais falhos. Em sistemas OLM, a
@@ -266,9 +266,6 @@ perspectivas de trabalhos futuros.
 \chapter{Estrutura de Sistemas de Monitoramento e Validação de Sensores}
 \label{chap:estrutura_sis}
 
-\textcolor{blue}{Conceitos gerais sobre monitoramento baseado em condição, importância de uma estrutura
-modular e bem definida.}
-
 Em esquemas de manutenção baseados em CBM, as condições de funcionamento de equipamentos e
 sistemas são monitoradas com o intuito de otimizar as ações de manutenção. As manutenções
 preventivas deixam de ser periódicas, passando a serem agendadas de forma dinâmica, de
@@ -395,9 +392,9 @@ sistema. Podem-se citar as funções:
 \end{description}
 
 
-A Fig. \ref{fig:osa_arq_pratico}, adaptada de Souza \cite{Souza2008}, ilustra um exemplo
-mais prático da estrutura de um sistema CBM, apresentando algumas possíveis técnicas
-presentes em cada uma das camadas.
+A Figura \ref{fig:osa_arq_pratico}, adaptada de Souza \cite{Souza2008}, ilustra um exemplo
+mais prático da arquitetura de um sistema de manutenção CBM, apresentando algumas possíveis
+técnicas presentes em cada uma das camadas.
 A arquitetura é dividida em duas aplicações, aplicação servidor e aplicação cliente,
 conectadas entre si por uma rede, onde compartilham informações.
 A aplicação servidor é responsável por prover as funcionalidades das seis camadas do
@@ -410,15 +407,74 @@ aplicação servidor.
     \centering
     \includegraphics[width=.7\textwidth]{figuras/arq-conceitual-sistema.eps}
     \caption{Arquitetura conceitual de sistemas baseados na arquitetura OSA-CBM. Adaptada
-        de \cite{Souza2008}.}
+        de Souza \cite{Souza2008}.}
     \label{fig:osa_arq_pratico}
 \end{figure}
 
+A OSA-CBM também está relacionada a outra arquitetura, a OSA-EAI (\textit{Open System
+Architecture for Enterprise Application Integration}).
+A OSA-EAI define estruturas de dados para armazenamento e movimentação de informações
+coletivas sobre todos os aspectos dos equipamentos dentro das atividades empresariais.
+Isso inclui a configuração física de plataformas assim como a confiabilidade, condição e
+manutenção de plataformas, sistemas e subsistemas.
+Vários elementos definidos pela OSA-EAI são utilizados pela OSA-CBM.
+Segundo Swearingen~\cite{Swearingen2007}, espera-se que no futuro a OSA-CBM esteja
+totalmente mapeada dentro da OSA-EAI, sem que seja possível distingui-las.
+A Figura \ref{fig:osa_eai} ilustra a atual relação entre entre a OSA-CBM e a OSA-EAI.
 
-\section{Detecção e Correção de Drift sob a OSA-CBM}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.6\textwidth]{figuras/cbm-eai.eps}
+    \caption{Relações entre as arquiteturas OSA-CBM e OSA-EAI. Adaptada de
+        Swearingen~\cite{Swearingen2007}.}
+    \label{fig:osa_eai}
+\end{figure}
 
-A maneira como os algoritmos de detecção de drift se inserem dentro da arquitetura
-OSA-CBM.
+\abreviatura{OSA-EAI}{\textit{Open System Architecture for Enterprise Application
+Integration}}
+
+\section{Validação de Sensores e o Modelo OSA-CBM}
+
+Considerando a arquitetura OSA-CBM, um sistema de validação de sensores básico poderia ser
+divido em duas das seis camadas, a camada de processamento de sinal e a de monitoramento
+da condição, como ilustrado na Fig.~\ref{fig:osa_drift}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}
+    \caption{Arquitetura do sistema de validação de sensores baseada no modelo OSA-CBM.}
+    \label{fig:osa_drift}
+\end{figure}
+
+A camada de processamento de sinal seria responsável por extrair informações sobre a
+condição de funcionamento dos sensores a partir das medições realizadas pelos mesmos e
+fornecidas pela camada de aquisição de dados.
+A comunicação com a base de dados seria essencial, tanto para o resgate do histórico de
+medições dos sensores quanto para o armazenamento das informações extraídas das novas
+amostras.
+% Esta tarefa pode ser subdividida em três partes: o pré-processamento, o processamento
+% principal e o pós-processamento.
+As tarefas desta camada podem ser divididas em três partes:
+
+\begin{description}
+    \item[Pré-processamento:] consiste na preparação e condicionamento dos dados aos
+        algoritmos de regressão.
+
+    \item[Processamento ou predição:] responsável pela construção de modelos regressivos,
+    predição de sinais e geração de resíduos.
+
+    \item[Pós-processamento:] não intrinsecamente necessária, realiza a estimação de
+        desvios nos sinais dos sensores para maior robustez dos modelos regressivos.
+\end{description}
+
+A camada de monitoramento da condição realizaria a tarefa de monitorar os indicadores de
+falhas nos sensores, os resíduos.
+Mudanças nas propriedades estatísticas dos resíduos seriam detectadas, gerando alertas ou
+alarmes que indicariam a ocorrência de falhas em sensores específicos.
+
+Como indicado na Fig.~\ref{fig:osa_drift}, ambas as camadas poderiam apresentar resultados e
+indicadores diretamente ao usuário através de uma interface gráfica.
+
 
 \chapter{Processamento de Sinais para Detecção e Correção de Drift}
 \label{chap:drift}
@@ -428,9 +484,6 @@ OSA-CBM.
 % Diferenças entre identificação de sistemas (density estimation) e a regressão por modelos
 % empíricos (livro ``Learning from data'').
 % Explicação básica sobre detecção por métodos estatísticos.
-
-\textcolor{red}{TODO:} Dividir as etapas em pré-processamento, processamento e
-pós-processmaneto. Incluir o KF na etapa de pós-processamento.
 
 Pode-se dividir o processo de validação de sensores em três etapas principais:
 pré-processamento, processamento, pós-processamento dos sinais e o monitoramento de
@@ -1221,6 +1274,8 @@ Neste capítulo são apresentados os sistemas implementados para monitoramento e v
 de sensores de poços de petróleo, além dos resultados da avaliação destes sistemas para
 diferentes conjuntos de dados, gerados a partir de simulações ou a partir de sensores
 reais.
+
+\section{Métricas de Desempenho}
 
 \section{Sistemas de Validação de Sensores}
 
