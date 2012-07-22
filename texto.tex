@@ -712,6 +712,7 @@ treinamento.
 
 
 \subsection{Técnicas de Regressão}
+\label{sec:tec_regressao}
 
 %% Present the quality metrics for each technique
 
@@ -1310,7 +1311,7 @@ neste trabalho, os quais se diferem pela técnica de modelagem e/ou pelo emprego 
 O Sistema 1 é semelhante a um dos sistemas utilizados por
 Hines et al.~\cite{Hines2008}, onde a técnica de modelagem utilizada é a AAKR e a
 detecção de desvios é realizada pelo algoritmo SPRT.
-Na Figura \ref{fig:aakr_sprt} é ilustrado o esquema de funcionamento do sistema.
+Na Figura \ref{fig:aakr_sprt} é ilustrado o esquema de funcionamento do Sistema 1.
 
 \begin{figure}[!htb]
     \centering\hspace*{-.7cm}
@@ -1320,25 +1321,63 @@ Na Figura \ref{fig:aakr_sprt} é ilustrado o esquema de funcionamento do sistema.
 \end{figure}
 
 O modelo regressivo AAKR é desenvolvido usando o conjunto de dados $\mathbf{X}_{n_m \times
-p}$. 
+p}$, que permanece armazenado como memória para geração de predições.
 Quando um novo vetor de leituras dos sensores $\mathbf{r}_{1 \times p}$ está disponível,
 uma nova predição $\hat{\mathbf{r}}_{1 \times p}$ é calculada.
 A diferença entre a leitura $\mathbf{r}_{1 \times p}$ e sua predição $\hat{\mathbf{r}}_{1
 \times p}$, o resíduo $\mathbf{d}_{1 \times p}$, é analisada pelo algoritmo estatístico
-SPRT para a indicação de ocorrências de falhas ou desvios.
+SPRT para a indicação de ocorrências de falhas ou desvios, $D \in [0,1]$.
 
+\subsection{Sistema 2 --- SVM-SPRT}
 
-\subsection{sistema 2 --- AAKR-KF-SPRT}
+O Sistema 2 é composto por um modelo de regressão SVM e pelo algoritmo estatístico SPRT.
+Como descrito na Seção \ref{sec:tec_regressao}, um modelo SVM possui estrutura
+inferencial, sendo capaz de gerar predições para apenas uma variável.
+Por consequência, para gerar predições de $p$ variáveis, como o modelo AAKR, são
+necessários $p$ diferentes modelos SVM.
+Na Figura \ref{fig:svm_sprt} é apresentado o esquema de funcionamento do Sistema 2 para o
+monitoramento de uma variável.
 
-\subsection{Sistema 3 --- SVM-SPRT}
+\begin{figure}[!htb]
+    \centering\hspace*{-.7cm}
+    \includegraphics[width=1.1\textwidth]{figuras/svm_sprt.eps}
+    \caption{Diagrama do processo de monitoramento de um único sensor pelo Sistema 2.}
+    \label{fig:svm_sprt}
+\end{figure}
 
+Considerando o monitoramento de uma variável dentre um conjunto de $p$ variáveis
+correlacionadas, quando novas leituras $\mathbf{r}_{1 \times p-1}$ e $y$ (onde $y$ corresponde
+à leitura do sensor monitorado) estão disponíveis, uma nova predição $\hat{y}$ é calculada
+pelo modelo SVM.
+A diferença entre a leitura $y$ do sensor monitorado e sua predição $\hat{y}$, o resíduo
+$d$, é analisada pelo algoritmo estatístico SPRT para a indicação de ocorrência de falhas
+ou desvios, $D \in [0,1]$.
+
+\subsection{Sistema 3 --- AAKR-KF-SPRT}
+
+O Sistema 3 é composto por um modelo de regressão SVM, um filtro de Kalman e o algoritmo
+estatístico SPRT.
+Na Figura \ref{fig:aakr_kf_sprt} é ilustrado o esquema de funcionamento do Sistema 3.
+
+\begin{figure}[!htb]
+    \centering\hspace*{-.7cm}
+    \includegraphics[width=1.1\textwidth]{figuras/aakr_kf_sprt.eps}
+    \caption{Diagrama do processo de monitoramento pelo Sistema 3.}
+    \label{fig:aakr_kf_sprt}
+\end{figure}
+
+No Sistema 3, as entradas do modelo AAKR correspondem às leituras corrigidas
+$\mathbf{x}_{1\times p}$ dos $p$ sensores a partir de uma estimativa inicial dos
+desvios $\hat{\mathbf{d}}_{1 \times p}^{k-1}$ e das leituras reais $\mathbf{r}_{1 \times p}$.
+As predições $\hat{\mathbf{x}}_{1 \times p}$ geradas pelo modelo AAKR e as leituras reais
+$\mathbf{r}_{1 \times p}$ são usadas como entradas do filtro de Kalman para a atualização
+das estimativas dos desvios, $\hat{\mathbf{d}}_{1 \times p}^k$.
+Finalmente, as novas estimativas $\hat{\mathbf{d}}_{1 \times p}^k$ são analisadas pelo
+algoritmo SPRT para a indicação de ocorrência de falhas ou desvios, $D \in [0,1]$.
 
 
 \section{Métricas de Desempenho}
 
-Uma vez que o modelo tenha sido treinado e otimizado com o conjunto de dados de
-treinamento, o conjunto de validação é utilizado para avaliar o desempenho do modelo
-desenvolvido.
 Segundo Hines~\cite{Hines2008a}, tradicionalmente o desempenho de sistemas de
 monitoramento de calibração de sensores é mensurada a partir de três indicadores:
 acurácia, autosensibilidade e sensibilidade cruzada.
