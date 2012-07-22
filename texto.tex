@@ -1319,6 +1319,14 @@ Na Figura \ref{fig:aakr_sprt} é ilustrado o esquema de funcionamento do sistema.
     \label{fig:aakr_sprt}
 \end{figure}
 
+O modelo regressivo AAKR é desenvolvido usando o conjunto de dados $\mathbf{X}_{n_m \times
+p}$. 
+Quando um novo vetor de leituras dos sensores $\mathbf{r}_{1 \times p}$ está disponível,
+uma nova predição $\hat{\mathbf{r}}_{1 \times p}$ é calculada.
+A diferença entre a leitura $\mathbf{r}_{1 \times p}$ e sua predição $\hat{\mathbf{r}}_{1
+\times p}$, o resíduo $\mathbf{d}_{1 \times p}$, é analisada pelo algoritmo estatístico
+SPRT para a indicação de ocorrências de falhas ou desvios.
+
 
 \subsection{sistema 2 --- AAKR-KF-SPRT}
 
