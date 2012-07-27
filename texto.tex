@@ -640,12 +640,42 @@ qualidade de predição.
 
 Dois aspectos principais, intrinsicamente relacionados, devem ser considerados para a
 seleção das amostras para o treinamento dos modelos: quantidade e representatividade.
-Geralmente, a quantidade de variáveis de entrada do modelo dita uma quantidade mínima de
-amostras necessárias para se ``capturar'' a correlação entre elas.
-% Com poucas observações, tende-se a obter predições degradadas por falta de informação; com
-% quantidade excessiva, o custo computacional de cada predição torna-se muito alto.
-Entretanto, essas amostras precisam representar as condições de operação que se espera
-encontrar quando o modelo estiver funcional.
+
+Normalmente, quanto maior a quantidade de amostras que se tem de um sistema, mais
+informações ficam disponíveis e mais preciso é o modelo que se pode obter para representá-lo.
+Entretanto, os limites físicos de armazenamento de dados e a capacidade computacional para
+processá-los devem ser considerados ao se implementar um sistema OLM.
+Quantidades excessivas de dados podem custar muito tempo para treinamento dos modelos e
+para os cálculos das predições, a um ganho insignificante de informações sobre o sistema.
+
+A representatividade está relacionada justamente à quantidade de informações relevantes
+sobre um sistema presentes em um conjunto de dados.
+Normalmente, a quantidade de amostras de um conjunto de dados não é linearmente
+relacionado à representatividade deste.
+Em muitos casos é possível obter pequenos conjuntos de dados que possuem praticamente a
+mesma representatividade que conjuntos volumosos~\cite{HinesGarvey2008}.
+
+Portanto, a seleção das amostras de treinamento de um modelo regressivo deve considerar
+primeiramente a cobertura de todos os futuros pontos de operação da planta ou poço para,
+finalmente, se fazer uma análise de ganho de precisão das predições em relação à
+quantidade de amostras.
+Além disso, é de suma importantância certificar que as amostras não correspondem à pontos
+de operação atípicos, como em casos de falha em equipamento ou de desvios em sensores.
+Se presentes no conjunto de treinamento do modelo, os pontos de operação atípicos são
+aprendidos pelo modelo como comportamento normal dos sensores.
+
+Em sistemas dinâmicos como poços de petróleo, onde não se tem dados de histórico que
+abranja todos os possíveis pontos de operação futuros devido às mudanças das
+características do próprio poço, normalmente torna-se necessário o retreinamento do modelo
+regressivo com novas amostras ao longo da vida útil do poço.
+
+
+% Geralmente, a quantidade de variáveis de entrada do modelo dita uma quantidade mínima de
+% amostras necessárias para se ``capturar'' a correlação entre elas.
+% % Com poucas observações, tende-se a obter predições degradadas por falta de informação; com
+% % quantidade excessiva, o custo computacional de cada predição torna-se muito alto.
+% Entretanto, essas amostras precisam representar as condições de operação que se espera
+% encontrar quando o modelo estiver funcional.
 
 % Para a maioria dos modelos empíricos, os dados devem ser separados em pelo menos dois
 % conjuntos, o de treinamento e o de validação. Os dados de treinamento são usados pelo
