@@ -1318,7 +1318,7 @@ valor de $M$ que resulte em uma probabilidade de alarmes falsos semelhante a $\a
 \end{equation}
 
 
-\chapter{Aplicação do Sistema Implementado a Dados de Poços de Petróleo}
+\chapter{Aplicação dos Sistemas Implementados a Dados de Poços de Petróleo}
 \label{chap:ensaios}
 
 % Descrição do sistema completo implementado, ou seja, sistema integrando os modelos
@@ -1418,29 +1418,56 @@ determinado sensor quando as leituras deste estão incorretas devido a algum tipo
 Já a sensibilidade cruzada mensura o efeito dos dados de um sensor defeituoso sobre as
 predições dos demais sensores.
 
-Apesar desses indicadores qualificarem características essenciais de todo sistema de
-monitoramento de calibração, a inspeção visual das predições é de fundamental importância.
-Modelos com bons índices de qualidade podem gerar predições insatisfatórias, como sinais
-muito suavizados, representando uma estimação muito grosseira da realidade e, por isso,
-sem valor prático para a tomada de decisões.
+A capacidade do modelo de predizer precisamente e corretamente os valores do sensor é
+medido pela acurácia ($E_a$) que é normalmente apresentada como o erro médio quadrático
+(MSE) entre as predições e as medições dos sensores.
+A Equação (\ref{eq:ea_mse}) apresenta o cálculo de $E_a$ para uma variável, onde $N$ é o
+número de amostras, $r^{(i)}$ é a amostra $i$ de um sensor livre de falhas e
+$\hat{r}^{(i)}$ é a respectiva predição.
 
-É importante destacar ainda a possível necessidade de retreinamento do modelo com dados
-mais atualizados da planta. Mudanças no ponto de operação, nas condições de equipamentos
-ou nas características do meio podem afetar significativamente na forma como as variáveis
-mensuradas pelos sensores se correlacionam. Assim, dependendo da instensidade da mudança,
-dados atualizados podem ser simplesmete incorporados ao conjunto de treinamento anterior
-ou devem compor um conjunto completamente novo.
+\begin{equation}
+    E_a = \frac{1}{N} \sum \limits_{i=1}^N \left( \hat{r}^{(i)} - r^{(i)} \right)^2
+    \label{eq:ea_mse}
+\end{equation}
 
-%% FIXME: put near of the models' descriptions
-%Ela é definida como o MSE entre as predições do modelo e os valores
-%reais das leituras dos sensores. Por corresponder a uma medida do erro, baixos valores de
-%acurácia são desejáveis. O cálculo da acurácia é realizado pela Eq.~(\ref{eq:mse}) para
-%modelos inferenciais, ou pela Eq.~(\ref{eq:}) para modelos auto-associativos
-%mas considerando $n$ o número de amostras do conjunto de dados de validação.
+A autosensibilidade $(S_A)$ mede a habilidade do modelo predizer corretamente quando a
+própria medida do sensor está incorreta em razão de alguma falha (esta métrica não é
+aplicada a modelos inferenciais como o SVM).
+A Equação (\ref{eq:autosensibilidade}) apresenta o cálculo de $S_a$ para um determinado
+sensor $k$, onde $\hat{r}^{(i)}_{drift}$ é a predição com desvio, $\hat{r}^{(i)}$ é a
+predição sem desvio, enquanto $r^{(i)}_{drift}$ e $r^{(i)}$ são as entradas com e sem
+desvio, respectivamente.
 
-%% Describe the metrics and its equations
-%% Say something about visual inspection to judge the quality
+\begin{equation}
+    S_{A_k} = \frac{1}{N} \sum \limits_{i=1}^N \frac{\left| \hat{r}_{k, drift}^{(i)} -
+    \hat{r}^{(i)}_{k, drift} \right|}{\left| r_{k,drift}^{(i)} - r^{(i)}_{k,drift} \right|}
+    \label{eq:autosensibilidade}
+\end{equation}
 
+O efeito de uma entrada de sensor falho na predição das outras variáveis é calculado pela
+sensibilidade cruzada $(S_C)$. Para um sensor sem desvio $j$ e um sensor com
+desvio $k$, a sensibilidade cruzada é calculada por
+
+\begin{equation}
+    S_{C_k} = \frac{1}{N} \sum \limits_{i=1}^N \frac{\left| \hat{r}_{j,drift}^{(i)} -
+    \hat{r}^{(i)}_{j} \right|}{\left| r_{k,drift}^{i} - r_{k}^{(i)} \right|}
+\end{equation}
+
+Além das métricas tradicionais, adota-se neste trabalho uma métrica relativa ao erro de
+predição ($E_d$) para sensores conhecidamente falhos, com presença de desvios em suas medições.
+Esta métrica é calculada pelo MSE entre a predição gerada pelo modelo regressivo, cujas
+entradas são as medidas de sensores com desvio, e o valor verdadeiro da variável
+monitorada pelo respectivo sensor, como apresentado na Eq. (\ref{eq:erro_predicao}).
+Sistemas de predição com menores valores de $E_a$ não apresentam necessariamente menores
+valores de $E_d$.
+
+\begin{equation}
+    E_d = \frac{1}{N} \sum\limits^N_{i=1} \left( r^{(i)}_{drift} - r^{(i)} \right)
+    \label{eq:erro_predicao}
+\end{equation}
+
+Os melhores sistemas para predição dos sensores de poços são aqueles com baixos valores de
+$E_a$, $S_A$, $S_C$ e $E_d$.
 
 \section{Descrição dos Dados}
 
