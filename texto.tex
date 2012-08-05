@@ -1477,6 +1477,54 @@ Seção semelhante a do artigo submetido para o ifac.
 
 \subsubsection{Dados Reais}
 
+
+\section{Ensaios com Dados de Simulação}
+
+Os dados simulados foram gerados por um modelo de poço construído com simulador
+OLGA\footnote{Mais informações o simulador são encontradas em
+http://www.sptgroup.com/Products/olga/}.  
+O modelo representa um poço operado por \textit{gas-lift} com um tubo de produção de 2500
+metros de profundidade.
+A pressão do separador foi mantida em 1000 kPa e o reservatório foi ajustado com uma
+pressão de 18000 kPa.
+Os dados simulados foram coletados durante 100 horas de produção de poço, enquanto a
+vazão de gás injetado foi ajustado em diferentes valores, representando diferentes
+condições de operação.
+O conjunto de dados é composto pela pressão de fundo de poço
+(PT$_f$), no topo do tubo de produção (PT$_t$), no topo do anular (PT$_g$) e a montante do
+\textit{choke} de injeção (PT$_m$), como ilustrado na Fig. \ref{fig:poco_sim}.
+A taxa de amostragem é de uma amostra por minuto. Um ruído branco com SNR (Relação
+Sinal-Ruído) igual a $0.3$ foi adicionado às medições.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.5\textwidth]{figuras/poco_simulado.ps}
+    \caption{Esquema do poço usado para gerar os dados de simulação.}
+    \label{fig:poco_sim}
+\end{figure}
+
+As 60 primeiras horas de dados foram usados para treinamento dos modelos AAKR e SVM. O
+restante dos dados foi dividido em duas partes: 20 horas como conjunto de otimização e 20
+horas como conjunto de testes.
+
+Para os Sistemas 1 e 3 foram utilizados o mesmo modelo AAKR, construído a partir dos dados
+de treinamento  e cujos parâmetros são $h = 0.1$ e $n_m = 600$ (20\% das amostras do
+conjunto de treinamento).
+Os parâmetros escolhidos advêm dos resultados apresentados no gráfico da Fig.
+\ref{fig:mse_aakr_sim}, onde os melhores parâmetros são aqueles que apresentam menor
+valor de MSE médio (ou $E_a$ médio) entre o conjunto de dados de otimização e suas
+predições gerados pelo modelo.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
+    \caption{Relação entre o MSE médio e diferentes valores de largura de banda $h$ e
+    vetores de memória $n_m$ para o modelo AAKR na predição do conjunto de dados de
+    otimização gerados por simulação.}
+    \label{fig:mse_aakr_sim}
+\end{figure}
+
+
 \section{Ensaio --- Construção dos Modelos Empíricos}
 
 \textcolor{red}{Escrever introdução}
@@ -1511,14 +1559,14 @@ dados de treinamento).
 %do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = $ e
 % vetores de memória.
 
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
-    \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
-    vetores de memória $n_m$ para o modelo AAKR aplicado aos dados de simulação para
-otimização.}
-    \label{fig:mse_aakr_sim}
-\end{figure}
+% \begin{figure}[!htb]
+%     \centering
+%     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
+%     \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
+%     vetores de memória $n_m$ para o modelo AAKR aplicado aos dados de simulação para
+% otimização.}
+%     \label{fig:mse_aakr_sim}
+% \end{figure}
 
 \subsubsection{SVM}
 
