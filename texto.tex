@@ -1200,6 +1200,19 @@ $d^{(k)}$ eventualmente presente no sensor:
     \item mínimo MSE, $$M^{(k|k)} = (1 - K) M^{(k|k-1)}.$$
 \end{enumerate}
 
+Para o emprego deste modelo de filtro de Kalman na estimação de desvios em sensores é
+necessário determinar os valores dos parâmetros $\sigma_v$ e $\sigma_q$ para cada uma das
+variáveis monitoradas.
+No trabalho de Takruri~\cite{Takruri2008}, os parâmetros são escolhidos por tentativa e
+erro.
+Se um valor alto é usado para $\sigma_q$, as estimativas do desvio demoram mais para
+seguir o desvio real; para valores pequenos de $\sigma_q$, as estimativas seguem qualquer
+pequena diferença entre as predições $\hat{r}$ e as leituras $r$ do sensor.
+O valor de $\sigma_v$ possui efeito contrário: valores altos emplicam em estimativas
+instáveis do desvio que seguem qualquer pequena diferença entre as predições $\hat{r}$ e
+as leituras $r$ do sensor; valores baixos implicam em maior lentidão para as estimativas
+seguirem o desvio real.
+
 As estimativas do desvio de um sensor podem ser usadas pelo menos de duas formas: indicar
 a ocorrência de desvios intoleráveis e a consequente necessidade de manutenção do sensor;
 e corrigir as leituras do sensor antes mesmo de serem utilizadas para predição pelo modelo
