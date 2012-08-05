@@ -1524,6 +1524,31 @@ predições gerados pelo modelo.
     \label{fig:mse_aakr_sim}
 \end{figure}
 
+As configurações dos modelos SVM (um para cada variável monitorada) também foram obtidas a
+partir do treinamento com o conjunto de dados de treinamento e da minimização do MSE entre
+o conjunto de dados de otimização e suas predições.
+Na Tabela \ref{tab:svm_sim_pars} são apresentados as configurações dos modelos.
+
+\begin{table}[!htb]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        Variável & $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte \\
+        \midrule
+        PT$_f$ & 0.05 & 0.5 & 0.25 & 234 \\
+        PT$_t$ & 0.1 & 1 & 8 & 246 \\
+        PT$_m$ & 0.1 & 8 & 4 & 331 \\
+        PT$_g$ & 0.12 & 32 & 2 & 316 \\
+        \bottomrule
+    \end{tabular}
+    \caption{\label{tab:svm_sim_pars}Configuração dos modelos SVM construídos com
+    conjunto de dados de treinamento gerados por simulação.}
+\end{table}
+
+Para o Sistema 3, foi necessário determinar apenas os valores de $\sigma_v$ e $\sigma_q$
+para cada uma das variáveis do modelo AAKR, uma vez que o modelo é o mesmo usado pelo
+Sistema 1.
+
 
 \section{Ensaio --- Construção dos Modelos Empíricos}
 
