@@ -1432,8 +1432,8 @@ Já a sensibilidade cruzada mensura o efeito dos dados de um sensor defeituoso so
 predições dos demais sensores.
 
 A capacidade do modelo de predizer precisamente e corretamente os valores do sensor é
-medido pela acurácia ($E_a$) que é normalmente apresentada como o erro médio quadrático
-(MSE) entre as predições e as medições dos sensores.
+medido pelo erro de acurácia ($E_a$) que é normalmente apresentada como o erro médio
+quadrático (MSE) entre as predições e as medições dos sensores.
 A Equação (\ref{eq:ea_mse}) apresenta o cálculo de $E_a$ para uma variável, onde $N$ é o
 número de amostras, $r^{(i)}$ é a amostra $i$ de um sensor livre de falhas e
 $\hat{r}^{(i)}$ é a respectiva predição.
@@ -1467,20 +1467,27 @@ desvio $k$, a sensibilidade cruzada é calculada por
 \end{equation}
 
 Além das métricas tradicionais, adota-se neste trabalho uma métrica relativa ao erro de
-predição ($E_d$) para sensores conhecidamente falhos, com presença de desvios em suas medições.
-Esta métrica é calculada pelo MSE entre a predição gerada pelo modelo regressivo, cujas
-entradas são as medidas de sensores com desvio, e o valor verdadeiro da variável
-monitorada pelo respectivo sensor, como apresentado na Eq. (\ref{eq:erro_predicao}).
-Sistemas de predição com menores valores de $E_a$ não apresentam necessariamente menores
-valores de $E_d$.
+predição ($E_p$) para entradas do modelo que podem conter desvios, calculado também pelo
+MSE.
+Diferentemente de $E_a$, onde as entradas não devem conter falhas ou desvios, o valor de
+$E_p$ mede o erro das predições na presença de desvios em uma ou mais entradas do modelo.
 
-\begin{equation}
-    E_d = \frac{1}{N} \sum\limits^N_{i=1} \left( r^{(i)}_{drift} - r^{(i)} \right)
-    \label{eq:erro_predicao}
-\end{equation}
+% predição ($E_p$) para sensores conhecidamente falhos, com presença de desvios em suas medições.
+% Esta métrica é calculada pelo MSE entre a predição gerada pelo modelo regressivo, cujas
+% entradas são as medidas de sensores que podem sofrer desvios, e o valor verdadeiro da variável
+% monitorada pelo respectivo sensor, como apresentado na Eq. (\ref{eq:erro_predicao}), onde
+% $\hat{r}^{(i)}_{|drift|}$.
+% Sistemas de predição com menores valores de $E_a$ não apresentam necessariamente menores
+% valores de $E_p$.
+% 
+% \begin{equation}
+%     E_p = \frac{1}{N} \sum\limits^N_{i=1} \left( \hat{r}^{(i)}_{|drift|} - r^{(i)}
+%     \right)^2
+%     \label{eq:erro_predicao}
+% \end{equation}
 
 Os melhores sistemas para predição dos sensores de poços são aqueles com baixos valores de
-$E_a$, $S_A$, $S_C$ e $E_d$.
+$E_a$, $S_A$, $S_C$ e $E_p$.
 
 \section{Descrição dos Dados}
 
@@ -1509,7 +1516,7 @@ O conjunto de dados é composto pela pressão de fundo de poço
 A taxa de amostragem é de uma amostra por minuto. Um ruído branco com SNR (Relação
 Sinal-Ruído) igual a $0.3$ foi adicionado às medições.
 
-\begin{figure}[!htb]
+\begin{figure}[bt]
     \centering
     \includegraphics[width=.5\textwidth]{figuras/poco_simulado.ps}
     \caption{Esquema do poço usado para gerar os dados de simulação.}
@@ -1528,7 +1535,7 @@ Os parâmetros escolhidos advêm dos resultados apresentados no gráfico da Fig.
 valor de MSE médio (ou $E_a$ médio) entre o conjunto de dados de otimização e suas
 predições gerados pelo modelo.
 
-\begin{figure}[htb]
+\begin{figure}[bt]
     \centering
     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
     \caption{Relação entre o MSE médio e diferentes valores de largura de banda $h$ e
@@ -1542,8 +1549,10 @@ partir do treinamento com o conjunto de dados de treinamento e da minimização do
 o conjunto de dados de otimização e suas predições.
 Na Tabela \ref{tab:svm_sim_pars} são apresentados as configurações dos modelos.
 
-\begin{table}[!htb]
+\begin{table}[bt]
     \centering
+    \caption{\label{tab:svm_sim_pars}Configuração dos modelos SVM construídos com
+    conjunto de dados de treinamento gerados por simulação.}
     \begin{tabular}{lcccc}
         \toprule
         Variável & $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte \\
@@ -1554,15 +1563,101 @@ Na Tabela \ref{tab:svm_sim_pars} são apresentados as configurações dos modelos.
         PT$_g$ & 0.12 & 32 & 2 & 316 \\
         \bottomrule
     \end{tabular}
-    \caption{\label{tab:svm_sim_pars}Configuração dos modelos SVM construídos com
-    conjunto de dados de treinamento gerados por simulação.}
 \end{table}
 
 Para o Sistema 3, foi necessário determinar apenas os valores de $\sigma_v$ e $\sigma_q$
 para cada uma das variáveis do modelo AAKR, uma vez que o modelo é o mesmo usado pelo
 Sistema 1.
+Inserindo desvios artificiais no conjunto de dados de otimização, foram selecionados os
+valores de $\sigma_v$ e $\sigma_q$ que geraram estimativas mais próximas dos desvios
+inseridos: $\sigma_v = 0.0001$ e $\sigma_q = 1$.
 
+Na Tabela \ref{tab:DF_sensibilidades} são apresentados os resultados da análise de
+sensibilidade e acurácia dos sistemas, avaliados com o conjunto de dados de teste.
+Para tal análise, um desvio artificial linearmente crescente terminando com uma magnitude
+de $3\sigma$ (três vezes o desvio padrão dos dados da variável) foi introduzido
+sequencialmente (em uma variável por vez) no conjunto de dados de teste.
 
+\begin{table}[bt]
+    \centering
+    \caption{\label{tab:DF_sensibilidades} Valores médios das métricas de desempenho para
+    os sistemas de monitoramento e validação de sensores:
+    ($E_a$), autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e erro de predição
+($E_p$).} 
+    \begin{tabular}{lcccc}
+        \toprule
+        & $E_a$ & $S_A$ & $S_C$ & $E_p$ \\
+        \midrule
+        Sistema 1 & 0.0020 & 0.2675 & 0.2682 & 0.0105 \\
+        Sistema 2 & 0.0039 & & 0.3356 & 0.0139 \\
+        Sistema 3 & 0.0023 & 0.2002 & 0.1997 & 0.0046 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Nota-se pela Tab. \ref{tab:DF_sensibilidades} que o Sistema 1 apresentou maior acurácia dentre
+os três sistemas, mas foi mais sensível a desvios quando comparado ao Sistema 3.
+Apesar de apresentar menor acurácia e maior sensibilidade cruzada dentre os sistemas,
+o Sistema 2 apresenta a vantagem de apresentar autosensibilidade nula, ou seja, as
+predições relativas a um sensor com desvio não sofrem influência desta falha.
+Apesar do melhor desempenho na presença de desvios, no Sistema 3  o filtro de Kalman acaba
+estimando pequenos desvios mesmo na ausência de desvios reais, o que implicou em menor acurácia
+em relação ao Sistema 1.
+
+Na Figura \ref{fig:sim_pred_drift4} são apresentadas as predições dos três sistemas na
+condição de ocorrência de desvios nas leituras da variável PT$_g$.
+Nesta figura é possível notar as diferenças de desempenho retratadas pelos valores de
+autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e erro de predição ($E_p$).
+O Sistema 1, com valores intermediários de $S_C$ e $E_p$, aparentemente apresenta predições
+com menores $E_p$ que o Sistema 2 para as variáveis PT$_t$ e PT$_m$, mas piores
+que o Sistema 3; no caso da variável PT$_f$, o modelo regressivo do Sistema 2 parece ser
+mais independete dos valores de PT$_g$ (\textcolor{red}{confirmar com os valores das
+correlações entre as varipaveis}), uma vez que suas predições praticamente não foram
+afetadas pelos desvios presentes em PT$_g$.
+Com excessão das variáveis PT$_f$ e PT$_g$, o Sistema 2 foi o mais afetado pelos desvios
+artificiais, confirmando seu maior valor de $S_C$, entretanto, as predições de PT$_g$
+permanceram inalteradas pelos desvios, uma vez que a autosensibilidade do seu modelo
+gressivo é nula.
+O Sistema 3 apresenta, em geral, o melhor desempenho aparente entre os três sistemas,
+confirmando as métricas de desempenho, gerando predições muito próximas do desejado mesmo
+na ocorrência de desvios; entretanto, pelo valor de $E_a$, na ausência de desvios nas
+leituras o Sistema 3 tende a ser menos preciso que o Sistema 1.
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys1_pred_d4.eps}
+    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys2_pred_d4.eps}
+    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys3_pred_d4.eps}
+    \caption{Predições dos sistemas para o conjunto de dados de testes gerados por
+    simulação, com inserção de desvios artificias na variável PT$_g$. Linhas vermelhas são
+    as predições, linhas verdes são as leituras das variáveis (sujeitas a falhas) usadas
+    como entradas dos sistemas e linhas azuis são os valores verdadeiros das variáveis
+    (diferentes das linhas verdes apenas na ocorrência de falhas).}
+    \label{fig:sim_pred_drift4}
+\end{figure}
+
+\begin{table}[bt]
+    \centering
+    \caption{\label{tab:sim_sprt_conf}}
+    \begin{tabular}{lcccc}
+        \toprule
+        & \multicolumn{4}{c}{Valores de $M$ por variável} \\
+        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+        \midrule
+        Sistema 2 & 0.2 & 0.45 & 0.5 & 0.6 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=.4\textwidth]{figuras/sim_svm_resid_d4.eps}
+    \includegraphics[width=.4\textwidth]{figuras/sim_svm_sprt_d4.eps}
+    \caption{}
+    \label{fig:sim_svm_sprt}
+\end{figure}
+
+\chapter{Versão antiga dos ensaios}
 \section{Ensaio --- Construção dos Modelos Empíricos}
 
 \textcolor{red}{Escrever introdução}
