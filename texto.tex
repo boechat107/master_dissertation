@@ -1525,6 +1525,8 @@ Os parâmetros escolhidos advêm dos resultados apresentados no gráfico da Fig.
 \ref{fig:mse_aakr_sim}, onde os melhores parâmetros são aqueles que apresentam menor
 valor de MSE médio (ou $E_a$ médio) entre o conjunto de dados de otimização e suas
 predições gerados pelo modelo.
+Apesar de maiores quantidades de amostras resultarem em menores valores de MSE médio, a
+partir de 600 amostras o ganho de desempenho foi insignificante.
 
 \begin{figure}[bt]
     \centering
@@ -1705,13 +1707,21 @@ sensores de um poço de petróleo: um de fundo de poço (PDG), um na árvore de nata
 (TPT) e outro a montante do \textit{choke} de injeção (PT$_m$).
 Os dados foram coletados durante 955 horas de operação de poço, amostrados a uma taxa de 1
 amostra/minuto.
+Na Figura ?? são apresentados os gráficos de todo o conjunto de dados reais.
 As primeiras 400 horas de dados foram separadas como conjunto de treinamento dos modelos,
 enquanto as 100 horas consecutivas foram usadas como conjunto de otimização e o restante
 como conjunto de testes.
 
-AAKR
-$h=0.05$
-$n_m = 4800$ (~20\% dos dados)
+\textcolor{red}{Figura com gráficos dos sinais}
+
+Novamente, os Sistemas 1 e 2 compartilharam o mesmo modelo AAKR, construído com $h=0.05$ e
+$n_m=4800$ (~20\% do conjunto de dados de treinamento).
+Assim como feito com os dados de simulação, os parâmetros do modelo foram selecionados
+visando minizar o MSE das predições do conjunto de dados de otimização.
+Neste caso, devido ao volume do conjunto de dados de treinamento, a quantidade $n_m$ de
+amostras impactou significativamente no custo de tempo das predições.
+Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempenho
+(valores de MSE) e custo das predições.
 
 \begin{table}[bt]
     \centering
