@@ -1489,15 +1489,6 @@ $E_p$ mede o erro das predições na presença de desvios em uma ou mais entradas d
 Os melhores sistemas para predição dos sensores de poços são aqueles com baixos valores de
 $E_a$, $S_A$, $S_C$ e $E_p$.
 
-\section{Descrição dos Dados}
-
-Seção semelhante a do artigo submetido para o ifac. 
-
-\subsubsection{Simulação}
-
-\subsubsection{Dados Reais}
-
-
 \section{Ensaios com Dados de Simulação}
 
 Os dados simulados foram gerados por um modelo de poço construído com simulador
@@ -1604,7 +1595,7 @@ Apesar do melhor desempenho na presença de desvios, no Sistema 3  o filtro de Ka
 estimando pequenos desvios mesmo na ausência de desvios reais, o que implicou em menor acurácia
 em relação ao Sistema 1.
 
-Na Figura \ref{fig:sim_pred_drift4} são apresentadas as predições dos três sistemas na
+Na Figura \ref{fig:sim_pred_drift4} são ilustradas as predições dos três sistemas na
 condição de ocorrência de desvios nas leituras da variável PT$_g$.
 Nesta figura é possível notar as diferenças de desempenho retratadas pelos valores de
 autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e erro de predição ($E_p$).
@@ -1632,30 +1623,111 @@ leituras o Sistema 3 tende a ser menos preciso que o Sistema 1.
     simulação, com inserção de desvios artificias na variável PT$_g$. Linhas vermelhas são
     as predições, linhas verdes são as leituras das variáveis (sujeitas a falhas) usadas
     como entradas dos sistemas e linhas azuis são os valores verdadeiros das variáveis
-    (diferentes das linhas verdes apenas na ocorrência de falhas).}
+    (diferentes das linhas verdes apenas na ocorrência de falhas). Todos os dados foram
+escalados no intervalo $[0,1]$.}
     \label{fig:sim_pred_drift4}
 \end{figure}
 
-\begin{table}[bt]
+Para a detecção automática de desvios e falhas, os algoritmos SPRT de cada um dos sistemas
+foram configurados a partir do conjunto de dados de otimização.
+Os valores de $M$ foram definidos como os menores valores para os quais o algoritmo SPRT
+não gera nenhum falso alarme para os resíduos gerados por seus respectivos sistemas.
+A Tabela \ref{tab:sim_sprt_conf} contem os valores de $M$ utilizados por cada um sistema e
+para cada uma das variáveis monitoradas.
+
+\begin{table}[tb]
     \centering
-    \caption{\label{tab:sim_sprt_conf}}
+    \caption{\label{tab:sim_sprt_conf}Configurações do algoritmo SPRT para o conjunto de
+dados de teste gerados por simulação.}
     \begin{tabular}{lcccc}
         \toprule
         & \multicolumn{4}{c}{Valores de $M$ por variável} \\
         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
         \midrule
+        Sistema 1 & 0.3 & 0.4 & 0.4 & 0.5 \\
         Sistema 2 & 0.2 & 0.45 & 0.5 & 0.6 \\
+        Sistema 3 & 0.2 & 0.2 & 0.2 & 0.2 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-\begin{figure}[!htb]
+Para o caso de ocorrência de desvios nas leituras da variável PT$_g$, por exemplo, os
+resultados da detecção automática pelos Sistemas 1 e 2 são ilustrados nas Figs.
+\ref{fig:sim_sys1_sprt} e \ref{fig:sim_svm_sprt}.
+Apesar dos falsos alarmes para as variáveis sem falhas, os Sistemas 1 e 2 detectaram
+corretamente a ocorrência de desvios nas leituras de PT$_g$.
+O impacto dos falsos alarmes pode ser reduzido ou até mesmo eliminado usando outras regras
+simples sobre os resultados do algoritmo SPRT, como um limite para o número de decisões
+positivas (ocorrência de desvios) consecutivas.
+Por exemplo, poderia-se considerar a ocorrência de desvios apenas quando o algoritmo SPRT
+gerasse $n$ ou mais resultados positivos consecutivos.
+Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
+
+\begin{figure}[tb]
     \centering
-    \includegraphics[width=.4\textwidth]{figuras/sim_svm_resid_d4.eps}
-    \includegraphics[width=.4\textwidth]{figuras/sim_svm_sprt_d4.eps}
-    \caption{}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_resid_d4.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_sprt_d4.eps}
+    \caption{Resíduos gerados pelo Sistema 1 e resultados do algoritmo SPRT para o
+    caso de ocorrência de desvios em PT$_g$ do conjunto de dados de simulação.}
+    \label{fig:sim_sys1_sprt}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_resid_d4.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_sprt_d4.eps}
+    \caption{Resíduos gerados pelo Sistema 2 e resultados do algoritmo SPRT para o
+    caso de ocorrência de desvios em PT$_g$ do conjunto de dados de simulação.}
     \label{fig:sim_svm_sprt}
 \end{figure}
+
+No caso do Sistema 3, a estimativa dos desvios sofreu menos interferência dos ruídos de
+leitura, como pode ser notado na Fig. \ref{fig:sim_sys3_sprt}.
+A correção efetuada pelo filtro de Kalman contribuíram para a melhoria da qualidade das
+predições do modelo AAKR, gerando diferenças nítidas nas estimativas dos desvios das
+leituras de cada variável.
+Desta forma, o algoritmo SPRT conseguiu detectar corretamente e mais rapidamente a
+ocorrência de desvios, além de ter gerado menos falsos alarmes.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_resid_d4.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_sprt_d4.eps}
+    \caption{Resíduos gerados pelo Sistema 3 e resultados do algoritmo SPRT para o
+    caso de ocorrência de desvios em PT$_g$ do conjunto de dados de simulação.}
+    \label{fig:sim_sys3_sprt}
+\end{figure}
+
+\section{Ensaios com Dados Reais}
+
+O conjunto de dados reais é composto pelas leituras de pressão de três diferentes
+sensores de um poço de petróleo: um de fundo de poço (PDG), um na árvore de natal
+(TPT) e outro a montante do \textit{choke} de injeção (PT$_m$).
+Os dados foram coletados durante 955 horas de operação de poço, amostrados a uma taxa de 1
+amostra/minuto.
+As primeiras 400 horas de dados foram separadas como conjunto de treinamento dos modelos,
+enquanto as 100 horas consecutivas foram usadas como conjunto de otimização e o restante
+como conjunto de testes.
+
+AAKR
+$h=0.05$
+$n_m = 4800$ (~20\% dos dados)
+
+\begin{table}[bt]
+    \centering
+    \caption{\label{tab:real_sensibilidades} Valores médios das métricas de desempenho para
+    os sistemas de monitoramento e validação de sensores:
+    ($E_a$), autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e erro de predição
+($E_p$).} 
+    \begin{tabular}{lcccc}
+        \toprule
+        & $E_a$ & $S_A$ & $S_C$ & $E_p$ \\
+        \midrule
+        Sistema 1 & 0.0035 & 0.3106 & 0.2806 & 0.0078 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 
 \chapter{Versão antiga dos ensaios}
 \section{Ensaio --- Construção dos Modelos Empíricos}
@@ -2178,5 +2250,7 @@ Revisão da sistema implementado e sua relação com a estrutura OSA-CBM.
 Revisão dos experimentos realizados e os resultados obtidos. Resumir as vantagens e
 desvantagens da abordagem escolhida, analisar de forma crítica as contribuições da
 dissertação.
+
+Não foi realizado um estudo da escolha das variáveis/agrupamento.
 
 Perspectivas de trabalhos futuros.
