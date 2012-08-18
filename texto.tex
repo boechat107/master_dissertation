@@ -1506,12 +1506,20 @@ O conjunto de dados é composto pela pressão de fundo de poço
 \textit{choke} de injeção (PT$_m$), como ilustrado na Fig. \ref{fig:poco_sim}.
 A taxa de amostragem é de uma amostra por minuto. Um ruído branco com SNR (Relação
 Sinal-Ruído) igual a $0.3$ foi adicionado às medições.
+Os dados de cada uma das variáveis são apresentados na Fig. \ref{fig:sim_dataset}.
 
 \begin{figure}[bt]
     \centering
     \includegraphics[width=.5\textwidth]{figuras/poco_simulado.ps}
     \caption{Esquema do poço usado para gerar os dados de simulação.}
     \label{fig:poco_sim}
+\end{figure}
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=1.2cm 1.2cm 1.5cm 1cm,clip=true,width=.6\textwidth]{figuras/sim_dataset.eps}
+    \caption{Dados de variáveis gerados pela simulação de um poço de petróleo.}
+    \label{fig:sim_dataset}
 \end{figure}
 
 As 60 primeiras horas de dados foram usados para treinamento dos modelos AAKR e SVM. O
@@ -1707,12 +1715,21 @@ sensores de um poço de petróleo: um de fundo de poço (PDG), um na árvore de nata
 (TPT) e outro a montante do \textit{choke} de injeção (PT$_m$).
 Os dados foram coletados durante 955 horas de operação de poço, amostrados a uma taxa de 1
 amostra/minuto.
-Na Figura ?? são apresentados os gráficos de todo o conjunto de dados reais.
+Na Figura \ref{fig:real_dataset} são apresentados os gráficos de todo o conjunto de dados reais.
+Os visíveis \textit{outliers} negativos representam, na verdade, leituras perdidas, não
+armazenadas por algum motivo desconhecido.
+
 As primeiras 400 horas de dados foram separadas como conjunto de treinamento dos modelos,
 enquanto as 100 horas consecutivas foram usadas como conjunto de otimização e o restante
 como conjunto de testes.
 
-\textcolor{red}{Figura com gráficos dos sinais}
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=2cm .7cm 2cm .7cm,clip=true,width=.9\textwidth]{figuras/real_dataset.eps}
+    \caption{Dados coletados por sensores de um poço de petróleo real, amostrados à taxa
+    de uma amostra por minuto.}
+    \label{fig:real_dataset}
+\end{figure}
 
 Novamente, os Sistemas 1 e 2 compartilharam o mesmo modelo AAKR, construído com $h=0.05$ e
 $n_m=4800$ (~20\% do conjunto de dados de treinamento).
@@ -1725,6 +1742,21 @@ Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempe
 
 \begin{table}[bt]
     \centering
+    \caption{\label{tab:svm_real_pars}Configuração dos modelos SVM construídos com
+    conjunto de dados reais de treinamento.}
+    \begin{tabular}{lcccc}
+        \toprule
+        Variável & $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte \\
+        \midrule
+        PDG & 0.12 & 256 & 512 & 5807 \\
+        TPT & 0.08 & 32 & 128 & 2286 \\
+        PT$_m$ & 0.05 & 4 & 0.0625 & 4176 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[bt]
+    \centering
     \caption{\label{tab:real_sensibilidades} Valores médios das métricas de desempenho para
     os sistemas de monitoramento e validação de sensores:
     ($E_a$), autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e erro de predição
@@ -1734,6 +1766,8 @@ Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempe
         & $E_a$ & $S_A$ & $S_C$ & $E_p$ \\
         \midrule
         Sistema 1 & 0.0035 & 0.3106 & 0.2806 & 0.0078 \\
+        Sistema 2 & 0.0069 &  & 0.4754 & 0.0190 \\
+        Sistema 3 & 0.0040 & 0.2418 & 0.2189 & 0.0046 \\
         \bottomrule
     \end{tabular}
 \end{table}
