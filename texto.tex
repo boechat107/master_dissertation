@@ -1156,6 +1156,7 @@ A seguir, apresenta-se a construção de um filtro de Kalman para a correção de se
 apresentem \textit{drift}.
 
 \subsection{Filtro de Kalman}
+\label{sec:kf}
 
 Um possível modelo matemático usado para estimar a amplitude do \textit{drift} $d$ de um
 sensor é apresentado na Eq. (\ref{eq:kf_dmodel}), onde $v^{(k)}$ é considerado um ruído
@@ -1645,7 +1646,7 @@ não gera nenhum falso alarme para os resíduos gerados por seus respectivos siste
 A Tabela \ref{tab:sim_sprt_conf} contem os valores de $M$ utilizados por cada um sistema e
 para cada uma das variáveis monitoradas.
 
-\begin{table}[tb]
+\begin{table}[bt]
     \centering
     \caption{\label{tab:sim_sprt_conf}Configurações do algoritmo SPRT para o conjunto de
 dados de teste gerados por simulação.}
@@ -1673,7 +1674,7 @@ Por exemplo, poderia-se considerar a ocorrência de desvios apenas quando o algor
 gerasse $n$ ou mais resultados positivos consecutivos.
 Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
 
-\begin{figure}[tb]
+\begin{figure}[bt]
     \centering
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_resid_d4.eps}
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_sprt_d4.eps}
@@ -1682,7 +1683,7 @@ Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
     \label{fig:sim_sys1_sprt}
 \end{figure}
 
-\begin{figure}[tb]
+\begin{figure}[bt]
     \centering
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_resid_d4.eps}
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_sprt_d4.eps}
@@ -1699,7 +1700,7 @@ leituras de cada variável.
 Desta forma, o algoritmo SPRT conseguiu detectar corretamente e mais rapidamente a
 ocorrência de desvios, além de ter gerado menos falsos alarmes.
 
-\begin{figure}[tb]
+\begin{figure}[bt]
     \centering
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_resid_d4.eps}
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_sprt_d4.eps}
@@ -1740,6 +1741,11 @@ amostras impactou significativamente no custo de tempo das predições.
 Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempenho
 (valores de MSE) e custo das predições.
 
+As configurações dos modelos SVM, obtidos a partir do conjunto de treinamento, são
+apresentadas na Tab. \ref{tab:svm_real_pars}.
+Os valores dos parâmetros foram obtidos por \textit{grid search} visando minimizar o MSE
+das estimativas do conjunto de otimização.
+
 \begin{table}[bt]
     \centering
     \caption{\label{tab:svm_real_pars}Configuração dos modelos SVM construídos com
@@ -1754,6 +1760,18 @@ Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempe
         \bottomrule
     \end{tabular}
 \end{table}
+
+Para o Sistema 3, utilizando o mesmo modelo AAKR do Sistema 1, foram selecionados os
+parâmetros como $\sigma_v = 0.0001$ e $\sigma_q = 500$.
+Em relação ao ensaio com dados de simulação, o valor mais alto de $\sigma_q$ se deve aos
+sinais mais ruidosos dos dados reais, tornando as observações $z$ dos desvios (vide Seção
+\ref{sec:kf}) menos confiáveis.
+
+Na Tabela \ref{tab:real_sensibilidades} são apresentados os resultados da análise de
+sensibilidade e acurácia dos sistemas, avaliados com o conjunto de dados de teste.
+Novamente, um desvio artificial linearmente crescente terminando com uma magnitude
+de $3\sigma$ (três vezes o desvio padrão dos dados da variável) foi introduzido
+sequencialmente (em uma variável por vez) no conjunto de dados de teste.
 
 \begin{table}[bt]
     \centering
@@ -1771,6 +1789,135 @@ Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempe
         \bottomrule
     \end{tabular}
 \end{table}
+
+Os resultados apresentados na Tab. \ref{tab:real_sensibilidades} corroboram as análises
+dos sistemas com os dados gerados por simulação.
+Apesar de possuir autosensibilidade nula, ou seja, a insensibilidade do sistema para gerar
+estimativas de uma variável cujo sensor apresenta desvios, o Sistema 2 apresentou maior
+sensibilidade aos desvios quando estes estão presentes em alguma das entradas do modelo
+regressivo, como se pode constatar pelos valores mais altos de $E_a$, $E_p$ e $S_C$.
+Além disso, o Sistema 2 possui a menor acurácia, ou seja, gerou estimativas piores mesmo
+na ausência de falhas.
+O Sistema 1 apresentou as melhores estimativas na ausência de desvios, entretanto,
+apresentou maior sensibilidade em comparação ao Sistema 3.
+Apesar das correções realizadas pelo filtro de Kalman na presença de desvios, o Sistema 3
+estima pequenos desvios a partir das variações dos resíduos mesmo na ausência de desvios
+reais nas leituras das variáveis, o que implicou em menor acurácia em relação ao Sistema
+1.
+
+As estimativas dos três sistemas na condição de ocorrência de desvios artificiais no
+sensor PDG são ilustradas na Fig. \ref{fig:real_pred_d1}.
+Os Sistemas 1 e 3 apresentaram estimativas bem semelhantes, porém as correções efetuadas
+pelo filtro de Kalman no Sistema 3 tornaram as estimativas mais próximas das leituras
+originais, no caso dos sensores PDG e TPT, e mais estáveis, no caso do sensor PT$_m$.
+As estimativas do Sistema 2 apresentaram grande variância, mesmo no caso da estimação das
+leituras do sensor PDG, onde as entradas do modelo regressivo não apresentavam desvios.
+Além do próprio ruído original dos sensores, possivelmente as informações apenas de dois
+dos sensores disponíveis são insuficientes para inferir com melhor qualidade as leituras
+do terceiro.
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]{figuras/real_aakr_pred_d1.eps}
+    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]{figuras/real_svm_pred_d1.eps}
+    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]{figuras/real_aakr_kf_pred_d1.eps}
+    \caption{Predições dos sistemas para o conjunto de dados reais de testes, com inserção
+        de desvios artificias nas leituras do PDG. Linhas vermelhas são as predições,
+        linhas verdes são as leituras dos sensores (sujeitas a falhas) usadas como
+        entradas dos sistemas e linhas azuis são as leituras originais dos sensores
+        (diferentes das linhas verdes apenas na ocorrência de falhas). Todos os dados
+        foram escalados no intervalo $[0,1]$.}
+        \label{fig:real_pred_d1}
+\end{figure}
+
+Para a detecção automática de desvios e falhas, os algoritmos SPRT de cada um dos sistemas
+foram configurados a partir do conjunto de dados de otimização.
+Os valores de $M$ foram definidos como os menores valores para os quais o algoritmo SPRT
+não gera nenhum falso alarme para os resíduos gerados por seus respectivos sistemas.
+A Tabela \ref{tab:real_sprt_conf} contem os valores de $M$ utilizados por cada um sistema e
+para cada uma das variáveis monitoradas.
+
+\begin{table}[bt]
+    \centering
+    \caption{\label{tab:real_sprt_conf}Configurações do algoritmo SPRT para o conjunto de
+dados reais de teste.} 
+    \begin{tabular}{lccc}
+        \toprule
+        & \multicolumn{3}{c}{Valores de $M$ por variável} \\
+        & PDG & TPT & PT$_m$ \\
+        \midrule
+        Sistema 1 & 0.4 & 0.4 & 0.4 \\
+        Sistema 2 & 1.0 & 0.5 & 0.5 \\
+        Sistema 3 & 0.1 & 0.1 & 0.1 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Para o caso de ocorrência de desvios no PDG, por exemplo, os resultados da detecção
+automática pelos Sistemas 1, 2 e 3 são ilustrados nas Figs. \ref{fig:real_sys1_sprt},
+\ref{fig:real_svm_sprt} e \ref{fig:real_sys3_sprt}, respectivamente.
+Apesar dos falsos alarmes para os sensores TPT e PT$_m$, os resultados do algoritmo SPRT
+do Sistema 1 apontaram corretamente a 
+Pelos resultados do algoritmo SPRT na Fig. \ref{fig:real_sys1_sprt}, o Sistema 1 detectou
+corretamente a ocorrência de desvios no PDG antes da ocorrência de vários falsos alarmes
+consecutivos nos demais sensores.
+Os falsos alarmes gerados próximos do instante 100 e 150 horas devem-se à uma possível
+anomalia (visível também próximo do instante 600 horas na Fig. \ref{fig:real_dataset}) e a
+um \textit{outlier}, citado anteriormente.
+Na verdade, estes resultados apontam a possibilidade de emprego do sistema para a
+indicação de outros tipos de falhas, como mudanças abruptas; entretanto, é de suma
+importância se certificar que o conjunto de treinamento dos modelos regressivos abrange o
+ponto de operação atual do poço.
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys1_res_d1.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys1_sprt_d1.eps}
+    \caption{Resíduos gerados pelo Sistema 1 e resultados do algoritmo SPRT para o
+    caso de ocorrência de desvios nas leituras do PDG do conjunto de dados reais.}
+    \label{fig:real_sys1_sprt}
+\end{figure}
+
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys2_res_d1.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys2_sprt_d1.eps}
+    \caption{Resíduos gerados pelo Sistema 2 e resultados do algoritmo SPRT para o
+    caso de ocorrência de desvios nas leituras do PDG do conjunto de dados reais.}
+    \label{fig:real_svm_sprt}
+\end{figure}
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys3_res_d1.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys3_sprt_d1.eps}
+    \caption{Resíduos gerados pelo Sistema 3 e resultados do algoritmo SPRT para o
+    caso de ocorrência de desvios nas leituras do PDG do conjunto de dados reais.}
+    \label{fig:real_sys3_sprt}
+\end{figure}
+
+Os resultados da detecção pelo Sistema 2, apresentados na Fig. \ref{fig:real_svm_sprt},
+refletem o pior desempenho do sistema verificado pelas análises de sensibilidade da Tab.
+\ref{tab:real_sensibilidades}.
+Apesar de aparentar média próxima de zero, a grande variância das estimativas das leituras
+do sensor TPT causaram a indicação incorreta de que o sensor com desvios seria o TPT.
+Aparentemente, a ocorrência de desvios no PDG afetou de tal forma as estimativas das
+leituras do TPT que a variância dos resíduos foi bem supeior à variância dos resíduos nas
+estimativas do conjunto de otimização, usado para a configuração do algoritmo SPRT.
+
+Pela Figura \ref{fig:real_sys3_sprt}, apesar das estimativas de desvios no TPT e
+PT$_m$, nota-se que o Sistema 3 estimou corretamente o desvio verdadeiro no PDG, dada a
+diferença de amplitudade entre os desvios estimados.
+As estimativas dos desvios do PDG não conseguiram corrigir perfeitamente as leituras do
+sensor, pois desvios crescentes, apesar de menor amplitude, também foram estimados no TPT
+e no PT$_m$.
+Entretanto, as correções efetuadas pelo filtro de Kalman do sistema foram suficientes para
+uma indicação clara da ocorrência de desvios apenas no sensor PDG.
+No caso do Sistema 3, o monitoramento e detecção de outros tipos de falhas deve ser
+realizado pela análise dos resíduos (que neste caso não apontam desvios, uma vez que foram
+subtraídos das entradas do modelo) entre as estimativas geradas pelo modelo regressivo e as
+leituras dos sensores.
 
 
 \chapter{Versão antiga dos ensaios}
@@ -1832,7 +1979,7 @@ excessivamente complexos tendem a incluir ruídos na modelagem.
 Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
 toleráveis são normalmente as melhores opções.
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
 da variável PT$_f$ dos dados de simulação.}
@@ -1850,7 +1997,7 @@ da variável PT$_f$ dos dados de simulação.}
 
 
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
 da variável PT$_t$ dos dados de simulação.}
@@ -1867,7 +2014,7 @@ da variável PT$_t$ dos dados de simulação.}
 \end{table}
 
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
 da variável PT$_m$ dos dados de simulação.}
@@ -1884,7 +2031,7 @@ da variável PT$_m$ dos dados de simulação.}
 \end{table}
 
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
 da variável PT$_g$ dos dados de simulação.}
@@ -1932,7 +2079,7 @@ Em relação ao número de vetores de memória, foi escolhido $n_m = 4800$, que corr
 $20\%$ do conjunto de dados de treinamento. Maiores valores de $n_m$ apresentaram
 impacto insignificante na redução do MSE (alterações a partir da quarta casa decimal).
 
-\begin{figure}[!htb]
+\begin{figure}[!hbt]
     \centering
     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_real.eps}
     \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
@@ -1954,7 +2101,7 @@ vetores suporte e do limite inferior do MSE.
 Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
 \ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_real_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
 do sensor PDG dos dados reais.}
@@ -1971,7 +2118,7 @@ do sensor PDG dos dados reais.}
     \end{tabular}
 \end{table}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_real_v2}Relação entre parâmetros do modelo SVM e o impacto no
 MSE na predição do sensor TPT dos dados reais.}
@@ -1988,7 +2135,7 @@ MSE na predição do sensor TPT dos dados reais.}
     \end{tabular}
 \end{table}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:svm_real_v3}Relação entre parâmetros do modelo SVM e o impacto no
 MSE na predição do sensor PT$_m$ dos dados reais.}
@@ -2032,7 +2179,7 @@ originados obtidos na simulação, uma vez que os dados não possuem falhas de sens
 Os valores de MSE para as predições de cada variável do modelo são apresentados na
 Tab.~\ref{tab:mse_aakr_sim}.
 
-\begin{figure}[!htb]
+\begin{figure}[!hbt]
     \centering
     \includegraphics[width=\textwidth]{figuras/pred_sim_aakr.eps}
     \caption{Predição do modelo AAKR para o conjunto de dados de validação gerados por
@@ -2040,7 +2187,7 @@ Tab.~\ref{tab:mse_aakr_sim}.
     \label{fig:pred_mse_sim_aakr}
 \end{figure}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:mse_aakr_sim}Resultados do cálculo do MSE para as predições do
 modelo AAKR para o conjunto de dados de validação gerados por simulação.}
@@ -2062,7 +2209,7 @@ Fig.~\ref{fig:pred_mse_sim_svm}.
 Nota-se que as predições estão próximas dos valores originados pela simulação, uma
 indicação visual da qualidade das predições do modelo.
 
-\begin{figure}[!htb]
+\begin{figure}[!hbt]
     \centering
     \includegraphics[width=\textwidth]{figuras/pred_sim_svm.eps}
     \caption{Predição do modelo SVM para o conjunto de dados de validação gerados por
@@ -2077,7 +2224,7 @@ Em comparação ao modelo AAKR, em geral as predições do modelo SVM apresentaram m
 ou seja, menor acurácia nas predições, exceto para a variável PT$_f$.
 
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:mse_svm_sim}Resultados do cálculo do MSE para as predições do
 modelo SVM para o conjunto de dados de validação gerados por simulação.}
@@ -2111,14 +2258,14 @@ forte correlação.
 Os valores de MSE para as predições de cada variável do modelo são apresentados na
 Tab.~\ref{tab:mse_aakr_real}.
 
-\begin{figure}[!htb]
+\begin{figure}[!hbt]
     \centering
     \includegraphics[width=\textwidth]{figuras/pred_real_aakr.eps}
     \caption{Predição do modelo AAKR para o conjunto de dados reais de validação.}
     \label{fig:pred_mse_real_aakr}
 \end{figure}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:mse_aakr_real}Resultados do cálculo do MSE para as predições do
 modelo AAKR para o conjunto de dados reais de validação.}
@@ -2142,7 +2289,7 @@ modelo AAKR para o conjunto de dados reais de validação.}
 \subsubsection{AAKR}
 
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:auto_sens_aakr_sim}Resultados do cálculo da autosensibilidade
     do modelo AAKR para o conjunto de testes gerados por simulação.}
@@ -2156,7 +2303,7 @@ modelo AAKR para o conjunto de dados reais de validação.}
 \end{table}
 
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:cross_sens_aakr_sim}Resultados do cálculo da sensibilidade cruzada
     do modelo AAKR para o conjunto de testes gerados por simulação.}
@@ -2175,7 +2322,7 @@ modelo AAKR para o conjunto de dados reais de validação.}
 
 \subsubsection{SVM}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:cross_sens_svm_sim}Resultados do cálculo da sensibilidade cruzada
     dos modelos SVM para o conjunto de testes gerados por simulação.}
@@ -2206,7 +2353,7 @@ modelo AAKR para o conjunto de dados reais de validação.}
 
 \subsubsection{AAKR}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:sim_aakr_sprtconf}Valores de mudança na média $M$ das variáveis do
 modelo AAKR aplicado aos dados de simulação.}
@@ -2219,7 +2366,7 @@ modelo AAKR aplicado aos dados de simulação.}
     \end{tabular}
 \end{table}
 
-\begin{figure}[!htb]
+\begin{figure}[!hbt]
     \begin{center}
         \hspace*{-3cm}
         \includegraphics[width=1.4\textwidth]{figuras/sim_aakr_drift_detect_d1.eps}
@@ -2233,7 +2380,7 @@ PT$_f$.}
 
 \subsubsection{SVM}
 
-\begin{table}[!htb]
+\begin{table}[!hbt]
     \centering
     \caption{\label{tab:sim_svm_sprtconf}Valores de mudança na média $M$ das variáveis do
 modelo SVM aplicado aos dados de simulação.}
@@ -2249,7 +2396,7 @@ modelo SVM aplicado aos dados de simulação.}
 Apesar da ocorrência de alarmes nas demais variáveis, grandes quantidades de decisões
 $H_1$ consecutivas só ocorreram na variável PT$_f$.
 
-\begin{figure}[!htb]
+\begin{figure}[!hbt]
     \begin{center}
         \hspace*{-3cm}
         \includegraphics[width=1.4\textwidth]{figuras/sim_drift_detect_d1.eps}
