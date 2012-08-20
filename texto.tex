@@ -419,6 +419,8 @@ modelo OSA-CBM, realizando a captura dos dados e o processamento inteligente.
 A aplicação cliente é responsável pela apresentação, através de uma interface
 gráfica, de dados técnicos e resultados provenientes do processamento realizado pela
 aplicação servidor.
+Possíveis aplicações da arquitetura OSA-CBM na indústria de petróleo são apresentadas por
+Boechat, Moreno e Teixeira \cite{Boechat2011}.
 
 \begin{figure}[!htb]
     \centering
@@ -452,16 +454,42 @@ Integration}}
 
 \section{Validação de Sensores e o Modelo OSA-CBM}
 
-Considerando a arquitetura OSA-CBM, um sistema de validação de sensores básico poderia ser
-divido em duas das seis camadas, a camada de processamento de sinal e a de monitoramento
-da condição, como ilustrado na Fig.~\ref{fig:osa_drift}.
+Considerando a arquitetura OSA-CBM, um sistema básico de validação de sensores poderia ser
+composto por quatro diferentes módulos e uma base de dados de histórico, como ilustrado na
+Fig. \ref{fig:osa_drift}.
+As principais funcionalidades presentes em cada módulo são:
 
-\begin{figure}[!htb]
+\begin{figure}[bt]
     \centering
     \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}
     \caption{Arquitetura do sistema de validação de sensores baseada no modelo OSA-CBM.}
     \label{fig:osa_drift}
 \end{figure}
+
+\begin{description}
+    \item[Aquisição de dados:] composta basicamente por sensores e transdutores,
+        responsáveis pela mensuração de grandezas físicas e pela transformação dessas
+        medidas para dados digitais. Contando com um sistema de banco de dados, as medidas
+        são armazenadas para futuras análises de histórico.
+
+    \item[Processamento:] responsável pela extração de informações relevantes sobre a
+        condição de funcionamento dos sensores a partir das medições realizadas pelos
+        sensores. Este módulo pode ser subdividido em pelo menos três etapas:
+        \begin{description}
+            \item[Pré-processamento:] consiste na preparação e condicionamento dos dados
+                aos algoritmos de regressão.
+
+            \item[Predição:] responsável pela construção de modelos regressivos a partir
+                do histórico de medidas dos sensores, predição de sinais e geração de
+                resíduos.
+        \end{description}
+
+
+    \item[Pós-processamento:] não intrinsecamente necessária, realiza a estimação de
+        desvios nos sinais dos sensores para maior robustez dos modelos regressivos.
+\end{description}
+
+
 
 A camada de processamento de sinal seria responsável por extrair informações sobre a
 condição de funcionamento dos sensores a partir das medições realizadas pelos mesmos e
@@ -472,17 +500,6 @@ amostras.
 % Esta tarefa pode ser subdividida em três partes: o pré-processamento, o processamento
 % principal e o pós-processamento.
 As tarefas desta camada podem ser divididas em três partes:
-
-\begin{description}
-    \item[Pré-processamento:] consiste na preparação e condicionamento dos dados aos
-        algoritmos de regressão.
-
-    \item[Processamento ou predição:] responsável pela construção de modelos regressivos,
-    predição de sinais e geração de resíduos.
-
-    \item[Pós-processamento:] não intrinsecamente necessária, realiza a estimação de
-        desvios nos sinais dos sensores para maior robustez dos modelos regressivos.
-\end{description}
 
 A camada de monitoramento da condição realizaria a tarefa de monitorar os indicadores de
 falhas nos sensores, os resíduos.
