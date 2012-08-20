@@ -140,13 +140,30 @@ Normalmente, os sistemas de monitoramento de desempenho de sensores baseados em 
 empíricos segue o esquema apresentado na Fig. \ref{fig:chap1_ddfdd}.  Supondo uma matriz
 de dados de treinamento $\mathbf{X} \in \mathbb{R}^{n \times p}$, onde $n_m$ é número de amostras
 de treino e $p$ é a quantidade de variáveis amostradas, um modelo empírico $f$ é treinado
-usando $\mathbf{X}$. Quando novas medições $\mathbf{r} \in \Re^{1\times p}$ tornam-se
+usando $\mathbf{X}$. Quando novas medições $\mathbf{r} \in \mathbb{R}^{1\times p}$ tornam-se
 disponíveis, estimações de $\mathbf{r}$ são obtidas por $\hat{\mathbf{r}} = f(\mathbf{r})$
 e resíduos são gerados como $\mathbf{d} = \mathbf{r} - \hat{\mathbf{r}}$. A ocorrência de
 \textit{drift} nas medições causa mudanças nas relações entre as variáveis de
 $\mathbf{r}$, o que resulta em mudanças estatísticas anormais nos resíduos. Então,
 avaliando estatisticamente os resíduos podem-se estabelecer as condições de operação ou
 saúde dos sensores \cite{Ma2011}.
+
+\simbolo{$p$}{Número de sensores cujas leituras compõem uma amostra de dados}
+
+\simbolo{$\mathbf{r}_{1 \times p}$}{Vetor que representa uma amostra de dados de
+$p$ sensores}
+
+\simbolo{$\hat{\mathbf{r}}_{1\times p}$}{Estimativa de $\mathbf{r}$ gerada por um modelo
+regressivo}
+
+\simbolo{$\mathbf{d}_{1 \times p}$}{Vetor de resíduos entre $\mathbf{r}$} e
+$\hat{\mathbf{r}}$
+
+\simbolo{$n_m$}{Quantidade de amostras de dados usados para construção dos modelos
+regressivos}
+
+\simbolo{$\mathbf{X}_{n_m \times p}$}{Matriz de dimensão $n_m \times p$ de histórico de
+amostras de treinamento do modelo regressivo AAKR.}
 
 \begin{figure}[!htb]
     \centering
@@ -566,7 +583,7 @@ quando expressadas em Pascal que em kgf/m$^2$.
 
 Para técnicas de aprendizagem de máquina, uma das formas comuns de se normalizar sinais é
 escalá-los no hipercubo $[0,1]^p$, onde $p$ é o número de variáveis de entrada do modelo.
-Neste caso, a normalização de uma amostra $r_p \in \Re$ obtida de um sensor $p$ é dada
+Neste caso, a normalização de uma amostra $r_p \in \mathbb{R}$ obtida de um sensor $p$ é dada
 pela Eq.~(\ref{eq:scaling}), onde $r_{norm,p}$ é o valor normalizado de $r_p$ e
 $r_{max,p}$ e $r_{min,p}$ são os valores máximos e mínimos dos dados de treinamento
 relativos ao sensor $p$.
@@ -767,6 +784,7 @@ Considerando $\mathbf{X}$ uma matriz de histórico de amostras livres de erros, o
 $X_{i,j}$ representa a i-ésima observação da j-ésima variável/sensor.
 Para $n_m$ vetores de memória e $p$ variáveis, a matriz $\mathbf{X}$ é definida como
 
+
 $$
 {\mathbf{X}} = \left[ {\begin{array}{*{20}{c}}
 {{X_{1,1}}}&{{X_{1,2}}}& \cdots &{{X_{1,p}}}\\
@@ -790,11 +808,14 @@ O funcionamento do modelo AAKR é composto de três passos básicos.
 Primeiro, calcula-se as distâncias entre $\mathbf{r}$ e cada linha da matriz de memória
 $\mathbf{X}$.
 Dentre as possíveis métricas de distância, a distância Euclidiana é a mais comumente
-utilizada, dada pela Eq.~(\ref{eq:aakr_distance}), onde $d_i$ é a distancia Euclidiana
+utilizada, dada pela Eq.~(\ref{eq:aakr_distance}), onde $u_i$ é a distancia Euclidiana
 entre o vetor de memória $\mathbf{X}_i$ e a entrada $\mathbf{r}$.
 
+\simbolo{$u_i$}{Distância Euclidiana entre o vetor de memória $\mathbf{X}_i$ e um vetor de
+entrada $\mathbf{r}$.}
+
 \begin{equation}
-    {d_i}\left( {{{\mathbf{X}}_i},{\mathbf{r}}} \right) = \sqrt {{{\left(
+    {u_i}\left( {{{\mathbf{X}}_i},{\mathbf{r}}} \right) = \sqrt {{{\left(
     {{X_{i,1}} - {r_1}} \right)}^2} + {{\left( {{X_{i,2}} - {r_2}} \right)}^2} +  \cdots
     {{\left( {{X_{i,p}} - {r_p}} \right)}^2}} 
     \label{eq:aakr_distance}
@@ -804,22 +825,28 @@ entre o vetor de memória $\mathbf{X}_i$ e a entrada $\mathbf{r}$.
 resultando em um vetor coluna de distâncias
 
 $$
-{\mathbf{d}} = \left[ {\begin{array}{*{20}{c}}
-{{d_1}}\\
-{{d_2}}\\
+{\mathbf{u}} = \left[ {\begin{array}{*{20}{c}}
+{{u_1}}\\
+{{u_2}}\\
  \vdots \\
-{{d_{{n_m}}}}
+{{u_{{n_m}}}}
 \end{array}} \right] .
 $$
 
 Em seguida, as distâncias são convertidas em medidas de similaridade ou pesos através
 da função kernel, como a Gaussiana apresentada na Eq.~(\ref{eq:gauss_kernel}), onde
-$w_i$ é o i-ésimo peso relativo a i-ésima distância $d_i$ e $h$ é a largura de banda da
-função kernel $K$.
+$\overline{w}_i$ é o i-ésimo peso relativo a i-ésima distância $u_i$ e $h$ é a largura de banda da
+função kernel $\textsf{K}$.
+
+\simbolo{$\textsf{K}$}{Função kernel}
+
+\simbolo{$h$}{Largura de banda da função kernel Gaussiana}
+
+\simbolo{$\overline{w}_i$}{Peso relativo ao vetor $u_i$ e à largura de banda $h$}
 
 \begin{equation}
-    {w_i} = K_h ({d_i}) = \frac{1}{{\sqrt {2\pi {h^2}} }}{\; \exp
-    \left(- \frac{{d_{_i}^2}}{{{h^2}}} \right) } \mbox{,}
+    {\overline{w}_i} = \textsf{K} ({u_i}) = \frac{1}{{\sqrt {2\pi {h^2}} }}{\; \exp
+    \left(- \frac{{u_{_i}^2}}{{{h^2}}} \right) } \mbox{,}
     \label{eq:gauss_kernel}
 \end{equation}
 
@@ -827,17 +854,17 @@ Por fim, através da Eq.~(\ref{eq:aakr_var_pred}), os pesos são combinados com os
 de memória para produzir uma estimativa $\hat{r}_j$ de cada variável $r_j$.
 Calculando as estimativas para $j = 1, 2, \cdots, p$, obtém-se a saída do modelo, a
 predição $\hat{\mathbf{r}}$.
-Alternativamente, definindo $a = {\sum\limits_{i = 1}^{{n_m}} {{w_i}} }$, o estimador AAKR
+Alternativamente, definindo $a = {\sum\limits_{i = 1}^{{n_m}} {{\overline{w}_i}} }$, o estimador AAKR
 pode ser apresentado pela Eq.~(\ref{eq:aakrPred}).
 
 \begin{equation}
-    \hat{r}_j = \frac{\sum\limits_{i = 1}^{n_m} {w_i}\cdot
-        X_{i,j}  }{{\sum\limits_{i = 1}^{{n_m}} {{w_i}} }}
+    \hat{r}_j = \frac{\sum\limits_{i = 1}^{n_m} {\overline{w}_i}\cdot
+        X_{i,j}  }{{\sum\limits_{i = 1}^{{n_m}} {{\overline{w}_i}} }}
     \label{eq:aakr_var_pred}
 \end{equation}
 
 \begin{equation}
-    {\hat \mathbf{r}} = \frac{{{{\mathbf{w}}^T}{\mathbf{X}}}}{a}
+    {\hat \mathbf{r}} = \frac{{{{\mathbf{\overline{w}}}^T}{\mathbf{X}}}}{a}
     \label{eq:aakrPred}
 \end{equation}
 
@@ -897,15 +924,15 @@ vetores necessária para se obter $n_m$.
 \subsubsection{SVM}
 
 Na técnica de SVM para regressão, uma matriz de dados de entrada $\mathbf{r} \in
-\Re^{p}$, de $p$ variáveis independentes, é usada para estimar uma
+\mathbb{R}^{p}$, de $p$ variáveis independentes, é usada para estimar uma
 função $f(\mathbf{r})$ que correlaciona as $p$ variáveis de $\mathbf{r}$ com uma variável
-dependente $y \in \Re$ a partir de $n_m$ observações independentes e identicamente
+dependente $y \in \mathbb{R}$ a partir de $n_m$ observações independentes e identicamente
 distribuídas.
 Dessa forma, um modelo SVM apresenta estrutura do tipo inferencial.
 
 A técnica corresponde à minimização da Eq.~(\ref{eq:DF_svm_minimize}),
-onde $f(\mathbf{r}) = \left< \mathbf{w,r} \right> + b$, com $w \in X$ (espaço de
-características) e $b \in \Re$, é o estimador da função de dependência entre $\mathbf{r}$
+onde $f(\mathbf{r}) = \left< \mathbf{w,r} \right> + b$, com $w \in \mathbb{X}$ (espaço de
+características) e $b \in \mathbb{R}$, é o estimador da função de dependência entre $\mathbf{r}$
 e $y$.
 A Equação~(\ref{eq:DF_svm_minimize}) pode ser reescrita como a Eq.~(\ref{eq:DF_svm_fx}).
 Essa formulação torna a solução esparsa no sentido que erros menores que $\varepsilon$ são
@@ -963,7 +990,7 @@ em relação às variáveis primais, o problema resulta em maximizar a função $W(\al
 \begin{equation}
     W(\alpha^*, \alpha) = - \varepsilon \sum\limits_{i=1}^n (\alpha_i + \alpha_i^*) +
     \sum\limits_{i=1}^n  y_i (\alpha_i - \alpha_i^*)  - \frac{1}{2}
-    \sum\limits_{i,j=1}^n (\alpha_i - \alpha_i^*) (\alpha_j - \alpha_j^*) \; K(r_i, r_j)
+    \sum\limits_{i,j=1}^n (\alpha_i - \alpha_i^*) (\alpha_j - \alpha_j^*) \; \textsf{K}(r_i, r_j)
     \label{eq:DF_svm_dual}
 \end{equation}
 
@@ -978,7 +1005,7 @@ $$
 $$
 
 \noindent A função $f(\mathbf{r})$ passa a ser dada pela Eq.~(\ref{eq:DF_svm_func_dual}),
-onde $\alpha, \alpha^*$ são multiplicadores de Lagrange e $K(\mathbf{r}, \mathbf{r}_i)$ é
+onde $\alpha, \alpha^*$ são multiplicadores de Lagrange e $\textsf{K}(\mathbf{r}, \mathbf{r}_i)$ é
 a função kernel que substitui os produtos internos dos dados de entrada e permite lidar
 com não linearidades eventualmente presente nos dados.
 Os vetores $\mathbf{r}_i$ são
@@ -988,7 +1015,7 @@ $\varepsilon$ afastados de suas estimativas $f(\mathbf{r})$.
 
 \begin{equation}
     f(\mathbf{r}) = \sum\limits_{i=1}^{N_{sv}} (\alpha_i^* - \alpha_i) \;
-    K(\mathbf{r}, \mathbf{r}_i) + b
+    \textsf{K}(\mathbf{r}, \mathbf{r}_i) + b
     \label{eq:DF_svm_func_dual}
 \end{equation}
 
@@ -1009,7 +1036,7 @@ apresentada na Eq.~(\ref{eq:DF_svm_kernel}),
 onde $\gamma$ é a largura de banda, o parâmetro de configuração.
 
 \begin{equation}
-    K(\mathbf{r}, \mathbf{r}_i) = \exp \left( - \frac{||\mathbf{r}-\mathbf{r}_i||^2}{2 \gamma^2} \right)
+    \textsf{K}(\mathbf{r}, \mathbf{r}_i) = \exp \left( - \frac{||\mathbf{r}-\mathbf{r}_i||^2}{2 \gamma^2} \right)
     \label{eq:DF_svm_kernel}
 \end{equation}
 
@@ -1049,7 +1076,7 @@ torna-se a função $f$.
 
 %Considere o esquema apresentado na Figura . Segundo as técnicas de aprendizado
 %preditivo, um modelo preditivo deve capturar as correlações entre as variáveis
-%$\mathbf{r} \in \Re^p$.
+%$\mathbf{r} \in \mathbb{R}^p$.
 
 Partindo-se de uma técnica de regressão, constroi-se um modelo empírico a partir de um
 conjunto de amostras de treinamento, compostas por pares entrada/saída.
@@ -1920,519 +1947,520 @@ subtraídos das entradas do modelo) entre as estimativas geradas pelo modelo regr
 leituras dos sensores.
 
 
-\chapter{Versão antiga dos ensaios}
-\section{Ensaio --- Construção dos Modelos Empíricos}
-
-\textcolor{red}{Escrever introdução}
-
-Testes sem o filtro de Kalman com AAKR e SVM. Verificar qualidade das predições.
-Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
-variáveis.
-Testes com sinais filtrados (fácil para o caso de simulação).
-
-\subsection{Dados de Simulação}
-
-\subsubsection{AAKR}
-
-O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
-Fig.~\ref{fig:mse_aakr_sim}.
-Modelos com valores altos de $h$ apresentaram grandes valores de MSE total, independente
-da quantidade de vetores de memória, $n_m$.
-Maiores valores de $n_m$ combinados com menores valores de $h$ tenderam a apresentar
-modelos com menor MSE total.
-Porém, apesar de não ser perceptível pela Fig.~\ref{fig:mse_aakr_sim}, para valores muito
-pequenos de $h$ ocorreram leves acréscimos no MSE total, para todos as quantidades
-$n_m$.
-Para evitar \textit{overfitting} e o armazenamento de grandes quantidades de dados
-desnecessariamente, escolheu-se $h = 0.1$ e $n_m = 600$ (20\% da quantidade amostras dos
-dados de treinamento).
-
-%Nota-se que modelos com menor MSE apresentam maior equilíbrio entre acurácia e
-%capacidade de generalização, ou seja, são aqueles localizados entre modelos com pequena
-%largura de banda e alta variância e modelos com largura de banda maiores e estimações
-%polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
-%menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
-%do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = $ e
-% vetores de memória.
-
-% \begin{figure}[!htb]
+% \chapter{Versão antiga dos ensaios}
+% \section{Ensaio --- Construção dos Modelos Empíricos}
+% 
+% \textcolor{red}{Escrever introdução}
+% 
+% Testes sem o filtro de Kalman com AAKR e SVM. Verificar qualidade das predições.
+% Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
+% variáveis.
+% Testes com sinais filtrados (fácil para o caso de simulação).
+% 
+% \subsection{Dados de Simulação}
+% 
+% \subsubsection{AAKR}
+% 
+% O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
+% Fig.~\ref{fig:mse_aakr_sim}.
+% Modelos com valores altos de $h$ apresentaram grandes valores de MSE total, independente
+% da quantidade de vetores de memória, $n_m$.
+% Maiores valores de $n_m$ combinados com menores valores de $h$ tenderam a apresentar
+% modelos com menor MSE total.
+% Porém, apesar de não ser perceptível pela Fig.~\ref{fig:mse_aakr_sim}, para valores muito
+% pequenos de $h$ ocorreram leves acréscimos no MSE total, para todos as quantidades
+% $n_m$.
+% Para evitar \textit{overfitting} e o armazenamento de grandes quantidades de dados
+% desnecessariamente, escolheu-se $h = 0.1$ e $n_m = 600$ (20\% da quantidade amostras dos
+% dados de treinamento).
+% 
+% %Nota-se que modelos com menor MSE apresentam maior equilíbrio entre acurácia e
+% %capacidade de generalização, ou seja, são aqueles localizados entre modelos com pequena
+% %largura de banda e alta variância e modelos com largura de banda maiores e estimações
+% %polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
+% %menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
+% %do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = $ e
+% % vetores de memória.
+% 
+% % \begin{figure}[!htb]
+% %     \centering
+% %     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
+% %     \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
+% %     vetores de memória $n_m$ para o modelo AAKR aplicado aos dados de simulação para
+% % otimização.}
+% %     \label{fig:mse_aakr_sim}
+% % \end{figure}
+% 
+% \subsubsection{SVM}
+% 
+% Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
+% \ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
+% Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
+% grade, variando-se os valores em potências de 2.
+% Nota-se que o valor de $\varepsilon$ parece ser o principal determinante da quantidade de
+% vetores suporte armazenados pelo modelo.
+% Menores valores de $\varepsilon$ implicaram em maiores números de vetores suporte e
+% menores valores do MSE.
+% Entretanto, maior número de vetores suporte indicam modelos mais complexos, e modelos
+% excessivamente complexos tendem a incluir ruídos na modelagem.
+% Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
+% toleráveis são normalmente as melhores opções.
+% 
+% \begin{table}[!hbt]
 %     \centering
-%     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
+%     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_f$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.03 & 0.0625 & 2 & 813 & 0.752\\
+%         \rowcolor{gray}0.05 & 0.5 & 0.25 & 234 & 0.778 \\
+%         0.1 & 2 & 0.5 & 50 & 1.20 \\
+%         0.2 & 2 & 2 & 15 & 3.90 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% 
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_t$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.05 & 32 & 2 & 1149 & 2.974 \\
+%         \rowcolor{gray}0.1 & 1 & 8 & 246 & 2.991 \\
+%         0.15 & 0.5 & 2 & 36 & 3.125 \\
+%         0.2 & 4 & 0.125 & 7 & 3.408 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_m$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
+%         \midrule
+%         0.05 & 0.25 & 16 & 1220 & 3.572 \\
+%         \rowcolor{gray}0.1 & 8 & 4 & 331 & 3.555 \\
+%         0.15 & 0.5 & 8 & 52 & 3.624 \\
+%         0.2 & 8 & 0.5 & 17 & 4.145 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% da variável PT$_g$ dos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
+%         \midrule
+%         0.1 & 0.125 & 8 & 525 & 5.642 \\
+%         \rowcolor{gray}0.12 & 32 & 2 & 316 & 5.694 \\
+%         0.15 & 0.25 & 4 & 133 & 5.764 \\
+%         0.2 & 32 & 1 & 29 & 5.814 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
+% \ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
+% Foram priorizados modelos cujo número de vetores suporte fosse próximo ao número de vetores
+% de memória do modelo AAKR, ou seja, próximo de 20\% do número de amostras do conjunto de
+% treinamento.
+% 
+% 
+% 
+% \subsection{Dados Reais}
+% 
+% \subsubsection{AAKR}
+% 
+% O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
+% Fig.~\ref{fig:mse_aakr_real}.
+% Para este conjunto de dados, menores valores de $h$ realmente geraram menores valores de
+% MSE total, exceto para quantidades $n_m$ muito pequenas.
+% Entretanto, modelos com $h < 0.07$ apresentaram problemas
+% numéricos para a predição dos dados de otimização, pois valores muito pequenos de
+% $h$ geram modelos com baixa capacidade de generalização, onde os denominadores da
+% Eq.~\ref{eq:aakr_var_pred} são muito próximos de zero.
+% Para diminuir a possibilidade de problemas numéricos por baixa capacidade de generalização
+% e ao mesmo tempo obter baixos valores de MSE total, adotou-se $h = 0.15$.
+% %Considerou-se $h = 0.15$ como um valor equilibrado entre acurácia e capacidade de
+% %generalização.
+% %Portanto, assim como ocorreu com os dados de simulação, 
+% %modelos com menor MSE apresentam maior equilíbrio entre acurácia e
+% %capacidade de generalização.
+% 
+% Em relação ao número de vetores de memória, foi escolhido $n_m = 4800$, que corresponde a
+% $20\%$ do conjunto de dados de treinamento. Maiores valores de $n_m$ apresentaram
+% impacto insignificante na redução do MSE (alterações a partir da quarta casa decimal).
+% 
+% \begin{figure}[!hbt]
+%     \centering
+%     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_real.eps}
 %     \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
-%     vetores de memória $n_m$ para o modelo AAKR aplicado aos dados de simulação para
+%     vetores de memória $n_m$ para o modelo AAKR aplicado aos dados reais para
 % otimização.}
-%     \label{fig:mse_aakr_sim}
+%     \label{fig:mse_aakr_real}
 % \end{figure}
-
-\subsubsection{SVM}
-
-Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
-\ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
-Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
-grade, variando-se os valores em potências de 2.
-Nota-se que o valor de $\varepsilon$ parece ser o principal determinante da quantidade de
-vetores suporte armazenados pelo modelo.
-Menores valores de $\varepsilon$ implicaram em maiores números de vetores suporte e
-menores valores do MSE.
-Entretanto, maior número de vetores suporte indicam modelos mais complexos, e modelos
-excessivamente complexos tendem a incluir ruídos na modelagem.
-Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
-toleráveis são normalmente as melhores opções.
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-da variável PT$_f$ dos dados de simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-        \midrule
-        0.03 & 0.0625 & 2 & 813 & 0.752\\
-        \rowcolor{gray}0.05 & 0.5 & 0.25 & 234 & 0.778 \\
-        0.1 & 2 & 0.5 & 50 & 1.20 \\
-        0.2 & 2 & 2 & 15 & 3.90 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-da variável PT$_t$ dos dados de simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-        \midrule
-        0.05 & 32 & 2 & 1149 & 2.974 \\
-        \rowcolor{gray}0.1 & 1 & 8 & 246 & 2.991 \\
-        0.15 & 0.5 & 2 & 36 & 3.125 \\
-        0.2 & 4 & 0.125 & 7 & 3.408 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-da variável PT$_m$ dos dados de simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-        \midrule
-        0.05 & 0.25 & 16 & 1220 & 3.572 \\
-        \rowcolor{gray}0.1 & 8 & 4 & 331 & 3.555 \\
-        0.15 & 0.5 & 8 & 52 & 3.624 \\
-        0.2 & 8 & 0.5 & 17 & 4.145 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-da variável PT$_g$ dos dados de simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
-        \midrule
-        0.1 & 0.125 & 8 & 525 & 5.642 \\
-        \rowcolor{gray}0.12 & 32 & 2 & 316 & 5.694 \\
-        0.15 & 0.25 & 4 & 133 & 5.764 \\
-        0.2 & 32 & 1 & 29 & 5.814 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
-\ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
-Foram priorizados modelos cujo número de vetores suporte fosse próximo ao número de vetores
-de memória do modelo AAKR, ou seja, próximo de 20\% do número de amostras do conjunto de
-treinamento.
-
-
-
-\subsection{Dados Reais}
-
-\subsubsection{AAKR}
-
-O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
-Fig.~\ref{fig:mse_aakr_real}.
-Para este conjunto de dados, menores valores de $h$ realmente geraram menores valores de
-MSE total, exceto para quantidades $n_m$ muito pequenas.
-Entretanto, modelos com $h < 0.07$ apresentaram problemas
-numéricos para a predição dos dados de otimização, pois valores muito pequenos de
-$h$ geram modelos com baixa capacidade de generalização, onde os denominadores da
-Eq.~\ref{eq:aakr_var_pred} são muito próximos de zero.
-Para diminuir a possibilidade de problemas numéricos por baixa capacidade de generalização
-e ao mesmo tempo obter baixos valores de MSE total, adotou-se $h = 0.15$.
-%Considerou-se $h = 0.15$ como um valor equilibrado entre acurácia e capacidade de
-%generalização.
-%Portanto, assim como ocorreu com os dados de simulação, 
-%modelos com menor MSE apresentam maior equilíbrio entre acurácia e
-%capacidade de generalização.
-
-Em relação ao número de vetores de memória, foi escolhido $n_m = 4800$, que corresponde a
-$20\%$ do conjunto de dados de treinamento. Maiores valores de $n_m$ apresentaram
-impacto insignificante na redução do MSE (alterações a partir da quarta casa decimal).
-
-\begin{figure}[!hbt]
-    \centering
-    \includegraphics[width=.7\textwidth]{figuras/mse_aakr_real.eps}
-    \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
-    vetores de memória $n_m$ para o modelo AAKR aplicado aos dados reais para
-otimização.}
-    \label{fig:mse_aakr_real}
-\end{figure}
-
-
-\subsubsection{SVM}
-
-Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
-\ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
-Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
-grade, variando-se os valores em potências de 2.
-Nota-se que o comportamento dos modelos é semelhante para o conjunto de dados de
-simulação: o valor de $\varepsilon$ apresenta-se como principal determinante do número de
-vetores suporte e do limite inferior do MSE.
-Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
-\ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_real_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-do sensor PDG dos dados reais.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
-        \midrule
-        0.5 & 0.5 & 1 & 19621 & 7.19 \\
-        0.8 & 32 & 0.25 & 17109 & 7.12 \\
-        1 & 0.25 & 0.5 & 15886 & 6.97 \\
-        \rowcolor{gray} 2 & 0.5 & 2 & 10662 & 7.00 \\
-        5 & 0.25 & 2 & 2221 & 8.86 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_real_v2}Relação entre parâmetros do modelo SVM e o impacto no
-MSE na predição do sensor TPT dos dados reais.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
-        \midrule
-        0.8 & 0.03125 & 0.03125 & 16775 & 4.36 \\
-        1.5 & 0.0625 & 0.5 & 10535 & 4.30 \\
-        2 & 0.0625 & 0.5 & 6922 & 4.25 \\
-        \rowcolor{gray}3 & 0.03125 & 0.5 & 3026 & 4.19 \\
-        4 & 0.03125 & 0.25 & 1087 & 4.22 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:svm_real_v3}Relação entre parâmetros do modelo SVM e o impacto no
-MSE na predição do sensor PT$_m$ dos dados reais.}
-    \begin{tabular}{ccccc}
-        \toprule
-        $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
-        \midrule
-        0.1 & 0.03125 & 32 & 20834 & 0.48 \\
-        0.5 & 0.03125 & 8 & 10117 & 0.47 \\
-        \rowcolor{gray}1 & 0.015625 & 0.25 & 2852 & 0.50 \\
-        2 & 128 & 0.125 & 143 & 0.80 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-% \subsubsection{Comentários}
 % 
-% Para ambas as técnicas, o processo de otimização dos modelos norteada pelo MSE foi
-% fortemente influenciada pela largura de banda da função kernel.
-% Nos modelos AAKR, o MSE
-% total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
-% ocasionaram problemas numéricos.
-% Nos modelos SVM,
 % 
-% Não houve uma escolha automática das variáveis, usou-se senso de engenharia.
-
-
-\section{Ensaio --- Verificação de Acurácia}
-
-% Supondo que exista uma seção descrevendo os critérios de avaliação.
-
-
-\subsection{Dados de Simulação}
-
-\subsubsection{AAKR}
-
-As predições do modelo AAKR para os dados de validação são apresentados na
-Fig.~\ref{fig:pred_mse_sim_aakr}.
-Nota-se que as predições correspondem à expectativa de serem bem similares aos valores
-originados obtidos na simulação, uma vez que os dados não possuem falhas de sensores.
-Os valores de MSE para as predições de cada variável do modelo são apresentados na
-Tab.~\ref{tab:mse_aakr_sim}.
-
-\begin{figure}[!hbt]
-    \centering
-    \includegraphics[width=\textwidth]{figuras/pred_sim_aakr.eps}
-    \caption{Predição do modelo AAKR para o conjunto de dados de validação gerados por
-    simulação.}
-    \label{fig:pred_mse_sim_aakr}
-\end{figure}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:mse_aakr_sim}Resultados do cálculo do MSE para as predições do
-modelo AAKR para o conjunto de dados de validação gerados por simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-        MSE & $1.0 \times 10^{-3}$ & $2.2 \times 10^{-3}$ & $2.4 \times 10^{-3}$ &
-        $2.5 \times 10^{-3}$ \\
-        \midrule
-        MSE médio & \multicolumn{4}{l}{$2.0 \times 10^{-3}$} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsubsection{SVM}
-
-As predições dos modelos SVM para os dados de validação são apresentados na
-Fig.~\ref{fig:pred_mse_sim_svm}.
-Nota-se que as predições estão próximas dos valores originados pela simulação, uma
-indicação visual da qualidade das predições do modelo.
-
-\begin{figure}[!hbt]
-    \centering
-    \includegraphics[width=\textwidth]{figuras/pred_sim_svm.eps}
-    \caption{Predição do modelo SVM para o conjunto de dados de validação gerados por
-    simulação.}
-    \label{fig:pred_mse_sim_svm}
-\end{figure}
-
-
-Os valores de MSE para as predições de cada variável, ou modelo, são apresentados na
-Tab.~\ref{tab:mse_svm_sim}.
-Em comparação ao modelo AAKR, em geral as predições do modelo SVM apresentaram maior MSE,
-ou seja, menor acurácia nas predições, exceto para a variável PT$_f$.
-
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:mse_svm_sim}Resultados do cálculo do MSE para as predições do
-modelo SVM para o conjunto de dados de validação gerados por simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-        MSE & $0.749 \times 10^{-3}$ & $3.392 \times 10^{-3}$ & $3.996 \times 10^{-3}$ &
-        $5.621 \times 10^{-3}$ \\
-        \midrule
-        MSE médio & \multicolumn{4}{l}{$3.949 \times 10^{-3}$} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\subsection{Dados Reais}
-
-\subsubsection{AAKR}
-
-As predições do modelo AAKR para os dados reais de validação são apresentados na
-Fig.~\ref{fig:pred_mse_real_aakr}.
-Nota-se que as predições apresentaram um comportamento mais suave que os sinais
-verdadeiros e não acompanharam tão bem as mudanças bruscas de valores.
-Tais características parecem corresponder ao agrupamento pobre de variáveis, uma vez que
-o sistema sensoriado apresenta alta complexidade e não linearidade no relacionamento entre
-as variáveis.
-Para lidar com casos deste tipo, normalmente é necessário formar agrupamentos com maior
-quantidade de variáveis correlacionadas ou, pelo menos, agrupar variáveis que apresentem
-forte correlação.
-
-Os valores de MSE para as predições de cada variável do modelo são apresentados na
-Tab.~\ref{tab:mse_aakr_real}.
-
-\begin{figure}[!hbt]
-    \centering
-    \includegraphics[width=\textwidth]{figuras/pred_real_aakr.eps}
-    \caption{Predição do modelo AAKR para o conjunto de dados reais de validação.}
-    \label{fig:pred_mse_real_aakr}
-\end{figure}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:mse_aakr_real}Resultados do cálculo do MSE para as predições do
-modelo AAKR para o conjunto de dados reais de validação.}
-    \begin{tabular}{cccc}
-        \toprule
-        & PDG & TPT & PT$_m$ \\
-        MSE & $7.9 \times 10^{-3}$ & $4.0 \times 10^{-3}$ & $2.3 \times 10^{-3}$\\
-        \midrule
-        MSE médio & \multicolumn{3}{l}{$4.7 \times 10^{-3}$} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsubsection{SVM}
-
-
-\section{Ensaio --- Análise de Sensibilidade e Detecção de \textit{Drifts}}
-
-\subsection{Dados de Simulação}
-
-\subsubsection{AAKR}
-
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:auto_sens_aakr_sim}Resultados do cálculo da autosensibilidade
-    do modelo AAKR para o conjunto de testes gerados por simulação.}
-    \begin{tabular}{cccc}
-        \toprule
-        PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-        \midrule
-        0.1038 & 0.2794 & 0.3169 & 0.3700 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:cross_sens_aakr_sim}Resultados do cálculo da sensibilidade cruzada
-    do modelo AAKR para o conjunto de testes gerados por simulação.}
-    \begin{tabular}{llccccc}
-        \toprule
-        & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
-        & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
-        \midrule
-        \multirow{4}{*}{Saídas} & PT$_f$ & & 0.0984 & 0.0976 & 0.0952 & 0.0971 \\
-        & PT$_t$ & 0.2973 & & 0.2775 & 0.2707 & 0.2818\\
-        & PT$_m$ & 0.3253 & 0.3184 & & 0.3118 & 0.3185\\
-        & PT$_g$ & 0.3779 & 0.3748 & 0.3738 & & 0.3755\\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsubsection{SVM}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:cross_sens_svm_sim}Resultados do cálculo da sensibilidade cruzada
-    dos modelos SVM para o conjunto de testes gerados por simulação.}
-    \begin{tabular}{llccccc}
-        \toprule
-        & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
-        & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
-        \midrule
-        \multirow{4}{*}{Saídas} & PT$_f$ & & 0.1411 & 0.1102 & 0.0343 & 0.0952\\
-        & PT$_t$ & 0.5922 & & 0.3272 & 0.2890 & 0.4028 \\
-        & PT$_m$ & 0.6395 & 0.3618 & & 0.2704 & 0.4239 \\
-        & PT$_g$ & 0.2836 & 0.4161 & 0.5620 & & 0.4206 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-
-\subsection{Dados Reais}
-
-\subsubsection{AAKR}
-
-\subsubsection{SVM}
-
-
-\section{Ensaio --- Detecção de Desvios}
-
-\subsection{Dados de Simulação}
-
-\subsubsection{AAKR}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:sim_aakr_sprtconf}Valores de mudança na média $M$ das variáveis do
-modelo AAKR aplicado aos dados de simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-        \midrule
-        $M$ & 0.3 & 0.4 & 0.4 & 0.5 \\
-        \bottomrule        
-    \end{tabular}
-\end{table}
-
-\begin{figure}[!hbt]
-    \begin{center}
-        \hspace*{-3cm}
-        \includegraphics[width=1.4\textwidth]{figuras/sim_aakr_drift_detect_d1.eps}
-    \end{center}
-    \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos AAKR
-    aplicados aos dados simulados de validação, com inserção de desvio artificial em
-PT$_f$.}
-    \label{fig:sim_aakr_drift_detec_d1}
-\end{figure}
-
-
-\subsubsection{SVM}
-
-\begin{table}[!hbt]
-    \centering
-    \caption{\label{tab:sim_svm_sprtconf}Valores de mudança na média $M$ das variáveis do
-modelo SVM aplicado aos dados de simulação.}
-    \begin{tabular}{ccccc}
-        \toprule
-        & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-        \midrule
-        $M$ & 0.2 & 0.4 & 0.4 & 0.5 \\
-        \bottomrule        
-    \end{tabular}
-\end{table}
-
-Apesar da ocorrência de alarmes nas demais variáveis, grandes quantidades de decisões
-$H_1$ consecutivas só ocorreram na variável PT$_f$.
-
-\begin{figure}[!hbt]
-    \begin{center}
-        \hspace*{-3cm}
-        \includegraphics[width=1.4\textwidth]{figuras/sim_drift_detect_d1.eps}
-    \end{center}
-    \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos SVM
-    aplicados aos dados simulados de validação, com inserção de desvio artificial em
-PT$_f$.}
-    \label{fig:sim_drift_detec_d1}
-\end{figure}
-
-\subsection{Dados Reais}
-
-
-\section{Ensaio --- Estimação de \textit{Drifts} com o KF}
-
-
-
-% \textcolor{red}{Figura:} comportamento do mse para diferentes valores de bandwidth.
+% \subsubsection{SVM}
 % 
-% Pela análise dos resíduos gerados entre a predição do modelo selecionado e os dados de
-% otimização, os parâmetros selecionados para o algoritmo SPRT foram:
-% \textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
-% probabilidade de alarmes perdidos igual a $10\%$.
+% Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
+% \ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
+% Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
+% grade, variando-se os valores em potências de 2.
+% Nota-se que o comportamento dos modelos é semelhante para o conjunto de dados de
+% simulação: o valor de $\varepsilon$ apresenta-se como principal determinante do número de
+% vetores suporte e do limite inferior do MSE.
+% Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
+% \ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
 % 
-% \subsubsection{AAKR-KF-SPRT}
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:svm_real_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
+% do sensor PDG dos dados reais.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
+%         \midrule
+%         0.5 & 0.5 & 1 & 19621 & 7.19 \\
+%         0.8 & 32 & 0.25 & 17109 & 7.12 \\
+%         1 & 0.25 & 0.5 & 15886 & 6.97 \\
+%         \rowcolor{gray} 2 & 0.5 & 2 & 10662 & 7.00 \\
+%         5 & 0.25 & 2 & 2221 & 8.86 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
 % 
-% Como os parâmetros $h = ?$ e $n_m = ?$ geraram o modelo com o melhor balanço entre
-% acurácia e capacidade de generalização para os dados de treinamento, tais valores também
-% foram adotados para o modelo AAKR do sistema AAKR-KF-SPRT. A busca pelos melhores valores
-% no espaço dos parâmetros $\mathbf{Q}$ e $\mathbf{V}$ do KF resultou nos valores
-% $\mathbf{Q} = \mathbf{I} \; ?$ e $\mathbf{V} = \mathbf{I} \; ?$; a Figura ?? apresenta o
-% comportamento do MSE para os diferentes valores dos parâmetros do KF.
-
-
-
-
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:svm_real_v2}Relação entre parâmetros do modelo SVM e o impacto no
+% MSE na predição do sensor TPT dos dados reais.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
+%         \midrule
+%         0.8 & 0.03125 & 0.03125 & 16775 & 4.36 \\
+%         1.5 & 0.0625 & 0.5 & 10535 & 4.30 \\
+%         2 & 0.0625 & 0.5 & 6922 & 4.25 \\
+%         \rowcolor{gray}3 & 0.03125 & 0.5 & 3026 & 4.19 \\
+%         4 & 0.03125 & 0.25 & 1087 & 4.22 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:svm_real_v3}Relação entre parâmetros do modelo SVM e o impacto no
+% MSE na predição do sensor PT$_m$ dos dados reais.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
+%         \midrule
+%         0.1 & 0.03125 & 32 & 20834 & 0.48 \\
+%         0.5 & 0.03125 & 8 & 10117 & 0.47 \\
+%         \rowcolor{gray}1 & 0.015625 & 0.25 & 2852 & 0.50 \\
+%         2 & 128 & 0.125 & 143 & 0.80 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% % \subsubsection{Comentários}
+% % 
+% % Para ambas as técnicas, o processo de otimização dos modelos norteada pelo MSE foi
+% % fortemente influenciada pela largura de banda da função kernel.
+% % Nos modelos AAKR, o MSE
+% % total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
+% % ocasionaram problemas numéricos.
+% % Nos modelos SVM,
+% % 
+% % Não houve uma escolha automática das variáveis, usou-se senso de engenharia.
+% 
+% 
+% \section{Ensaio --- Verificação de Acurácia}
+% 
+% % Supondo que exista uma seção descrevendo os critérios de avaliação.
+% 
+% 
+% \subsection{Dados de Simulação}
+% 
+% \subsubsection{AAKR}
+% 
+% As predições do modelo AAKR para os dados de validação são apresentados na
+% Fig.~\ref{fig:pred_mse_sim_aakr}.
+% Nota-se que as predições correspondem à expectativa de serem bem similares aos valores
+% originados obtidos na simulação, uma vez que os dados não possuem falhas de sensores.
+% Os valores de MSE para as predições de cada variável do modelo são apresentados na
+% Tab.~\ref{tab:mse_aakr_sim}.
+% 
+% \begin{figure}[!hbt]
+%     \centering
+%     \includegraphics[width=\textwidth]{figuras/pred_sim_aakr.eps}
+%     \caption{Predição do modelo AAKR para o conjunto de dados de validação gerados por
+%     simulação.}
+%     \label{fig:pred_mse_sim_aakr}
+% \end{figure}
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:mse_aakr_sim}Resultados do cálculo do MSE para as predições do
+% modelo AAKR para o conjunto de dados de validação gerados por simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+%         MSE & $1.0 \times 10^{-3}$ & $2.2 \times 10^{-3}$ & $2.4 \times 10^{-3}$ &
+%         $2.5 \times 10^{-3}$ \\
+%         \midrule
+%         MSE médio & \multicolumn{4}{l}{$2.0 \times 10^{-3}$} \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% \subsubsection{SVM}
+% 
+% As predições dos modelos SVM para os dados de validação são apresentados na
+% Fig.~\ref{fig:pred_mse_sim_svm}.
+% Nota-se que as predições estão próximas dos valores originados pela simulação, uma
+% indicação visual da qualidade das predições do modelo.
+% 
+% \begin{figure}[!hbt]
+%     \centering
+%     \includegraphics[width=\textwidth]{figuras/pred_sim_svm.eps}
+%     \caption{Predição do modelo SVM para o conjunto de dados de validação gerados por
+%     simulação.}
+%     \label{fig:pred_mse_sim_svm}
+% \end{figure}
+% 
+% 
+% Os valores de MSE para as predições de cada variável, ou modelo, são apresentados na
+% Tab.~\ref{tab:mse_svm_sim}.
+% Em comparação ao modelo AAKR, em geral as predições do modelo SVM apresentaram maior MSE,
+% ou seja, menor acurácia nas predições, exceto para a variável PT$_f$.
+% 
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:mse_svm_sim}Resultados do cálculo do MSE para as predições do
+% modelo SVM para o conjunto de dados de validação gerados por simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+%         MSE & $0.749 \times 10^{-3}$ & $3.392 \times 10^{-3}$ & $3.996 \times 10^{-3}$ &
+%         $5.621 \times 10^{-3}$ \\
+%         \midrule
+%         MSE médio & \multicolumn{4}{l}{$3.949 \times 10^{-3}$} \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% 
+% \subsection{Dados Reais}
+% 
+% \subsubsection{AAKR}
+% 
+% As predições do modelo AAKR para os dados reais de validação são apresentados na
+% Fig.~\ref{fig:pred_mse_real_aakr}.
+% Nota-se que as predições apresentaram um comportamento mais suave que os sinais
+% verdadeiros e não acompanharam tão bem as mudanças bruscas de valores.
+% Tais características parecem corresponder ao agrupamento pobre de variáveis, uma vez que
+% o sistema sensoriado apresenta alta complexidade e não linearidade no relacionamento entre
+% as variáveis.
+% Para lidar com casos deste tipo, normalmente é necessário formar agrupamentos com maior
+% quantidade de variáveis correlacionadas ou, pelo menos, agrupar variáveis que apresentem
+% forte correlação.
+% 
+% Os valores de MSE para as predições de cada variável do modelo são apresentados na
+% Tab.~\ref{tab:mse_aakr_real}.
+% 
+% \begin{figure}[!hbt]
+%     \centering
+%     \includegraphics[width=\textwidth]{figuras/pred_real_aakr.eps}
+%     \caption{Predição do modelo AAKR para o conjunto de dados reais de validação.}
+%     \label{fig:pred_mse_real_aakr}
+% \end{figure}
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:mse_aakr_real}Resultados do cálculo do MSE para as predições do
+% modelo AAKR para o conjunto de dados reais de validação.}
+%     \begin{tabular}{cccc}
+%         \toprule
+%         & PDG & TPT & PT$_m$ \\
+%         MSE & $7.9 \times 10^{-3}$ & $4.0 \times 10^{-3}$ & $2.3 \times 10^{-3}$\\
+%         \midrule
+%         MSE médio & \multicolumn{3}{l}{$4.7 \times 10^{-3}$} \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% \subsubsection{SVM}
+% 
+% 
+% \section{Ensaio --- Análise de Sensibilidade e Detecção de \textit{Drifts}}
+% 
+% \subsection{Dados de Simulação}
+% 
+% \subsubsection{AAKR}
+% 
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:auto_sens_aakr_sim}Resultados do cálculo da autosensibilidade
+%     do modelo AAKR para o conjunto de testes gerados por simulação.}
+%     \begin{tabular}{cccc}
+%         \toprule
+%         PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+%         \midrule
+%         0.1038 & 0.2794 & 0.3169 & 0.3700 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:cross_sens_aakr_sim}Resultados do cálculo da sensibilidade cruzada
+%     do modelo AAKR para o conjunto de testes gerados por simulação.}
+%     \begin{tabular}{llccccc}
+%         \toprule
+%         & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
+%         & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
+%         \midrule
+%         \multirow{4}{*}{Saídas} & PT$_f$ & & 0.0984 & 0.0976 & 0.0952 & 0.0971 \\
+%         & PT$_t$ & 0.2973 & & 0.2775 & 0.2707 & 0.2818\\
+%         & PT$_m$ & 0.3253 & 0.3184 & & 0.3118 & 0.3185\\
+%         & PT$_g$ & 0.3779 & 0.3748 & 0.3738 & & 0.3755\\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% \subsubsection{SVM}
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:cross_sens_svm_sim}Resultados do cálculo da sensibilidade cruzada
+%     dos modelos SVM para o conjunto de testes gerados por simulação.}
+%     \begin{tabular}{llccccc}
+%         \toprule
+%         & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
+%         & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
+%         \midrule
+%         \multirow{4}{*}{Saídas} & PT$_f$ & & 0.1411 & 0.1102 & 0.0343 & 0.0952\\
+%         & PT$_t$ & 0.5922 & & 0.3272 & 0.2890 & 0.4028 \\
+%         & PT$_m$ & 0.6395 & 0.3618 & & 0.2704 & 0.4239 \\
+%         & PT$_g$ & 0.2836 & 0.4161 & 0.5620 & & 0.4206 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+% 
+% 
+% \subsection{Dados Reais}
+% 
+% \subsubsection{AAKR}
+% 
+% \subsubsection{SVM}
+% 
+% 
+% \section{Ensaio --- Detecção de Desvios}
+% 
+% \subsection{Dados de Simulação}
+% 
+% \subsubsection{AAKR}
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:sim_aakr_sprtconf}Valores de mudança na média $M$ das variáveis do
+% modelo AAKR aplicado aos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+%         \midrule
+%         $M$ & 0.3 & 0.4 & 0.4 & 0.5 \\
+%         \bottomrule        
+%     \end{tabular}
+% \end{table}
+% 
+% \begin{figure}[!hbt]
+%     \begin{center}
+%         \hspace*{-3cm}
+%         \includegraphics[width=1.4\textwidth]{figuras/sim_aakr_drift_detect_d1.eps}
+%     \end{center}
+%     \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos AAKR
+%     aplicados aos dados simulados de validação, com inserção de desvio artificial em
+% PT$_f$.}
+%     \label{fig:sim_aakr_drift_detec_d1}
+% \end{figure}
+% 
+% 
+% \subsubsection{SVM}
+% 
+% \begin{table}[!hbt]
+%     \centering
+%     \caption{\label{tab:sim_svm_sprtconf}Valores de mudança na média $M$ das variáveis do
+% modelo SVM aplicado aos dados de simulação.}
+%     \begin{tabular}{ccccc}
+%         \toprule
+%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
+%         \midrule
+%         $M$ & 0.2 & 0.4 & 0.4 & 0.5 \\
+%         \bottomrule        
+%     \end{tabular}
+% \end{table}
+% 
+% Apesar da ocorrência de alarmes nas demais variáveis, grandes quantidades de decisões
+% $H_1$ consecutivas só ocorreram na variável PT$_f$.
+% 
+% \begin{figure}[!hbt]
+%     \begin{center}
+%         \hspace*{-3cm}
+%         \includegraphics[width=1.4\textwidth]{figuras/sim_drift_detect_d1.eps}
+%     \end{center}
+%     \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos SVM
+%     aplicados aos dados simulados de validação, com inserção de desvio artificial em
+% PT$_f$.}
+%     \label{fig:sim_drift_detec_d1}
+% \end{figure}
+% 
+% \subsection{Dados Reais}
+% 
+% 
+% \section{Ensaio --- Estimação de \textit{Drifts} com o KF}
+% 
+% 
+% 
+% % \textcolor{red}{Figura:} comportamento do mse para diferentes valores de bandwidth.
+% % 
+% % Pela análise dos resíduos gerados entre a predição do modelo selecionado e os dados de
+% % otimização, os parâmetros selecionados para o algoritmo SPRT foram:
+% % \textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
+% % probabilidade de alarmes perdidos igual a $10\%$.
+% % 
+% % \subsubsection{AAKR-KF-SPRT}
+% % 
+% % Como os parâmetros $h = ?$ e $n_m = ?$ geraram o modelo com o melhor balanço entre
+% % acurácia e capacidade de generalização para os dados de treinamento, tais valores também
+% % foram adotados para o modelo AAKR do sistema AAKR-KF-SPRT. A busca pelos melhores valores
+% % no espaço dos parâmetros $\mathbf{Q}$ e $\mathbf{V}$ do KF resultou nos valores
+% % $\mathbf{Q} = \mathbf{I} \; ?$ e $\mathbf{V} = \mathbf{I} \; ?$; a Figura ?? apresenta o
+% % comportamento do MSE para os diferentes valores dos parâmetros do KF.
+% 
+% 
+% 
+% 
+% 
 \chapter{Conclusões}
 \label{chap:conclusoes}
 
