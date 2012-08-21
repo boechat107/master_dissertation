@@ -482,32 +482,29 @@ As principais funcionalidades presentes em cada módulo são:
             \item[Predição:] responsável pela construção de modelos regressivos a partir
                 do histórico de medidas dos sensores, predição de sinais e geração de
                 resíduos.
+
+            \item[Pós-processamento:] não intrinsecamente necessária, realiza a estimação de
+                desvios nos sinais dos sensores para maior robustez dos modelos regressivos.
         \end{description}
 
+    \item[Monitoramento de condição:] realiza a tarefa de monitorar os indicadores de
+        falhas nos sensores a partir da detecção de mudanças nas propriedades estatísticas
+        dos resíduos ou das estimativas de desvio. Alertas e alarmes podem ser gerados
+        para indicarem falhas em sensores específicos.
 
-    \item[Pós-processamento:] não intrinsecamente necessária, realiza a estimação de
-        desvios nos sinais dos sensores para maior robustez dos modelos regressivos.
+    \item[Interface gráfica:] módulo de apresentação de resultados e indicadores para os
+        usuários, realiza a tarefa de apresentar as informações relevantes para cada grupo
+        de usuários, como o de manuntenção, operação da planta ou o grupo responsável por
+        tomadas de decisões estratégicas de negócio.
 \end{description}
 
-
-
-A camada de processamento de sinal seria responsável por extrair informações sobre a
-condição de funcionamento dos sensores a partir das medições realizadas pelos mesmos e
-fornecidas pela camada de aquisição de dados.
-A comunicação com a base de dados seria essencial, tanto para o resgate do histórico de
-medições dos sensores quanto para o armazenamento das informações extraídas das novas
-amostras.
-% Esta tarefa pode ser subdividida em três partes: o pré-processamento, o processamento
-% principal e o pós-processamento.
-As tarefas desta camada podem ser divididas em três partes:
-
-A camada de monitoramento da condição realizaria a tarefa de monitorar os indicadores de
-falhas nos sensores, os resíduos.
-Mudanças nas propriedades estatísticas dos resíduos seriam detectadas, gerando alertas ou
-alarmes que indicariam a ocorrência de falhas em sensores específicos.
-
-Como indicado na Fig.~\ref{fig:osa_drift}, ambas as camadas poderiam apresentar resultados e
-indicadores diretamente ao usuário através de uma interface gráfica.
+Vale destacar ainda uma das principais vantagens da adoção de uma arquitetura padronizada
+como a OSA-CBM: a facilidade de inserção de novos algoritmos para cada um dos módulos do
+sistema de manutenção.
+Através das interfaces padronizadas dos módulos, algoritmos de diagnóstico, para a
+identificação de diferentes tipos de falhas, e de prognóstico, previsão das condições
+futuras de funcionamento, por exemplo, poderiam ser incluídos sem praticamente nenhuma
+mudança nos algoritmos e módulos já presentes no sistema.
 
 
 \chapter{Processamento de Sinais para Detecção e Correção de Drift}
