@@ -795,16 +795,16 @@ multivariável por kernel, apresentada por Wand e Jones \cite{wand1995kernel}.
 %conjunto de vetores do histórico, armazenado como uma memória, o modelo AAKR 
 
 Considerando $\mathbf{X}$ uma matriz de histórico de amostras livres de erros, ou memória,
-$X_{i,j}$ representa a i-ésima observação da j-ésima variável/sensor.
+$x_j^{(i)}$ representa a i-ésima observação da j-ésima variável/sensor.
 Para $n_m$ vetores de memória e $p$ variáveis, a matriz $\mathbf{X}$ é definida como
 
 
 $$
 {\mathbf{X}} = \left[ {\begin{array}{*{20}{c}}
-{{X_{1,1}}}&{{X_{1,2}}}& \cdots &{{X_{1,p}}}\\
-{{X_{2,1}}}&{{X_{2,2}}}& \cdots &{{X_{2,p}}}\\
+{{x_1^{(1)}}}&{{x_2^{(1)}}}& \cdots &{{x_p^{(1)}}}\\
+{{x^{(2)}_1}}&{{x^{(2)}_2}}& \cdots &{{x_p^{(2)}}}\\
  \vdots & \vdots & \ddots & \vdots \\
-{{X_{{n_m},1}}}&{{X_{{n_m},2}}}& \cdots &{{X_{{n_m},p}}}
+ {{x^{(n_m)}_1}}&{{x^{(n_m)}_2}}& \cdots &{{x^{(n_m)}_p}}
 \end{array}} \right] \mbox{.}
 $$
 
@@ -823,15 +823,15 @@ Primeiro, calcula-se as distâncias entre $\mathbf{r}$ e cada linha da matriz de 
 $\mathbf{X}$.
 Dentre as possíveis métricas de distância, a distância Euclidiana é a mais comumente
 utilizada~\cite{Hines2008}, dada pela Eq.~(\ref{eq:aakr_distance}), onde $u_i$ é a distancia Euclidiana
-entre o vetor de memória $\mathbf{X}_i$ e a entrada $\mathbf{r}$.
+entre o vetor de memória $\mathbf{x}^{(i)}$ e a entrada $\mathbf{r}$.
 
-\simbolo{$u_i$}{Distância Euclidiana entre o vetor de memória $\mathbf{X}_i$ e um vetor de
+\simbolo{$u_i$}{Distância Euclidiana entre o vetor de memória $\mathbf{x}^{(i)}$ e um vetor de
 entrada $\mathbf{r}$.}
 
 \begin{equation}
-    {u_i}\left( {{{\mathbf{X}}_i},{\mathbf{r}}} \right) = \sqrt {{{\left(
-    {{X_{i,1}} - {r_1}} \right)}^2} + {{\left( {{X_{i,2}} - {r_2}} \right)}^2} +  \cdots
-    {{\left( {{X_{i,p}} - {r_p}} \right)}^2}} 
+    {u_i}\left( {{{\mathbf{X}}^{(i)}},{\mathbf{r}}} \right) = \sqrt {{{\left(
+        {{x_1^{(i)}} - {r_1}} \right)}^2} + {{\left( {{x_2^{(i)}} - {r_2}} \right)}^2} +  \cdots
+        {{\left( {{x_p^{(i)}} - {r_p}} \right)}^2}} 
     \label{eq:aakr_distance}
 \end{equation}
 
@@ -866,14 +866,14 @@ função kernel $\textsf{K}$.
 
 Por fim, através da Eq.~(\ref{eq:aakr_var_pred}), os pesos são combinados com os vetores
 de memória para produzir uma estimativa $\hat{r}_j$ de cada variável $r_j$.
-Calculando as estimativas para $j = 1, 2, \cdots, p$, obtém-se a saída do modelo, a
+Calculando as estimativas para $j = \{1, 2, \cdots, p\}$, obtém-se a saída do modelo, a
 predição $\hat{\mathbf{r}}$.
 Alternativamente, definindo $a = {\sum\limits_{i = 1}^{{n_m}} {{\overline{w}_i}} }$, o estimador AAKR
 pode ser apresentado pela Eq.~(\ref{eq:aakrPred}).
 
 \begin{equation}
     \hat{r}_j = \frac{\sum\limits_{i = 1}^{n_m} {\overline{w}_i}\cdot
-        X_{i,j}  }{{\sum\limits_{i = 1}^{{n_m}} {{\overline{w}_i}} }}
+        x_j^{(i)}  }{{\sum\limits_{i = 1}^{{n_m}} {{\overline{w}_i}} }}
     \label{eq:aakr_var_pred}
 \end{equation}
 
@@ -917,14 +917,14 @@ máximos e mínimos de cada variável, sem repetição de vetores.
 No método de seleção por ordenamento de vetores, primeiramente ordenam-se os vetores de
 treinamento de acordo com a norma Euclidiana.
 A Equação~(\ref{eq:aakrVecOrd}) apresenta o cálculo da norma Euclidiana $N_i$ para um
-vetor $\mathbf{X}_i$ de treinamento.
+vetor $\mathbf{x}^{(i)}$ de treinamento.
 Em seguida, selecionam-se $n_m$ vetores amostrando de forma periódica.
 É importante destacar que este método é intrinsecamente relacionado com a localização da
 origem do espaço da matriz de dados de treinamento, o que torna importante escalar as
 variáveis antes da utilização deste método de seleção.
 
 \begin{equation}
-    N_i = \sqrt{X_{i,1}^2 + X_{i,2}^2 + \cdots + X_{i,p}^2}
+    N_i = \sqrt{x_1^{(i) \; 2} + x_2^{(i) \; 2} + \cdots + x_p^{(i) \; 2}}
     \label{eq:aakrVecOrd}
 \end{equation}
 
