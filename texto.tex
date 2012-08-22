@@ -2478,12 +2478,82 @@ leituras dos sensores.
 \chapter{Conclusões}
 \label{chap:conclusoes}
 
-Revisão da importância do monitoramento de calibração.
-Revisão da sistema implementado e sua relação com a estrutura OSA-CBM.
-Revisão dos experimentos realizados e os resultados obtidos. Resumir as vantagens e
-desvantagens da abordagem escolhida, analisar de forma crítica as contribuições da
-dissertação.
+% Revisão da importância do monitoramento de calibração.
+% Revisão da sistema implementado e sua relação com a estrutura OSA-CBM.
+% Revisão dos experimentos realizados e os resultados obtidos. Resumir as vantagens e
+% desvantagens da abordagem escolhida, analisar de forma crítica as contribuições da
+% dissertação.
+% 
+% Não foi realizado um estudo da escolha das variáveis/agrupamento.
+% 
+% Perspectivas de trabalhos futuros.
 
-Não foi realizado um estudo da escolha das variáveis/agrupamento.
+Neste trabalho foi apresentado o desenvolvimento e implementação de um sistema de
+monitoramento e validação de sensores de poços de petróleo, utilizando técnicas de
+aprendizado de máquina e modelos empíricos baseados em histórico de
+dados\footnote{Parte deste trabalho foi publicado no \textit{workshop} em automação e
+controle em plataformas de petróleo e gás, IFAC \cite{Boechat2012}.}.
+O emprego de tal sistema visa garantir a qualidade e veracidade das informações coletadas
+pelos sensores, normalmente essenciais para ações de controle, otimização da produção e
+tomadas de decisões estratégicas para o negócio, além de preservar a segurança das
+operações.
 
-Perspectivas de trabalhos futuros.
+Pensando na complexidade de todo o processo de produção petrolífero e na possibilidade de
+integração com sistemas de manutenção mais abrangentes, o sistema proposto foi estruturado
+de acordo com uma arquitetura aberta para sistemas de manutenção baseados na condição de
+funcionamento (CBM), a OSA-CBM.
+Para o desenvolvimento dos modelos empíricos baseados em histórico, duas diferentes
+técnicas de regressão foram analisadas: a regressão por kernel auto-associativa (AAKR) e a
+\textit{Support Vector Machines} (SVM).
+Foi apresentado um filtro de Kalman para a estimação de desvios, visando tanto um ganho de
+desempenho das predições dos modelos empíricos quanto uma alternativa para a detecção
+automática de desvios nos sensores.
+A detecção de desvios nos sensores foi realizado pelo algoritmo SPRT, através da análise
+de mudanças nas propriedades estatísticas dos resíduos ou das estimativas de desvios
+realizadas pelo filtro de Kalman.
+
+Para verificar a aplicabilidade do trabalho desenvolvido, foram realizados ensaios com
+três diferentes sistemas de validação: o Sistema 1, composto por um modelo AAKR; o Sistema
+2, composto por um modelo SVM; e o Sistema 3, composto por um modelo AAKR (devido aos
+melhores resultados nos ensaios quando comparado ao modelo SVM) e um filtro de Kalman.
+A avaliação dos sistemas considerou quatro diferentes métricas: acurácia ($E_a$),
+autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e os erros de predição na
+presença de desvios ($E_p$).
+Em relação à detecção automática de desvios, avaliou-se os sistemas pela influência de
+falsos positivos na decisão final do sistema.
+Dois diferentes conjuntos de dados foram usados para os ensaios: um conjunto de dados
+gerados pela simulação do modelo de um poço de petróleo; e um conjunto de dados coletados
+de sensores de um poço real.
+
+Em ambos os ensaios, com dados simulados e reais, o Sistema 3 apresentou menor
+sensibilidade a desvios e o menor erro de predição $E_p$ quando comparado ao Sistema 1,
+porém apresentou menor acurácia (maior $E_a$).
+Apesar das diferenças de desempenho, ambos os sistemas foram capazes de detectar
+corretamente a ocorrência de desvios.
+O Sistema 2, embora possua autosensibilidade nula de forma inerente, apresentou valores
+piores de $E_a$, $E_p$ e $S_C$ para os dois conjuntos de dados.
+No caso dos dados de simulação, o pior desempenho não impediu que o sistema detectasse
+corretamente a ocorrência de desvios.
+Entretanto, para o conjunto de dados reais, o Sistema 2 não foi capaz de gerar predições
+consistentes e detectar a ocorrência de desvios corretamente, gerando uma quantidade
+inaceitável de falsos alarmes e impossibilitando a identificação do sensor defeituoso.
+
+Embora os resultados apontem o emprego de modelos AAKR e do filtro de Kalman como
+promissores, não se pode descartar o uso de modelos SVM para sistemas de monitoramento e
+validação de sensores.
+É preciso considerar a pequena quantidade de sensores disponíveis no conjunto de dados
+reais.
+Possivelmente, em grupos maiores de sensores correlacionados os modelos SVM podem
+apresentar desempenhos melhores.
+
+Tanto os sistemas compostos por modelos AAKR quanto por modelos SVM poderiam gerar
+melhores predições com o emprego de técnicas automáticas de agrupamento ótimo de sensores,
+que deve ser considerado para trabalhos futuros.
+Além disso, a aplicação de métodos automáticos para validação dos próprios modelos
+empíricos seria desejável, uma vez que as características de um poço de petróleo mudam ao
+longo de sua vida útil, assim como o comportamento da correlação entre as variáveis
+mensuradas pelos sensores.
+Finalmente, vislumbra-se a possibilidade de contruir modelos SVM de séries temporais, onde
+a saída do modelo não dependa apenas das entradas atuais, mas também de entradas
+anteriores \cite{Chen2004}.
+
