@@ -937,10 +937,12 @@ vetores necessária para se obter $n_m$.
 
 \subsubsection{SVM}
 
-Na técnica de SVM para regressão, uma matriz de dados de entrada $\mathbf{r} \in
-\mathbb{R}^{p}$, de $p$ variáveis independentes, é usada para estimar uma
+Na técnica de SVM para regressão, um conjunto de dados de treinamento
+$\{(\mathbf{r}^{(1)}, y^{(1)}), \ldots, (\mathbf{r}^{(n_m)}, y^{(n_m)})\}$, onde $\mathbf{r}
+\in \mathbb{R}^p$ e $y \in \mathbb{R}$,
+é usado para estimar uma
 função $f(\mathbf{r})$ que correlaciona as $p$ variáveis de $\mathbf{r}$ com uma variável
-dependente $y \in \mathbb{R}$ a partir de $n_m$ observações independentes e identicamente
+dependente $y$ a partir de $n_m$ observações independentes e identicamente
 distribuídas.
 Dessa forma, um modelo SVM apresenta estrutura do tipo inferencial.
 
@@ -948,30 +950,30 @@ A técnica corresponde à minimização da Eq.~(\ref{eq:DF_svm_minimize}),
 onde $f(\mathbf{r}) = \left< \mathbf{w,r} \right> + b$, com $w \in \mathbb{X}$ (espaço de
 características) e $b \in \mathbb{R}$, é o estimador da função de dependência entre $\mathbf{r}$
 e $y$.
-A Equação~(\ref{eq:DF_svm_minimize}) pode ser reescrita como a Eq.~(\ref{eq:DF_svm_fx}).
+A solução da Eq.~(\ref{eq:DF_svm_minimize}) pode ser escrita como a Eq.~(\ref{eq:DF_svm_fx}).
 Essa formulação torna a solução esparsa no sentido que erros menores que $\varepsilon$ são
 ignorados, ou seja, a solução torna-se ``$\varepsilon$-insensível''.
 
 \begin{equation}
-    \frac{1}{2} || \mathbf{w}||^2 + C \sum\limits^n_{i=1} \left( \xi_i + \xi^{*} \right)
+    \begin{array}{ll}
+        \mbox{Minimizar} & \frac{1}{2} || \mathbf{w}||^2 + C \sum\limits^n_{i=1} \left(
+        \xi^{(i)} + \xi^{* \; (i)} \right) \\[.5cm]
+        \mbox{Sujeito a} &
+        \left\{
+        \begin{array}{rl}
+            y^{(i)} - \left<\mathbf{w}, \mathbf{r}^{(i)} \right> - b & \le \varepsilon
+            + \xi^{(i)} \\[7pt]
+            \left<\mathbf{w}, \mathbf{r}^{(i)} \right> + b - y^{(i)} & \le \varepsilon +
+            \xi^{* \; (i)} \\[7pt]
+            \xi^{(i)}, \xi^{* \; (i)} & \ge 0
+        \end{array}
+        \right\} \\
+    \end{array}
     \label{eq:DF_svm_minimize}
 \end{equation}
 
-$$
-    \mbox{Sujeito a}
-    \left\{
-    \begin{array}{rl}
-        y_i - \left<\mathbf{w}, \mathbf{r}_i \right> - b & \le \varepsilon
-        + \xi_i \\
-        \left<\mathbf{w}, \mathbf{r}_i \right> + b - y_i & \le \varepsilon +
-        \xi_i^* \\
-        \xi_i, \xi_i^* & \ge 0
-    \end{array}
-    \right\}
-$$
-
 \begin{equation}
-    f(\mathbf{r}) = \sum\limits_{j=1}^p w_j \; r_j + b .
+    f(\mathbf{r}) = \sum\limits_{j=1}^p w_j \; r_j + b
     \label{eq:DF_svm_fx}
 \end{equation}
 
@@ -979,14 +981,14 @@ O primeiro termo da equação (\ref{eq:DF_svm_minimize}) é um termo de regularizaç
 evita o mau condicionamento do problema de estimação, contribuindo na simplicidade do
 estimador da função.
 O segundo termo é a função de perda $\varepsilon$-insensível, a qual
-mede o quanto os valores estimados estão próximos dos valores $y$. As variáveis $\xi_i$ e
-$\xi_i^*$ são chamadas de variáveis de folga, que determinam o grau de penalização
+mede o quanto os valores estimados estão próximos dos valores $y$. As variáveis $\xi^{(i)}$ e
+$\xi^{* \; (i)}$ são chamadas de variáveis de folga, que determinam o grau de penalização
 aplicados às estimativas com erros maiores que $\varepsilon$.
 A Figura
 \ref{fig:DF_svm_insensibilidade} ilustra a zona de insensibilidade formada por $\varepsilon$
 e a penalização efetuada pelas variáveis de folga. Por isso, qualquer erro absoluto menor
-que $\varepsilon$ não necessita de valores diferentes de zero para as variáveis $\xi_i,
-\xi_i^*$ na função objetiva, o que causa a esparsividade da solução.
+que $\varepsilon$ não necessita de valores diferentes de zero para as variáveis $\xi^{(i)},
+\xi^{* \; (i)}$ na função objetiva, o que causa a esparsividade da solução.
 A constante $C$ determina o custo-benefício entre a complexidade da função $f$ e a
 quantidade tolerada de desvios maiores que $\varepsilon$.
 
@@ -999,45 +1001,47 @@ quantidade tolerada de desvios maiores que $\varepsilon$.
 
 Escrevendo a Eq.~(\ref{eq:DF_svm_minimize}) na forma dual e resolvendo por diferenciação
 em relação às variáveis primais, o problema resulta em maximizar a função $W(\alpha^*,
-\alpha)$ na Eq.~(\ref{eq:DF_svm_dual}).
+\alpha)$ na Eq.~(\ref{eq:DF_svm_dual}), onde $\alpha, \alpha^*$ são multiplicadores de
+Lagrange e $\textsf{K}(\mathbf{r}^{(i)}, \mathbf{r}^{(j)})$ é a função kernel que substitui o
+que seriam os produtos internos $\left<\mathbf{r}^{(i)}, \mathbf{r}^{(j)}\right>$ e permite lidar
+com não linearidades do espaço de entrada do modelo.
 
 \begin{equation}
-    W(\alpha^*, \alpha) = - \varepsilon \sum\limits_{i=1}^n (\alpha_i + \alpha_i^*) +
-    \sum\limits_{i=1}^n  y_i (\alpha_i - \alpha_i^*)  - \frac{1}{2}
-    \sum\limits_{i,j=1}^n (\alpha_i - \alpha_i^*) (\alpha_j - \alpha_j^*) \; \textsf{K}(r_i, r_j)
+    \begin{array}{rrr}
+        \lefteqn{\mbox{Maximizar}}\\ 
+        & & W(\alpha^*, \alpha) = - \varepsilon \sum\limits_{i=1}^{n_m} (\alpha^{(i)} + \alpha^{* \; (i)}) +
+        \sum\limits_{i=1}^{n_m}  y^{(i)} (\alpha^{(i)} - \alpha^{* \; (i)})  - \\[7pt]
+        & & \frac{1}{2} \sum\limits_{i,j=1}^{n_m} (\alpha^{(i)} - \alpha^{* \; (i)}) (\alpha_j -
+        \alpha_j^*) \; \textsf{K}(\mathbf{r}^{(i)}, \mathbf{r}^{(j)}) \\[12pt]
+    \lefteqn{\mbox{Sujeito a}
+    \left\{
+    \begin{array}{c}
+        \sum\limits_{i=1}^{n_m} (\alpha^{* \; (i)} - \alpha^{(i)})  = 0\\
+        0 \le \alpha^{(i)}, \alpha^{* \; (i)} \le C
+    \end{array}
+\right\}} \\
+    \end{array}
     \label{eq:DF_svm_dual}
 \end{equation}
 
-$$
-    \mbox{Sujeito a}
-    \left\{
-    \begin{array}{c}
-        \sum\limits_{i=1}^n (\alpha_i^* - \alpha_i)  = 0\\
-        0 \le \alpha_i, \alpha_i^* \le C
-    \end{array}
-    \right\}
-$$
-
-\noindent A função $f(\mathbf{r})$ passa a ser dada pela Eq.~(\ref{eq:DF_svm_func_dual}),
-onde $\alpha, \alpha^*$ são multiplicadores de Lagrange e $\textsf{K}(\mathbf{r}, \mathbf{r}_i)$ é
-a função kernel que substitui os produtos internos dos dados de entrada e permite lidar
-com não linearidades eventualmente presente nos dados.
-Os vetores $\mathbf{r}_i$ são
-chamados de ``vetores suporte'' e $N_{sv}$ (normalmente $N_{sv} << n$) é o número de
-vetores suporte correspondentes à quantidade de valores de $y$ que estão pelo menos
-$\varepsilon$ afastados de suas estimativas $f(\mathbf{r})$.
+A função $f(\mathbf{r})$ passa a ser dada pela Eq.~(\ref{eq:DF_svm_func_dual}).
+Os vetores $\{\mathbf{r}^{(1)}, \cdots, \mathbf{r}^{(N_{sv})}\}$, pertencentes ao conjunto
+inicial de treinamento, são chamados de ``vetores suporte'', onde $N_{sv}$ (normalmente
+$N_{sv} << n_m$) é o número de vetores suporte correspondentes à quantidade de valores de
+$\{y^{(1)}, \cdots, y^{(n_m)}\}$ que estão pelo menos $\varepsilon$ afastados de suas
+estimativas $\{f(\mathbf{r}^{(1)}), \cdots, f(\mathbf{r}^{(n_m)})\}$.
 
 \begin{equation}
-    f(\mathbf{r}) = \sum\limits_{i=1}^{N_{sv}} (\alpha_i^* - \alpha_i) \;
-    \textsf{K}(\mathbf{r}, \mathbf{r}_i) + b
+    f(\mathbf{r}) = \sum\limits_{i=1}^{N_{sv}} (\alpha^{* \; (i)} - \alpha^{(i)}) \;
+    \textsf{K}(\mathbf{r}, \mathbf{r}^{(i)}) + b
     \label{eq:DF_svm_func_dual}
 \end{equation}
 
 
 As condições de Kuhn-Tucker demandam que o produto entre as variáveis duais e as
-restrições devem desaparecer para otimalidade. Por isso, para $|f(\mathbf{r}_i) - y_i| \ge
+restrições devem desaparecer para otimalidade. Por isso, para $|f(\mathbf{r}^{(i)}) - y^{(i)}| \ge
 \varepsilon$, os multiplicadores de Lagrange são diferentes de zero; e para pontos dentro
-da região $\varepsilon$-insensível, os coeficientes $\alpha_i^*, \alpha_i$ devem
+da região $\varepsilon$-insensível, os coeficientes $\alpha^{* \; (i)}, \alpha^{(i)}$ devem
 desaparecer. Os vetores com coeficientes diferentes de zero são os chamados vetores
 suporte. Basicamente, os vetores suporte são os vetores que suportam a ``superfície de
 decisão'' ou o ``hiperplano'' que melhor se adequa aos dados, de acordo com o critério
@@ -1050,7 +1054,7 @@ apresentada na Eq.~(\ref{eq:DF_svm_kernel}),
 onde $\gamma$ é a largura de banda, o parâmetro de configuração.
 
 \begin{equation}
-    \textsf{K}(\mathbf{r}, \mathbf{r}_i) = \exp \left( - \frac{||\mathbf{r}-\mathbf{r}_i||^2}{2 \gamma^2} \right)
+    \textsf{K}(\mathbf{r}, \mathbf{r}^{(i)}) = \exp \left( - \frac{||\mathbf{r}-\mathbf{r}^{(i)}||^2}{2 \gamma^2} \right)
     \label{eq:DF_svm_kernel}
 \end{equation}
 
