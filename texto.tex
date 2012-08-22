@@ -822,7 +822,7 @@ O funcionamento do modelo AAKR é composto de três passos básicos.
 Primeiro, calcula-se as distâncias entre $\mathbf{r}$ e cada linha da matriz de memória
 $\mathbf{X}$.
 Dentre as possíveis métricas de distância, a distância Euclidiana é a mais comumente
-utilizada, dada pela Eq.~(\ref{eq:aakr_distance}), onde $u_i$ é a distancia Euclidiana
+utilizada~\cite{Hines2008}, dada pela Eq.~(\ref{eq:aakr_distance}), onde $u_i$ é a distancia Euclidiana
 entre o vetor de memória $\mathbf{X}_i$ e a entrada $\mathbf{r}$.
 
 \simbolo{$u_i$}{Distância Euclidiana entre o vetor de memória $\mathbf{X}_i$ e um vetor de
@@ -1092,7 +1092,7 @@ torna-se a função $f$.
 %preditivo, um modelo preditivo deve capturar as correlações entre as variáveis
 %$\mathbf{r} \in \mathbb{R}^p$.
 
-Partindo-se de uma técnica de regressão, constroi-se um modelo empírico a partir de um
+Partindo-se de uma técnica de regressão, constrói-se um modelo empírico a partir de um
 conjunto de amostras de treinamento, compostas por pares entrada/saída.
 As amostras de treinamento são exemplares de valores das variáveis de entrada juntamente
 com os valores das variáveis de saída que se espera do modelo.
@@ -1103,11 +1103,11 @@ entrada/saída possuem o mesmo valor.
 Para ambas as técnicas, a complexidade dos modelos podem ser especificadas por parâmetros
 e deve ser ajustada para que se adeque à complexidade dos dados de treinamento.
 Se o modelo não é flexível, ele não será capaz de modelar as relações dos dados de
-treinamento; se o modelo é excessivamente complexo, o problema de sobreajustamento
-(\textit{overfitting}) dos dados poderá ocorrer, incluindo ruídos na modelagem.
+treinamento; se o modelo é excessivamente complexo, problemas de sobreajustamento
+(\textit{overfitting}) dos dados podem ocorrer, incluindo ruídos na modelagem.
 Considerando o uso de funções kernel do tipo Gaussiana ou RBF, a complexidade dos modelos
-SVM é determinada pelos parâmetros $C$, $\varepsilon$ e $\gamma$; nos modelos AAKR, pelo
-parâmetro $h$.
+(o grau de ajustamento do modelo aos dados de treinamento) SVM é determinada pelos
+parâmetros $C$, $\varepsilon$ e $\gamma$; nos modelos AAKR, pelo parâmetro $h$.
 Em muitas aplicações, esses valores podem são encontrados por tentativa e erro, ou
 \textit{grid search}, onde treinam-se vários modelos com diferentes permutações de valores
 de configuração e avalia-se a qualidade das predições destes atráves de um novo conjunto
