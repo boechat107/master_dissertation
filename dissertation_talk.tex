@@ -65,7 +65,7 @@
 
 \author[Boechat A.A.]
 { 
-    André A. Boechat
+    André Ambrósio Boechat
 }
 \institute[UFSC]{Departamento de Automação e Sistemas\\Universidade Federal de Santa
 Catarina}
@@ -77,6 +77,7 @@ Catarina}
 % Se comentar a linha abaixo, ira aparecer a data quando foi compilada a apresentacao
 \date{Florianópolis, Agosto de 2012}
 
+\setbeamercolor{postit}{fg=black,bg=block body.fg!75!black!10!bg}
 % =========================================================================================
 \begin{document}
 
@@ -123,54 +124,100 @@ Catarina}
     }
 \end{frame}
 
+\begin{frame}{\textit{Drift} em Sensores}
+    Desvio lento e continuo das medições ao longo do tempo
 
+    \begin{itemize}
+        \item Um dos problemas mais comuns em sensores
+        \item Difícil detecção manual
+            \begin{itemize}
+                \item comparação com sinais de outros sensores
+                \item detectável quando os desvios são grosseiros
+            \end{itemize}
+    \end{itemize}
 
-% \begin{frame}{Sensor Drifts}
-%     \begin{itemize}
-%         \item Slow rate of change in a signal's correct value
-%         \item ``Measurements from an unstable or excessively \alert{drifting} gauge might
-%             prove more \alert{troublesome} to an oilfield operator than outright failure
-%             of the gauge.''
-%     \end{itemize}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/drift.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% 
-% %% Our objective is the 
-% \begin{frame}{Performance Assessment of Sensors}
-%     \begin{itemize}
-%         \item Traditional approach
-%             \begin{itemize}
-%                 \item periodic manual calibration
-%                 \item or\ldots~the sensor's readings are just ignored
-%             \end{itemize}
-%             \vspace{.8cm}
-%         \item Condition based maintenance
-%             \begin{itemize}
-%                 \item less invasive
-%                 \item physical recalibrations are performed only when their performance is
-%                     degraded
-%             \end{itemize}
-%         \item Hardware redundancy
-%         \item Analytical redundancy
-%             \begin{itemize}
-%                 \item models based on physical equations
-%                 \item \alert{data-driven models}
-%             \end{itemize}
-%     \end{itemize}
-% \end{frame}
-% 
-% 
-% \begin{frame}{Data-driven Models Approach}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/data_driven.eps}
-%     \end{figure}
-% \end{frame}
-% 
+    \begin{beamercolorbox}[sep=5pt]{postit}
+        ``Leituras realizadas por um sensor instável ou com desvios excessivos
+        normalmente são mais problemáticos a um operador que a falha completa do
+        sensor.''\\ \footnotesize(Joseph Eck et al., 1999)
+    \end{beamercolorbox}
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[trim=0pt 0pt 0cm 15pt,clip=true,width=\textwidth]{figuras/drift.eps}
+    \end{figure}
+
+    \note{
+    Um dos principais problemas que ocorrem com sensores e é o foco da dissertação.
+
+    \begin{itemize}
+        \item Dificuldade de detecção manual: depende da comparação com os sinais de
+            outros sensores, das ações dos operadores, além de ser perceptível apenas
+            quando os desvios são grosseiros.
+        \item Frase sobre falha de sensor: tomar decisões baseadas em falsas informações
+            pode ser mais perigoso que decisões baseadas na falta da informação.
+    \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Avaliação do Desempenho de Sensores}
+    \begin{block}{Abordagem tradicional}
+        \begin{itemize}
+            \item calibração manual periódica
+                \begin{itemize}
+                    \item não se conhece a real necessidade
+                    \item instrumentos são retirados de operação
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Manutenção baseada na condição (CBM)}
+        \begin{itemize}
+            \item monitora-se a \alert{condição} de funcionamento
+            \item calibrações físicas apenas quando realmente \alert{necessário}
+            \item tendem a ser menos invasivas e mais eficazes
+                \vspace{6pt}
+            \item redundância por \textit{hardware}
+            \item redundância \alert{analítica}
+                \begin{itemize}
+                    \item equações fenomenológicas
+                    \item modelos empíricos baseados em \alert{histórico}
+                \end{itemize}
+        \end{itemize}
+        
+    \end{block}
+
+    \note{
+    \begin{itemize}
+        \item necessidade da calibração periódica: desperdício de tempo, dinheiro,
+            mão-de-obra ou usa-se de forma descalibrada sem saber, mesmo que por um
+            determinado período de tempo
+
+        \item calibrações físicas no CBM: leituras podem ser ajustadas via software ou
+            corrige-se as leituras conhecendo-se os erros
+
+        \item CBM menos invasivas e mais eficazes: pelos dois motivos citados
+            anteriormente sobre a calibração manual
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{Abordagem por Modelos Baseados em Histórico}
+    
+    \begin{figure}[!htb]
+        \centering\hspace*{-20pt}
+        \includegraphics[width=1.1\textwidth]{figuras/data_driven_fdd.eps}
+    \end{figure}
+
+\end{frame}
+
+\section{Estrutura de Sistemas de Manutenção CBM}
+\subsection{}
+
+\begin{frame}{Estrutura de Sistemas de Manutenção CBM}
+    
+\end{frame}
+
 % \section{Monitoring Systems}
 % \subsection{}
 % 
