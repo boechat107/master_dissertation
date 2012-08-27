@@ -1490,19 +1490,21 @@ desvio, respectivamente.
 
 \begin{equation}
     S_{A_k} = \frac{1}{N} \sum \limits_{i=1}^N \frac{\left| \hat{r}_{k, drift}^{(i)} -
-    \hat{r}^{(i)}_{k, drift} \right|}{\left| r_{k,drift}^{(i)} - r^{(i)}_{k,drift} \right|}
+    \hat{r}^{(i)}_{k} \right|}{\left| r_{k,drift}^{(i)} - r^{(i)}_{k} \right|}
     \label{eq:autosensibilidade}
 \end{equation}
 
 O efeito de uma entrada de sensor falho na predição das outras variáveis é calculado pela
 sensibilidade cruzada $(S_C)$. Para um sensor sem desvio $j$ e um sensor com
-desvio $k$, a sensibilidade cruzada é calculada por
+desvio $k$, a sensibilidade cruzada é calculada como a Eq.
+(\ref{eq:sensibilidade_cruzada}).
 
 \simbolo{$S_C$}{Sensibilidade cruzada}
 
 \begin{equation}
     S_{C_k} = \frac{1}{N} \sum \limits_{i=1}^N \frac{\left| \hat{r}_{j,drift}^{(i)} -
     \hat{r}^{(i)}_{j} \right|}{\left| r_{k,drift}^{i} - r_{k}^{(i)} \right|}
+    \label{eq:sensibilidade_cruzada}
 \end{equation}
 
 Além das métricas tradicionais, adota-se neste trabalho uma métrica relativa ao erro de

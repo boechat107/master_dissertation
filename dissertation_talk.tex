@@ -21,7 +21,9 @@
   \setbeamercovered{transparent}
   % or whatever (possibly just delete it)
   \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{note page}[plain]
   %\logo{\includegraphics[width=1.2 cm]{figuras/logo_ufes}}
+  \setbeamertemplate{footline}{\hfill\scriptsize{\vspace*{5pt}\color{gray}{\insertframenumber}\hspace*{5pt}}} 
   %\setbeamertemplate{footline}{%
   %\leavevmode%
   %\hbox{%
@@ -83,6 +85,7 @@ Catarina}
 
 \begin{frame}
     \titlepage
+    \thispagestyle{empty}
 \end{frame}
 
 
@@ -198,6 +201,12 @@ Catarina}
 
         \item CBM menos invasivas e mais eficazes: pelos dois motivos citados
             anteriormente sobre a calibração manual
+            \vspace{15pt}
+        \item redundância por hardware: necessidade de inclusão de novos sensores, espaço
+            e energia limitado em um poço
+        \item eqs fenomenológicas: são normalmente bem precisos, mas necessitam de grandes
+            esforços de engenharia e podem ser sensíveis a mudanças ou degradações não
+            previstas no sistema
     \end{itemize}}
     
 \end{frame}
@@ -208,13 +217,311 @@ Catarina}
         \centering\hspace*{-20pt}
         \includegraphics[width=1.1\textwidth]{figuras/data_driven_fdd.eps}
     \end{figure}
-
+    
+    \note{
+    \begin{itemize}
+        \item dados de treinamento: precisam estar livre de falhas e representar as
+            condições de funcionamento esperadas para o futuro
+        \item predição: imitar as leituras de sensores a partir de sensores
+            correlacionados
+    \end{itemize}}
 \end{frame}
+
 
 \section{Estrutura de Sistemas de Manutenção CBM}
 \subsection{}
 
-\begin{frame}{Estrutura de Sistemas de Manutenção CBM}
+\begin{frame}{Benefícios de Sistemas de Manutenção CBM}
+
+    \begin{itemize}
+        \item Manutenções agendadas \alert{dinamicamente}
+            \pause
+        \item Redução do tempo de \alert{inatividade}
+            \pause
+        \item Ganho de \alert{desempenho} dos sistemas
+            \pause
+        \item Prolongamento da \alert{vida útil} de equipamentos
+            \pause
+        \item Melhor utilização de \alert{recursos humanos} limitados
+        \item Redução de \alert{custos}\\
+            $\vdots$
+            \pause
+        \item Produção gradualmente mais \alert{efetiva}
+    \end{itemize}
+
+    \note{
+        Para entender a necessidade de se pensar com cuidado na estrutura desses sistemas,
+        é necessário primeiro apontar os potenciais benefícios dos sistemas e depois
+        discutir sobre as dificuldades de se implementar
+    \begin{itemize}
+        \item agendamento dinâmico: de acordo com a real necessidade
+        \item tempo de inatividade: paradas desnecessárias não acontecem, falhas são
+            previstas e as ações são planejadas
+        \item desempenho dos sistemas: tendem a funcionar da melhor forma possível por
+            mais tempo
+        \item prolongamento da vida útil: equipamentos funcionam da melhor maneira
+            possível por maior tempo
+        \item recursos humanos: consequência do melhor planejamento
+    \end{itemize}}
+\end{frame}
+
+\begin{frame}{Implementação de Sistemas de Manutenção CBM}
+
+    \begin{block}{Dificuldades}
+        \begin{itemize}
+            \item Grande volume de dados coletados
+                \pause
+            \item Dados provindos de sistemas geograficamente dispersos
+                \pause
+            \item Integração dos dados
+                \pause
+            \item Escalabilidade
+                \pause
+            \item Disponibilidade de conhecimentos especialistas
+                \pause
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Benefícios de uma arquitetura modular e padronizada}
+        \begin{itemize}
+            \item facilidade de atualização de componentes
+                \pause
+            \item facilidade para se tornar um fornecedor de soluções
+                \pause
+            \item redução de preços e custos
+        \end{itemize}
+        
+    \end{block}
+
+    \note{
+    \begin{itemize}
+        \item volume de dados: coletados de vários partes de vários processos
+        \item integração: em muitos casos, informações úteis surgem apenas a integração
+            dos dados de diferentes fontes e tipos
+        \item escalabilidade: com o tempo pode surgir a necessidade de adicionar novas fontes
+            de dados
+        \item conhecimentos especialistas: necessário para extrair informações úteis para
+            manutenção
+        \item atualização de componentes: mudanças em componentes não necessitariam de
+            mudanças em outras partes do sistema
+        \item fornecedor: não é necessário conhecer todo o sistema, facilidade de
+            integrar uma solução ao sistema, possibilidade de se focar em problemas
+            menores (detecção de estado estacionário, por exemplo)
+        \item redução de custos: como o sistema torna-se dividido em partes independentes,
+            concorrência entre fornecedores 
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{OSA-CBM}
+    
+    \centering
+    Resultado de um parceria entre indústrias, fabricantes, universidades e a Marinha
+    Norte-Americana
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=.9\textwidth]{figuras/arte/osa_cbm_camadas.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item é uma arquitetura aberta para sistemas de manutenção na condição de operação
+        \item OSA-CBM ainda faz parte de uma arquitura maior, que incorpora a manutenção
+            com gerência de recursos humanos e de maquinários e as decisões de negócio
+    \end{itemize}}
+    
+\end{frame}
+
+
+\section{Sistemas de Validação de Sensores}
+\subsection{}
+
+\begin{frame}{Validação de Sensores e a OSA-CBM}
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}\\
+        \includegraphics[width=.8\textwidth]{figuras/data_driven_fdd.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item explicar bem o que significa a limpeza dos dados
+        \item filtragem: remoção de dados espúrios (outliers) e ruídos dos dados de
+            treinamento, apenas informações verdadeiras são absorvidas pelos modelos
+        \item dizer por cima a parte de predição, como feito no diagrama de um sistema de
+            validação, imitação das leituras de um sensor a partir de medidas de sensores
+            correlacionados
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{Predição das Leituras dos Sensores}
+
+    \begin{block}{AAKR - Regressão por kernel auto-associativa}
+        \begin{itemize}
+            \item estrutura auto-associativa
+            %\item não há um processo real de treinamento
+            \item predições baseadas na similaridade entre as entradas e os vetores de
+                memória
+            \item dois parâmetros de sintonia: número de vetores ($n_m$) e largura de
+                banda ($h$)
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{SVM - \textit{Support Vector Machines}}
+        \begin{itemize}
+            \item estrutura inferencial
+            \item processo de treinamento constrói uma $f(\mathbf{r})$ e seleciona
+                subgrupo dos dados de treinamento
+            \item três parâmetros de sintonia: $\varepsilon$, $C$ e $\gamma$
+        \end{itemize}
+        
+    \end{block}
+
+    \note{
+        AAKR
+    \begin{itemize}
+        \item auto-associativa: as saídas imitam as próprias entradas
+        \item número de vetores: número alto pode garantir uma melhor cobertura dos pontos
+            de operação, mas torna as predições computacionalmente mais custosas; baixo
+            número, podem faltar informações
+        \item largura de banda: controla a suavidade das predições
+    \end{itemize}
+        SVM
+    \begin{itemize}
+        \item inferencial: as leituras de um sensor são estimadas a partir de outros
+            sensores apenas, as próprias leituras são desprezadas
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{Monitoramento da Condição}
+
+    \begin{itemize}
+        \item Resíduos: diferença entre as predições
+        \item Normalidade: média zero e variância semelhante a do ruído no sensor
+    \end{itemize}
+
+    \begin{block}{Detecção de falhas e desvios (\textit{drift})}
+        Detecção de mudanças nas propriedades estatísticas dos resíduos
+    \end{block}
+
+    \begin{itemize}
+        \item Algoritmo de detecção: SPRT (\textit{Sequential Probability Ratio Test}),
+            parâmetro $M$
+    \end{itemize}
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=\textwidth]{figuras/residual_ex.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item $M$: praticamente a amplitude do desvio, limiar ou threshold
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{Filtro de Kalman}
+
+    \begin{beamercolorbox}[sep=5pt]{postit}
+        Estima continuamente os desvios presentes no sensor
+    \end{beamercolorbox}
+
+    \begin{itemize}
+        \item Considerações:
+            \begin{itemize}
+                \item suavidade
+                \item crescimento lento
+                \item linear ou exponencial
+                \item descorrelacionado com desvios de outros sensores
+            \end{itemize}
+    \end{itemize}
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}
+    \end{figure}
+    
+\end{frame}
+
+\section{Ensaios}
+
+\begin{frame}{Sistemas Implementados}
+
+    \begin{block}{Sistema 1}
+        \begin{itemize}
+            \item AAKR
+            \item SPRT
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Sistema 2}
+        \begin{itemize}
+            \item SVM
+            \item SPRT
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Sistema 3}
+        \begin{itemize}
+            \item AAKR
+            \item filtro de Kalman
+            \item SPRT
+        \end{itemize}
+    \end{block}
+
+    \note{
+    \begin{itemize}
+        \item 
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{Análises dos Ensaios}
+    
+\end{frame}
+
+\begin{frame}{Métricas de Desempenho}
+    \begin{itemize}
+        \item Acurácia ($E_a$)
+            $$ E_a = \frac{1}{N} \sum \limits_{i=1}^N \left( \hat{r}^{(i)} - r^{(i)}
+            \right)^2$$
+        \item Erro de predição na ocorrência de desvios ($E_p$)
+        \item Auto-sensibilidade ($S_A$) do sensor $p$
+            $$
+            S_{A_p} = \frac{1}{N} \sum \limits_{i=1}^N \frac{\left| \hat{r}_{p, drift}^{(i)} -
+            \hat{r}^{(i)}_{p} \right|}{\left| r_{p,drift}^{(i)} - r^{(i)}_{p} \right|}
+            $$
+        \item Sensibilidade cruzada ($S_C$) do sensor $p$ em relação a $j$
+            $$
+            S_{C_{p,j}} = \frac{1}{N} \sum \limits_{i=1}^N \frac{\left| \hat{r}_{j,drift}^{(i)} -
+            \hat{r}^{(i)}_{j} \right|}{\left| r_{p,drift}^{i} - r_{p}^{(i)} \right|}
+            $$
+    \end{itemize}
+    
+\end{frame}
+
+\subsection{Dados de Simulação}
+
+\begin{frame}{Descrição dos Dados de Simulação}
+    
+\end{frame}
+
+
+\subsection{Dados Reais}
+
+\begin{frame}{Descrição dos Dados}
+    
+\end{frame}
+
+\section{Conclusão}
+\subsection{}
+
+\begin{frame}{Conclusões}
     
 \end{frame}
 
