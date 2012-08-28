@@ -224,6 +224,8 @@ Catarina}
             condições de funcionamento esperadas para o futuro
         \item predição: imitar as leituras de sensores a partir de sensores
             correlacionados
+        % \item na verdade, este diagrama poderia representar também a redundância por
+        %     equações fenomenológicas
     \end{itemize}}
 \end{frame}
 
@@ -420,7 +422,10 @@ Catarina}
 
     \note{
     \begin{itemize}
+        \item A detecção consiste em detectar um estado diferente da normalidade
         \item $M$: praticamente a amplitude do desvio, limiar ou threshold
+        \item o SPRT é usado para detecção de mudanças em propriedades estatísticas, neste
+            caso, a média
     \end{itemize}}
     
 \end{frame}
@@ -445,34 +450,38 @@ Catarina}
         \centering
         \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}
     \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item Como se pode ver na figura, o kf pode vir como a etapa de pós-processamento,
+            opcional, antes mesmo do SPRT
+        \item Deixei-o para ser explicado depois porque seria necessário entender a
+            utilidade dos resíduos
+        \item suavidade: sem mudanças bruscas
+    \end{itemize}}
     
 \end{frame}
 
 \section{Ensaios}
 
+
 \begin{frame}{Sistemas Implementados}
 
-    \begin{block}{Sistema 1}
-        \begin{itemize}
-            \item AAKR
-            \item SPRT
-        \end{itemize}
-    \end{block}
-
-    \begin{block}{Sistema 2}
-        \begin{itemize}
-            \item SVM
-            \item SPRT
-        \end{itemize}
-    \end{block}
-
-    \begin{block}{Sistema 3}
-        \begin{itemize}
-            \item AAKR
-            \item filtro de Kalman
-            \item SPRT
-        \end{itemize}
-    \end{block}
+    \begin{figure}[!htb]
+        \centering Sistema 1
+        \includegraphics[width=.8\textwidth]{figuras/aakr_sprt.eps}
+    \end{figure}
+    
+    \begin{figure}[!htb]
+        \centering Sistema 2
+        \includegraphics[width=.8\textwidth]{figuras/svm_sprt.eps}
+    \end{figure}
+    
+    \begin{figure}[!htb]
+        \centering Sistema 3
+        \includegraphics[width=.8\textwidth]{figuras/aakr_kf_sprt.eps}
+    \end{figure}
+    
 
     \note{
     \begin{itemize}
@@ -482,6 +491,35 @@ Catarina}
 \end{frame}
 
 \begin{frame}{Análises dos Ensaios}
+
+    \begin{itemize}
+        \item Objetivo\\
+            Verificar a \alert{aplicabilidade} dos sistemas a sensores de poços de petróleo
+            \vspace{10pt}
+
+        \item Como foram realizados\\
+            Uso de conjuntos de dados compostos por amostras de diferentes
+            \alert{sensores correlacionados}
+            \begin{itemize}
+                \item dados gerados por simulação
+                \item dados reais
+            \end{itemize}
+            \vspace{10pt}
+
+        \item Critérios
+            \begin{itemize}
+                \item \alert{consistência} e \alert{qualidade} das predições
+                \item capacidade de \alert{detecção} e \alert{isolamento} de desvios
+            \end{itemize}
+    \end{itemize}
+
+    \note{
+    \begin{itemize}
+        \item consistência e qualidade: considerando que se tem os valores ideais,
+            verificar a proximidade das predições com esses valores
+        \item detecção e isolamento: além de detectar a ocorrência de desvios, o sistema
+            deve ser capaz de identificar o sensor falho
+    \end{itemize}}
     
 \end{frame}
 
@@ -502,6 +540,19 @@ Catarina}
             \hat{r}^{(i)}_{j} \right|}{\left| r_{p,drift}^{i} - r_{p}^{(i)} \right|}
             $$
     \end{itemize}
+
+    \note{
+    \begin{itemize}
+        \item acurácia: mede a consistência e qualidade, a proximidade entre as predições
+            e os valores verdadeiros, sem falhas
+        \item erro de predição: semelhante à acurácia, medindo-se na presença de desvios,
+            importante para medir a confiança nas predições na ocorrência de desvios
+        \item auto-sensibilidade: sensibilidade do modelo a desvios no próprio sensor
+        \item sensibilidade cruzada: sensibilidade do modelo para desvios em outros
+            sensores
+        \item as sensibilidades são calculadas inserindo desvios em um sensor por vez e,
+            neste trabalho, tira-se a média dos sensores
+    \end{itemize}}
     
 \end{frame}
 
@@ -509,20 +560,306 @@ Catarina}
 
 \begin{frame}{Descrição dos Dados de Simulação}
     
+    \begin{columns}[T]
+        \column{.35\textwidth}
+        \begin{figure}[!htb]
+            \centering
+            \includegraphics[height=.8\textheight]{figuras/poco_simulado.ps}
+        \end{figure}
+        \column{.55\textwidth}
+        Modelo próximo de um poço real
+        \begin{itemize}
+            \item 4 sensores de pressão:
+                \begin{itemize}
+                    \item fundo do poço (PT$_f$)
+                    \item topo do tubo de produção (PT$_t$)
+                    \item topo do anular (PT$_g$)
+                    \item a montante do \textit{choke} de injeção (PT$_m$)
+                \end{itemize}
+            \item Coletado durante 100 horas de produção
+            \item Amostrado em 1 minuto
+            \item Ruído branco de NSR (\textit{noise to signal ratio}) igual a 0.3
+            \item 60 horas como treinamento, 20 de otimização e 20 de teste
+        \end{itemize}
+    \end{columns}
+
 \end{frame}
 
+\begin{frame}{Gráficos dos Dados de Simulação}
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[height=\textheight]{figuras/sim_dataset.eps}
+    \end{figure}
+
+    \note{
+    Mostrar divisão dos conjuntos de treinamento, otimização e teste}
+    
+\end{frame}
+
+\begin{frame}{Indicadores de Desempenho\\Dados de Simulação}
+
+    \begin{table}[bt]
+        \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        & $E_a$ & $S_A$ & $S_C$ & $E_p$ \\
+        \midrule
+        Sistema 1 & 0.0020 & 0.2675 & 0.2682 & 0.0105 \\
+        Sistema 2 & 0.0039 & & 0.3356 & 0.0139 \\
+        Sistema 3 & 0.0023 & 0.2002 & 0.1997 & 0.0046 \\
+        \bottomrule
+    \end{tabular}
+    \end{table}
+
+    \note{
+    \begin{itemize}
+        \item valor nulo de $S_A$: os modelos SVM estimam dados de um sensor que não é
+            usado como input (inferencial)
+    \end{itemize}}
+
+\end{frame}
+
+\begin{frame}{Predições para Desvios em PT$_g$}
+
+    \begin{itemize}
+        \item \color{red}{Predições} 
+        \item \color{green}{Entradas} 
+        \item \color{blue}{Verdadeiro}
+    \end{itemize}
+    \vspace*{-15pt}
+    \begin{figure}[bt]
+        \centering\hspace*{-20pt}
+        \includegraphics[trim=1cm .7cm 1cm .5cm, clip=true,width=.37\textwidth]{figuras/sim_sys1_pred_d4.eps}
+        \includegraphics[trim=1cm .7cm 1cm .5cm, clip=true,width=.37\textwidth]{figuras/sim_sys2_pred_d4.eps}
+        \includegraphics[trim=1cm .7cm 1cm .5cm, clip=true,width=.37\textwidth]{figuras/sim_sys3_pred_d4.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item sistema 1: predições pioram a medida que os desvios se acentuam, a ponto de
+            não conseguir gerar predições por não haver vetores de memória similares nos
+            dados de treinamento
+        \item sistema 2: as predições que dependem do sensor PT$_g$ ficam muito degradadas
+            com o crescimento dos desvios; o modelo corresponde a uma função e pra vetores
+            de dados muito diferentes dos dados de treino as predições ficam imprevisíveis
+        \item sistema 3: estimando os desvios, consegue-se uma certa correção das
+            predições, mantendo um desempenho mais constante mesmo para desvios grandes,
+            apesar do bias
+    \end{itemize}}
+
+\end{frame}
+
+\begin{frame}{Detecção de Desvios nos Dados de Simulação\\Sistema 1}
+    
+    \begin{figure}[bt]
+        \centering\hspace*{-15pt}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/sim_sys1_resid_d4.eps}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/sim_sys1_sprt_d4.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item O ideal é que se consiga detectar os desvios antes que as predições fiquem
+            muito degradadas
+        \item apesar dos falsos alarmes para PT$_m$, se víssemos mais de perto as
+            decisões, perceberíamos que ocorrem poucos falsos alarmes consecutivos
+        \item alarmes verdadeiros ocorrem de forma consecutiva
+        \item outra forma de melhor o isolamento é ajustar melhor o valor de $M$, com a
+            possibilidade de uma detecção mais tardia
+    \end{itemize}}
+\end{frame}
+
+\begin{frame}{Detecção de Desvios nos Dados de Simulação\\Sistema 2}
+
+    \begin{figure}[bt]
+        \centering\hspace*{-15pt}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/sim_svm_resid_d4.eps}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/sim_svm_sprt_d4.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item apesar das piores predições na ocorrência de desvios severos, a detecção e
+            isolamento dos desvios é bem clara, devido à boa predição de PT$_g$
+        \item funciona bem para a detecção de desvios, mas se pode confiar muito nas
+            predições quando uma ocorrência é detectada
+    \end{itemize}}
+\end{frame}
+
+\begin{frame}{Detecção de Desvios nos Dados de Simulação\\Sistema 3}
+
+    \begin{figure}[bt]
+        \centering\hspace*{-15pt}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/sim_sys3_resid_d4.eps}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/sim_sys3_sprt_d4.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item neste caso, usam-se as estimativas do filtro de kalman para a detecção e
+            isolamento
+        \item nota-se a diferença entre as estimativas pela escala do gráfico; ficaria
+            melhor se estivessem na mesma escala
+        \item falsos alarmes ocorrem apenas quando os desvios estão grandes
+        \item então, o sistema 3 também corresponde aos critérios aplicabilidade
+    \end{itemize}}
+\end{frame}
 
 \subsection{Dados Reais}
 
-\begin{frame}{Descrição dos Dados}
+\begin{frame}{Descrição dos Dados Reais}
     
+    \begin{itemize}
+        \item Pressão coletada de 3 sensores
+            \begin{itemize}
+                \item no fundo do poço (PDG)
+                \item na árvore de natal (TPT)
+                \item a montante do choke de injeção (PT$_m$)
+            \end{itemize}
+        \item Coletados durante 955 horas de produção
+            \begin{itemize}
+                \item 400 primeiras horas para treinamento
+                \item 100 para otimização
+                \item 455 para teste
+            \end{itemize}
+        \item Amostragem de 1 por minuto
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Gráficos dos Dados Reais}
+
+\begin{figure}[bt]
+    \centering
+    \includegraphics[trim=2cm .7cm 2cm .7cm,clip=true,width=\textwidth]{figuras/real_dataset.eps}
+\end{figure}
+
+\note{
+\begin{itemize}
+    \item gráficos escalados para 0-100\%
+    \item outliers (dados faltantes) estão representados como $-1$
+\end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{Indicadores de Desempenho\\Dados Reais}
+
+\begin{table}[bt]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        & $E_a$ & $S_A$ & $S_C$ & $E_p$ \\
+        \midrule
+        Sistema 1 & 0.0035 & 0.3106 & 0.2806 & 0.0078 \\
+        Sistema 2 & 0.0069 &  & 0.4754 & 0.0190 \\
+        Sistema 3 & 0.0040 & 0.2418 & 0.2189 & 0.0046 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Predições para Desvios no PDG}
+    
+    \begin{itemize}
+        \item \color{red}{Predições} 
+        \item \color{green}{Entradas} 
+        \item \color{blue}{Verdadeiro}
+    \end{itemize}
+    \vspace*{-20pt}
+
+    \begin{figure}[bt]
+        \centering\hspace*{-20pt}
+        \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.37\textwidth]{figuras/real_aakr_pred_d1.eps}
+        \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.37\textwidth]{figuras/real_svm_pred_d1.eps}
+        \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.37\textwidth]{figuras/real_aakr_kf_pred_d1.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item Problemas no sistema 2: pouca informação, ruídos e desvios
+    \end{itemize}}
+\end{frame}
+
+\begin{frame}{Detecção de Desvios nos Dados Reais\\Sistema 1}
+    
+    \begin{figure}[bt]
+        \centering\hspace*{-15pt}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/real_sys1_res_d1.eps}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/real_sys1_sprt_d1.eps}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Detecção de Desvios nos Dados Reais\\Sistema 2}
+    \begin{figure}[bt]
+        \centering\hspace*{-15pt}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/real_sys2_res_d1.eps}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/real_sys2_sprt_d1.eps}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Detecção de Desvios nos Dados Reais\\Sistema 3}
+    \begin{figure}[bt]
+        \centering\hspace*{-15pt}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/real_sys3_res_d1.eps}
+        \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.55\textwidth]{figuras/real_sys3_sprt_d1.eps}
+    \end{figure}
 \end{frame}
 
 \section{Conclusão}
 \subsection{}
 
 \begin{frame}{Conclusões}
+
+    \begin{itemize}
+        \item Importância dos sensores na indústria de petróleo
+        \item Principais abordagens para validação
+        \item Benefícios e dificuldades dos sistemas de manutenção CBM
+            \begin{itemize}
+                \item OSA-CBM
+            \end{itemize}
+        \item Implementação de 3 diferentes sistemas de detecção de desvios
+            \begin{itemize}
+                \item Sistema 1: AAKR e SPRT
+                \item Sistema 2: SVM e SPRT
+                \item Sistema 3: AAKR, KF e SPRT
+            \end{itemize}
+        \item Ensaios
+            \begin{itemize}
+                \item simulação\\
+                    todos os sistemas detectaram desvios corretamente
+                \item dados reais\\
+                    o Sistema 2 apresentou problemas
+                \item KF tem uso promissor
+            \end{itemize}
+    \end{itemize}
+
+    \note{
+    \begin{itemize}
+        \item importância dos sensores: ações de controle, otimização da produção e tomada
+            de decisões
+        \item problemas do sistema 2 nos dados reais: apesar dos problemas, não seria uma
+            boa ideia descartar o emprego de modelos SVM, uma vez que tratamentos mais
+            adequados ou casos com mais sensores envolvidos podem gerar bons resultados
+    \end{itemize}}
     
+\end{frame}
+
+\begin{frame}{Trabalhos Futuros}
+    \begin{itemize}
+        \item Agrupamento automático de sensores
+        \item Validação dos modelos empíricos
+        \item Modelos SVM para predição de séries temporais
+    \end{itemize}
+
+    \note{
+    \begin{itemize}
+        \item agrupamento: tećnicas para agrupamento ótimo, com grupos mais
+            correlacionados
+        \item validação dos modelos: características do poço mudam com tempo; analisar
+            formas de discernir entre falhas em sensores e mudanças no poço
+        \item modelos SVM: considerar na modelagem a dependência entre as amostras de
+            instantes consecutivos, dinâmica
+    \end{itemize}}
 \end{frame}
 
 % \section{Monitoring Systems}
