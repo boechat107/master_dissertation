@@ -51,14 +51,14 @@
 %     \tableofcontents[currentsection,currentsubsection]
 %   \end{frame}
 % }
-% \AtBeginSection[]
-% {
-%   \begin{frame}<beamer>{Sumário}
-%     \tableofcontents[currentsection]
-%   \end{frame}
-% }
+ \AtBeginSection[]
+ {
+   \begin{frame}<beamer>{Sumário}
+     \tableofcontents[currentsection]
+   \end{frame}
+ }
 %\setbeameroption{show notes}
-\setbeameroption{show notes on second screen=right}
+%\setbeameroption{show notes on second screen=right}
 %============================================================================================
 
 \title
@@ -86,6 +86,11 @@ Catarina}
 \begin{frame}
     \titlepage
     \thispagestyle{empty}
+
+    \note{
+    \begin{itemize}
+        \item trabalho de mestrado sob orientação do prof. Ubirajara
+    \end{itemize}}
 \end{frame}
 
 
@@ -115,24 +120,26 @@ Catarina}
     \end{itemize}
 
     \begin{block}{Problema}
-        As informações fornecidas pelos sensores são confiáveis?
+        As informações fornecidas pelos sensores são \alert{confiáveis}?
     \end{block}
 
     \note{
     \begin{itemize}
+        \item sensores são como os sentidos humanos para a indústria
         \item monitoramento do poço: mudanças nas características
-        \item crescimento do número de sensores: queda dos preços
+        \item crescimento do número de sensores: queda dos preços, espalhando por todos os
+            lugares, como nos celulares (acelerômetros, sensor de luz)
         \item ambientes inóspitos, degradantes: alta temperatura, pressão, etc.
     \end{itemize}
     }
 \end{frame}
 
 \begin{frame}{\textit{Drift} em Sensores}
-    Desvio lento e continuo das medições ao longo do tempo
+    Desvio lento e contínuo das medições ao longo do tempo
 
     \begin{itemize}
         \item Um dos problemas mais comuns em sensores
-        \item Difícil detecção manual
+        \item Difícil detecção
             \begin{itemize}
                 \item comparação com sinais de outros sensores
                 \item detectável quando os desvios são grosseiros
@@ -162,6 +169,116 @@ Catarina}
     \end{itemize}
     }
 \end{frame}
+
+\begin{frame}{Proposta do Trabalho}
+
+    \begin{itemize}
+        \item Estratégia de manutenção \alert{CBM}
+        \item Modelos empíricos baseados em \alert{histórico}
+    \end{itemize}
+    
+\end{frame}
+
+\section{Estrutura de Sistemas de Manutenção CBM}
+\subsection{}
+
+\begin{frame}{Estratégias de Manutenção}
+
+        CBM (\textit{Condition Based Maintenance})\\
+            Manuntenção baseada na condição de funcionamento
+
+    \begin{block}{Estratégia tradicional}
+        \begin{itemize}
+            \item Manutenção periódica
+            \item Manutenção reativa
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{CBM}
+        \begin{itemize}
+            \item Monitoramento da condição de funcionamento
+            \item Manutenção apenas quando realmente necessário
+            \item Agendamento dinâmico de manutenções
+            \item Planejamento de acordo com as condições
+            \item Redução de manutenções reativas (menos surpresas)
+        \end{itemize}
+    \end{block}
+    
+\end{frame}
+
+
+\begin{frame}{Implementação de Sistemas de Manutenção CBM}
+
+    \begin{block}{Dificuldades}
+        \begin{itemize}
+            \item Grande volume de dados coletados
+                \pause
+            \item Dados provindos de sistemas geograficamente dispersos
+                \pause
+            \item Integração dos dados
+                \pause
+            \item Escalabilidade
+                \pause
+            \item Disponibilidade de conhecimentos especialistas
+                \pause
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Benefícios de uma arquitetura modular e padronizada}
+        \begin{itemize}
+            \item Facilidade de atualização de componentes
+                \pause
+            \item Facilidade para se tornar um fornecedor de soluções
+                \pause
+            \item Redução de preços e custos
+        \end{itemize}
+        
+    \end{block}
+
+    \note{
+    \begin{itemize}
+        \item volume de dados: coletados de vários partes de vários processos
+        \item integração: em muitos casos, informações úteis surgem apenas a integração
+            dos dados de diferentes fontes e tipos
+        \item escalabilidade: com o tempo pode surgir a necessidade de adicionar novas fontes
+            de dados
+        \item conhecimentos especialistas: necessário para extrair informações úteis para
+            manutenção
+        \item atualização de componentes: mudanças em componentes não necessitariam de
+            mudanças em outras partes do sistema
+        \item fornecedor: não é necessário conhecer todo o sistema, facilidade de
+            integrar uma solução ao sistema, possibilidade de se focar em problemas
+            menores (detecção de estado estacionário, por exemplo)
+        \item redução de custos: como o sistema torna-se dividido em partes independentes,
+            concorrência entre fornecedores 
+    \end{itemize}}
+    
+\end{frame}
+
+\begin{frame}{OSA-CBM}
+    
+    \centering
+    Resultado de um parceria entre indústrias, fabricantes, universidades e a Marinha
+    Norte-Americana
+
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=.9\textwidth]{figuras/arte/osa_cbm_camadas.eps}
+    \end{figure}
+
+    \note{
+    \begin{itemize}
+        \item é uma arquitetura aberta para sistemas de manutenção na condição de operação
+        \item OSA-CBM ainda faz parte de uma arquitura maior, que incorpora a manutenção
+            com gerência de recursos humanos e de maquinários e as decisões de negócio
+        \item processamento de sinais:
+    \end{itemize}}
+    
+\end{frame}
+
+
+\section{Sistemas de Validação de Sensores}
+\subsection{}
 
 \begin{frame}{Avaliação do Desempenho de Sensores}
     \begin{block}{Abordagem tradicional}
@@ -230,114 +347,44 @@ Catarina}
 \end{frame}
 
 
-\section{Estrutura de Sistemas de Manutenção CBM}
-\subsection{}
 
-\begin{frame}{Benefícios de Sistemas de Manutenção CBM}
-
-    \begin{itemize}
-        \item Manutenções agendadas \alert{dinamicamente}
-            \pause
-        \item Redução do tempo de \alert{inatividade}
-            \pause
-        \item Ganho de \alert{desempenho} dos sistemas
-            \pause
-        \item Prolongamento da \alert{vida útil} de equipamentos
-            \pause
-        \item Melhor utilização de \alert{recursos humanos} limitados
-        \item Redução de \alert{custos}\\
-            $\vdots$
-            \pause
-        \item Produção gradualmente mais \alert{efetiva}
-    \end{itemize}
-
-    \note{
-        Para entender a necessidade de se pensar com cuidado na estrutura desses sistemas,
-        é necessário primeiro apontar os potenciais benefícios dos sistemas e depois
-        discutir sobre as dificuldades de se implementar
-    \begin{itemize}
-        \item agendamento dinâmico: de acordo com a real necessidade
-        \item tempo de inatividade: paradas desnecessárias não acontecem, falhas são
-            previstas e as ações são planejadas
-        \item desempenho dos sistemas: tendem a funcionar da melhor forma possível por
-            mais tempo
-        \item prolongamento da vida útil: equipamentos funcionam da melhor maneira
-            possível por maior tempo
-        \item recursos humanos: consequência do melhor planejamento
-    \end{itemize}}
-\end{frame}
-
-\begin{frame}{Implementação de Sistemas de Manutenção CBM}
-
-    \begin{block}{Dificuldades}
-        \begin{itemize}
-            \item Grande volume de dados coletados
-                \pause
-            \item Dados provindos de sistemas geograficamente dispersos
-                \pause
-            \item Integração dos dados
-                \pause
-            \item Escalabilidade
-                \pause
-            \item Disponibilidade de conhecimentos especialistas
-                \pause
-        \end{itemize}
-    \end{block}
-
-    \begin{block}{Benefícios de uma arquitetura modular e padronizada}
-        \begin{itemize}
-            \item facilidade de atualização de componentes
-                \pause
-            \item facilidade para se tornar um fornecedor de soluções
-                \pause
-            \item redução de preços e custos
-        \end{itemize}
-        
-    \end{block}
-
-    \note{
-    \begin{itemize}
-        \item volume de dados: coletados de vários partes de vários processos
-        \item integração: em muitos casos, informações úteis surgem apenas a integração
-            dos dados de diferentes fontes e tipos
-        \item escalabilidade: com o tempo pode surgir a necessidade de adicionar novas fontes
-            de dados
-        \item conhecimentos especialistas: necessário para extrair informações úteis para
-            manutenção
-        \item atualização de componentes: mudanças em componentes não necessitariam de
-            mudanças em outras partes do sistema
-        \item fornecedor: não é necessário conhecer todo o sistema, facilidade de
-            integrar uma solução ao sistema, possibilidade de se focar em problemas
-            menores (detecção de estado estacionário, por exemplo)
-        \item redução de custos: como o sistema torna-se dividido em partes independentes,
-            concorrência entre fornecedores 
-    \end{itemize}}
-    
-\end{frame}
-
-\begin{frame}{OSA-CBM}
-    
-    \centering
-    Resultado de um parceria entre indústrias, fabricantes, universidades e a Marinha
-    Norte-Americana
-
-    \begin{figure}[!htb]
-        \centering
-        \includegraphics[width=.9\textwidth]{figuras/arte/osa_cbm_camadas.eps}
-    \end{figure}
-
-    \note{
-    \begin{itemize}
-        \item é uma arquitetura aberta para sistemas de manutenção na condição de operação
-        \item OSA-CBM ainda faz parte de uma arquitura maior, que incorpora a manutenção
-            com gerência de recursos humanos e de maquinários e as decisões de negócio
-    \end{itemize}}
-    
-\end{frame}
+% \begin{frame}{Benefícios de Sistemas de Manutenção CBM}
+% 
+%     \begin{itemize}
+%         \item Manutenções agendadas \alert{dinamicamente}
+%             \pause
+%         \item Redução do tempo de \alert{inatividade}
+%             \pause
+%         \item Ganho de \alert{desempenho} dos sistemas
+%             \pause
+%         \item Prolongamento da \alert{vida útil} de equipamentos
+%             \pause
+%         \item Melhor utilização de \alert{recursos humanos} limitados
+%         \item Redução de \alert{custos}\\
+%             $\vdots$
+%             \pause
+%         \item Produção gradualmente mais \alert{efetiva}
+%     \end{itemize}
+% 
+%     \note{
+%         Para entender a necessidade de se pensar com cuidado na estrutura desses sistemas,
+%         é necessário primeiro apontar os potenciais benefícios dos sistemas e depois
+%         discutir sobre as dificuldades de se implementar
+%     \begin{itemize}
+%         \item agendamento dinâmico: de acordo com a real necessidade
+%         \item tempo de inatividade: paradas desnecessárias não acontecem, falhas são
+%             previstas e as ações são planejadas
+%         \item desempenho dos sistemas: tendem a funcionar da melhor forma possível por
+%             mais tempo
+%         \item prolongamento da vida útil: equipamentos funcionam da melhor maneira
+%             possível por maior tempo
+%         \item recursos humanos: consequência do melhor planejamento
+%     \end{itemize}}
+% \end{frame}
 
 
-\section{Sistemas de Validação de Sensores}
-\subsection{}
+
+
 
 \begin{frame}{Validação de Sensores e a OSA-CBM}
 
@@ -363,21 +410,20 @@ Catarina}
 
     \begin{block}{AAKR - Regressão por kernel auto-associativa}
         \begin{itemize}
-            \item estrutura auto-associativa
+            \item Estrutura auto-associativa
             %\item não há um processo real de treinamento
-            \item predições baseadas na similaridade entre as entradas e os vetores de
+            \item Predições baseadas na similaridade entre as entradas e os vetores de
                 memória
-            \item dois parâmetros de sintonia: número de vetores ($n_m$) e largura de
+            \item Dois parâmetros de sintonia: número de vetores ($n_m$) e largura de
                 banda ($h$)
         \end{itemize}
     \end{block}
 
     \begin{block}{SVM - \textit{Support Vector Machines}}
         \begin{itemize}
-            \item estrutura inferencial
-            \item processo de treinamento constrói uma $f(\mathbf{r})$ e seleciona
-                subgrupo dos dados de treinamento
-            \item três parâmetros de sintonia: $\varepsilon$, $C$ e $\gamma$
+            \item Estrutura inferencial
+            \item Processo de treinamento constrói uma $f(\mathbf{r}) \approx y$ 
+            \item Três parâmetros de sintonia: $\varepsilon$, $C$ e $\gamma$
         \end{itemize}
         
     \end{block}
@@ -399,36 +445,76 @@ Catarina}
     
 \end{frame}
 
-\begin{frame}{Monitoramento da Condição}
+\begin{frame}{Geração de Resíduos}
 
     \begin{itemize}
-        \item Resíduos: diferença entre as predições
-        \item Normalidade: média zero e variância semelhante a do ruído no sensor
+        \item Diferenças entre as leituras dos sensores e as predições dos modelos
     \end{itemize}
-
-    \begin{block}{Detecção de falhas e desvios (\textit{drift})}
-        Detecção de mudanças nas propriedades estatísticas dos resíduos
-    \end{block}
-
-    \begin{itemize}
-        \item Algoritmo de detecção: SPRT (\textit{Sequential Probability Ratio Test}),
-            parâmetro $M$
-    \end{itemize}
-
-    \begin{figure}[!htb]
-        \centering
-        \includegraphics[width=\textwidth]{figuras/residual_ex.eps}
-    \end{figure}
-
-    \note{
-    \begin{itemize}
-        \item A detecção consiste em detectar um estado diferente da normalidade
-        \item $M$: praticamente a amplitude do desvio, limiar ou threshold
-        \item o SPRT é usado para detecção de mudanças em propriedades estatísticas, neste
-            caso, a média
-    \end{itemize}}
     
+    \begin{figure}[!htb]
+        \centering Sistema 1
+        \includegraphics[width=.8\textwidth]{figuras/aakr_sprt.eps}
+    \end{figure}
+    
+    \begin{figure}[!htb]
+        \centering Sistema 2
+        \includegraphics[width=.8\textwidth]{figuras/svm_sprt.eps}
+    \end{figure}
 \end{frame}
+
+\begin{frame}{Monitoramento da Condição\\SPRT}
+    \textit{Sequential Probability Ratio Test}
+    
+    \begin{itemize}
+        \item Algoritmo para detecção de propriedades estatísticas
+        \item Testes para verificar qual a distruição de probabilidade
+            \begin{itemize}
+                \item modo normal $H_0$: distribuição Normal, média zero e variância
+                    semelhante a do ruído
+                \item modo degradado $H_1$: distribuição Normal, média diferente de zero e
+                    variância semelhante a do ruído
+            \end{itemize}
+    \end{itemize}
+    $$
+    \Lambda^{(i)} = \ln \frac{P(d^{(i)} | H_1)}{P(d^{(i)} | H_0)}
+    \label{eq:loglikelihood}
+    $$
+    \begin{itemize}
+        \item Parâmetro de sintonia $M$, diferença tolerável na média
+    \end{itemize}
+
+\end{frame}
+
+% \begin{frame}{Monitoramento da Condição}
+% 
+%     \begin{itemize}
+%         \item Resíduos: diferença entre as predições
+%         \item Normalidade: média zero e variância semelhante a do ruído no sensor
+%     \end{itemize}
+% 
+%     \begin{block}{Detecção de falhas e desvios (\textit{drift})}
+%         Detecção de mudanças nas propriedades estatísticas dos resíduos
+%     \end{block}
+% 
+%     \begin{itemize}
+%         \item Algoritmo de detecção: SPRT (\textit{Sequential Probability Ratio Test}),
+%             parâmetro $M$
+%     \end{itemize}
+% 
+%     \begin{figure}[!htb]
+%         \centering
+%         \includegraphics[width=\textwidth]{figuras/residual_ex.eps}
+%     \end{figure}
+% 
+%     \note{
+%     \begin{itemize}
+%         \item A detecção consiste em detectar um estado diferente da normalidade
+%         \item $M$: praticamente a amplitude do desvio, limiar ou threshold
+%         \item o SPRT é usado para detecção de mudanças em propriedades estatísticas, neste
+%             caso, a média
+%     \end{itemize}}
+%     
+% \end{frame}
 
 \begin{frame}{Filtro de Kalman}
 
@@ -446,10 +532,24 @@ Catarina}
             \end{itemize}
     \end{itemize}
 
-    \begin{figure}[!htb]
-        \centering
-        \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}
-    \end{figure}
+    Atualização das estimativas
+    $$
+    {d}^{(k)} = {d}^{(k-1)} + {v}^{(k)}, \quad {v}^{(k)} \sim \mathcal{N} ({0}, \sigma_v)
+    $$
+
+    Observação
+    $$
+    {z} = {d}^{(k)} +{q}^{(k)}, \quad {q}^{(k)} \sim
+    \mathcal{N} ({0}, \sigma_q)
+    $$
+
+    $$
+    z = r - \hat{r}
+    $$
+    % \begin{figure}[!htb]
+    %     \centering
+    %     \includegraphics[width=\textwidth]{figuras/osa_cbm_drift.eps}
+    % \end{figure}
 
     \note{
     \begin{itemize}
@@ -461,9 +561,6 @@ Catarina}
     \end{itemize}}
     
 \end{frame}
-
-\section{Ensaios}
-
 
 \begin{frame}{Sistemas Implementados}
 
@@ -490,11 +587,21 @@ Catarina}
     
 \end{frame}
 
+
+\section{Ensaios}
+
 \begin{frame}{Análises dos Ensaios}
 
     \begin{itemize}
         \item Objetivo\\
             Verificar a \alert{aplicabilidade} dos sistemas a sensores de poços de petróleo
+            \vspace{10pt}
+
+        \item Critérios
+            \begin{itemize}
+                \item \alert{consistência} e \alert{qualidade} das predições
+                \item capacidade de \alert{detecção} e \alert{isolamento} de desvios
+            \end{itemize}
             \vspace{10pt}
 
         \item Como foram realizados\\
@@ -504,13 +611,7 @@ Catarina}
                 \item dados gerados por simulação
                 \item dados reais
             \end{itemize}
-            \vspace{10pt}
 
-        \item Critérios
-            \begin{itemize}
-                \item \alert{consistência} e \alert{qualidade} das predições
-                \item capacidade de \alert{detecção} e \alert{isolamento} de desvios
-            \end{itemize}
     \end{itemize}
 
     \note{
@@ -812,11 +913,8 @@ Catarina}
 
     \begin{itemize}
         \item Importância dos sensores na indústria de petróleo
-        \item Principais abordagens para validação
-        \item Benefícios e dificuldades dos sistemas de manutenção CBM
-            \begin{itemize}
-                \item OSA-CBM
-            \end{itemize}
+        \item Problemas de \textit{drifts} ou desvios
+        \item Proposta do trabalho
         \item Implementação de 3 diferentes sistemas de detecção de desvios
             \begin{itemize}
                 \item Sistema 1: AAKR e SPRT
@@ -844,6 +942,21 @@ Catarina}
     
 \end{frame}
 
+\begin{frame}{Conclusões}
+    
+    Problemas com a abordagem por modelos baseados em histórico:
+    \begin{itemize}
+        \item Agrupamento ótimo de sensores
+        \item Seleção dos dados de treinamento
+            \begin{itemize}
+                \item livres de falhas
+                \item cobertura das condições de operação futuras
+            \end{itemize}
+        \item Discernir entre mudanças no processo e falhas nos sensores
+    \end{itemize}
+    
+\end{frame}
+
 \begin{frame}{Trabalhos Futuros}
     \begin{itemize}
         \item Agrupamento automático de sensores
@@ -862,282 +975,9 @@ Catarina}
     \end{itemize}}
 \end{frame}
 
-% \section{Monitoring Systems}
-% \subsection{}
-% 
-% \begin{frame}{Sensor Drift Detection/Correction (state of art)}
-%     \begin{columns}[T]
-%         \column{.35\textwidth}
-%         \begin{figure}
-%             \centering
-%             \includegraphics[height=.8\textheight]{figures/sys_arch_aakr.eps}
-%         \end{figure}
-%         %%
-%         \column{.55\textwidth}
-%         \begin{itemize}
-% 
-%             \item A auto-associative empirical model predicts the ``corrected'' readings
-%                 of a group of correlated sensors
-%                 \begin{itemize}
-%                     \item kernel regression
-%                     \item using historical of fault free observations
-%                 \end{itemize}
-%             \item The residual is analysed by statistical algorithms
-%         \end{itemize}
-%         
-%     \end{columns}
-% \end{frame}
-% 
-% \begin{frame}{Auto-associative Kernel Regression}
-%     \begin{itemize}
-%         \item \alert{Non-parametric} model
-%         \item \alert{Auto-associative} arquitecture: the outputs emulate the inputs
-%         \item \alert{Lazy} learning: there is not a real training procedure
-%     \end{itemize}
-% 
-%     \centering
-%     $
-%     \hat{\mathbf{x}} = \frac{\sum\limits_{i=1}^n K(\mathbf{X}_i - \mathbf{x}) \;
-%     \mathbf{X}_i}{\sum\limits_{i=1}^n K(\mathbf{X}_i - \mathbf{x})} 
-%     $
-% 
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=.7\textwidth]{figures/aakr_prediction.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% \begin{frame}{Residual Analisys}
-%     \begin{itemize}
-%         \item Hypotesis:
-%             \begin{itemize}
-%                 \item $H_0$: \alert{normal} mode, zero mean and variance related to the sensor's
-%                     noise
-%                 \item $H_1$: \alert{degraded} mode, some statiscally abnormal change
-%             \end{itemize}
-%         \item \alert{Sequential Probability Ratio Test} (SPRT) to test the hypothesis
-%     \end{itemize}
-%     $$\Lambda^i = \ln \frac{P(d^i | H_1)}{P(d^i | H_0)}$$
-%     $$S^i = S^{i-1} + \Lambda^i$$
-%     \begin{itemize}
-%         \item $A < S^i < B$: continue monitoring and calculating $S^{i+1}$
-%         \item $S^i \le A$: $H_0$ is accepted
-%         \item $S^i \ge B$: $H_1$ is accepted
-%     \end{itemize}
-% \end{frame}
-% 
-% \begin{frame}{Sensor Drift Detection/Correction with Kalman Filter}
-%     \begin{columns}[T]
-%         \column{.35\textwidth}
-%         \begin{figure}
-%             \centering
-%             \includegraphics[height=.8\textheight]{figures/sys_arch.eps}
-%         \end{figure}
-%         %%
-%         \column{.55\textwidth}
-%         \begin{itemize}
-%             \item A Kalman filter tracks the drift's \alert{amplitude} over time
-%             \item ``Pre-corrected'' measurements are used for prediction
-%             \item Allows better predictions of drifted sensors, even for severe drifts
-%         \end{itemize}
-%     \end{columns}
-% \end{frame}
-% 
-% \begin{frame}{Kalman Filter}
-%     \begin{itemize}
-%         \item Assumptions:
-%             \begin{itemize}
-%                 \item smooth
-%                 \item slowly increasing
-%                 \item linear or exponential fashion
-%                 \item uncorrelation among the drifts of different sensors
-%             \end{itemize}
-%         \item Mathematical model to estimate the drift $\mathbf{d}^k$
-%             $$
-%             \mathbf{d}^k = \mathbf{I} \; \mathbf{d}^{k-1} + \mathbf{v}^k, \quad
-%             \mathbf{v}^k \sim \mathcal{N} (\mathbf{0}, \mathbf{V})
-%             $$
-%         \item Available observations of the drifts $\mathbf{z}$
-%             $$
-%             \mathbf{z} = \mathbf{r} - \hat{\mathbf{x}}
-%             $$
-%         \item Measurement equation
-%             $$
-%             \mathbf{z} = \mathbf{I} \; \mathbf{d}^k + \mathbf{q}^k, \quad \mathbf{q}^k
-%             \sim \mathcal{N} (\mathbf{0}, \mathbf{Q})
-%             $$
-%     \end{itemize}
-% \end{frame}
-% 
-% \begin{frame}{Performance Metrics}
-%     \begin{itemize}
-%         \item Mean squared error (for unfalted data)
-%             $$
-%             \mbox{MSE} = \frac{1}{N} \sum\limits_{i=1}^N (\hat{x}^i - x^i)^2
-%             $$
-%         \item Auto sensitivity for a sensor $p$
-%             $$
-%             S_{A,p} = \frac{1}{N} \sum\limits_{i=1}^N \frac{|\hat{x}_{p,drift}^{i} -
-%             \hat{x}_{p}^i|}{|x^{i}_{p,drift} - x_{p}^i|}
-%             $$
-%         \item Cross sensitivity for a unfaulted sensor $j$ and a drifted sensor $p$
-%             $$
-%             S_{C,p} = \frac{1}{N} \sum\limits_{i=1}^N \frac{|\hat{x}_{j}^{i,drift} -
-%             \hat{x}_{j}^i|}{|x^{i,drift}_{p} - x_{p}^i|}
-%             $$
-%     \end{itemize}
-% \end{frame}
-% 
-% \section{Examples}
-% 
-% \subsection{Simulated Data Set}
-% 
-% \begin{frame}{Simulated Data Set}
-%     \begin{columns}[T]
-%         \column{.35\textwidth}
-%         \begin{figure}[!htb]
-%             \centering
-%             \includegraphics[height=.8\textheight]{figures/poco.eps}
-%         \end{figure}
-%         \column{.55\textwidth}
-%         \begin{itemize}
-%             \item 4 simulated pressure sensors:\vspace{-.5cm}
-%                 \begin{itemize}
-%                     \item bottom hole (PT$_f$)
-%                     \item top of the production pipe (PT$_t$)
-%                     \item top of the annular space (PT$_g$)
-%                     \item upstream of the injection choke (PT$_m$)
-%                 \end{itemize}
-%             \item Data collected during 225 hours of well production
-%             \item Sample rate of 1 sample per minute
-%             \item White noise of NSR (noise to signal ratio) equal to $0.3$
-%             \item The first 90 hours of data were used to develop the model
-%         \end{itemize}
-%     \end{columns}
-% \end{frame}
-% 
-% \begin{frame}{Predictions for Simulated Data Set}
-%     \vspace*{-.25cm}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/pred_124d.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% \begin{frame}{Sensibility Analisys for Simulated Data}
-%     \begin{table}[!bt]
-%         \centering
-%         \begin{tabular}{lcc}
-%             & AAKR-KF-SPRT & AAKR-SPRT\\
-%             \midrule
-%             MSE & $9.1293\times 10^{-3}$ & $2.8491\times 10^{-3}$ \\
-%             $\mbox{S}_A$ & $1.9431\times 10^{-5}$ & $5.0840\times 10^{-5}$ \\
-%             $\mbox{S}_C$ & $8.1022\times 10^{-5}$ & $11.8895\times 10^{-5}$ \\
-%             \bottomrule
-%         \end{tabular}
-%     \end{table}
-%     \vspace{1cm}
-%     Note: MSE is calculated for unfaulted data.
-% \end{frame}
-% 
-% \begin{frame}{Residual Analisys Without KF}
-%     \vspace*{-.2cm}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/res_124d.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% \begin{frame}{Residual Analisys With KF}
-%     \vspace*{-.2cm}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/kfres_124d.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% \subsection{Real Data Set}
-% 
-% \begin{frame}{Real Data Set}
-%     \begin{itemize}
-%         \item Pressure data collected from 3 sensors:
-%             \begin{itemize}
-%                 \item PDG (at the bottom hole)
-%                 \item TPT (at the christmas tree)
-%                 \item at the upstream of the injection choke (PT$_m$)
-%             \end{itemize}
-%         \item Data collected during 955 hours
-%         \item Sample rate of 1 sample per minute
-%         \item The first 500 hours were used to develop the model
-%     \end{itemize}
-% \end{frame}
-% 
-% \begin{frame}{Predictions for Real Data Set}
-%     \vspace*{-.2cm}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/pred_real_23d.eps}
-%     \end{figure}
-%     %%
-%     % Artificial linear drift was inserted
-%     % Upstream of the injection choke
-%     % Downhole pressure, wellhead pressure
-% \end{frame}
-% 
-% \begin{frame}{Sensibility Analisys for Real Data Set}
-%     \begin{table}[!bt]
-%         \centering
-%         \begin{tabular}{lcc}
-%             & AAKR-KF-SPRT & AAKR-SPRT\\
-%             \midrule
-%             MSE & $2.7013$ & $1.4061$ \\
-%             $\mbox{S}_A$ & $0.0747$ & $0.6956$ \\
-%             $\mbox{S}_C$ & $0.0466$ & $0.1208$ \\
-%             \bottomrule
-%         \end{tabular}
-%     \end{table}
-% \end{frame}
-% 
-% \begin{frame}{Residual Analysis Without KF}
-%     \vspace*{-.2cm}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/akres_real.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% \begin{frame}{Residual Analysis With KF}
-%     \vspace*{-.2cm}
-%     \begin{figure}[!htb]
-%         \centering
-%         \includegraphics[width=\textwidth]{figures/kfres_real.eps}
-%     \end{figure}
-% \end{frame}
-% 
-% \section{Conclusions}
-% \subsection{}
-% 
-% \begin{frame}{Conclusions and Future Works}
-%     \begin{itemize}
-%         \item Sensors play important roles in the oil field
-%         \item Two on-line calibration monitoring systems were presented
-%         \item Data-driven approach
-%         \item The KF allows much \alert{less sensitivity} for drifts with a slight loss of
-%             accuracy
-%         \item The systems allows a greater extension of the \alert{useful life} of the sensors
-%         \item Future works:
-%             \begin{itemize}
-%                 \item Uncertainty analysis
-%             %% instead of statistical algorithms for drift detection
-%                 \item Detection of valve closing
-%                     \begin{itemize}
-%                         \item variables decoupling
-%                     \end{itemize}
-%                 \item Automatic variables grouping
-%             %% Which could be choose optimal groups of variables
-%             \end{itemize}
-%     \end{itemize}
-% \end{frame}
-
+\begin{frame}
+    \titlepage
+    
+\end{frame}
 
 \end{document}
