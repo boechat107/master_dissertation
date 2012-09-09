@@ -23,15 +23,16 @@ realizada é sequer necessária. Além disso, a confiabilidade de um instrumento po
 afetado de forma adversa pelas intervenções manuais.
 
 Por essas e outras razões, como a competitividade de mercado, tem crescido a procura por
-estratégias menos invasivas e mais eficientes. Técnicas de manutenção baseadas em condição
+estratégias menos invasivas e mais eficientes. Técnicas de manutenção baseadas na condição
 (CBM --- \textit{Condition Based Maintenance})
-tendem à manutenção ótima, pois o desempenho dos instrumentos é monitorado durante a
-operação da planta e recalibrações físicas são realizadas apenas esse desempenho está
-degradado.  Na literatura, esses métodos têm sido chamados de monitoramento
+tendem à manutenção ótima, pois a condição de funcionamento dos instrumentos é monitorada
+durante a operação da planta e recalibrações físicas são realizadas apenas quando uma
+degradação do desempenho é detectada.
+Na literatura, esses métodos têm sido chamados de monitoramento
 \textit{on-line} de calibração (OLM --- \textit{On-line
 Monitoring}).
 
-\abreviatura{CBM}{Manutenção baseada em condição}
+\abreviatura{CBM}{Manutenção baseada na condição}
 \abreviatura{OLM}{On-line Monitoring}
 
 O monitoramento de calibração baseia-se essencialmente em estimar as medidas corretas que
@@ -42,10 +43,11 @@ mesmos. Para isso, existem duas abordagens atualmente utilizadas: redundância po
 Na redundância por
 \textit{hardware}, sensores redundantes são utilizados para medirem uma mesma variável,
 possibilitando formas mais simples e intuitivas de estimação dos valores corretos das
-medições (pela média das medições, por exemplo). Porém, a redundância por
-\textit{hardware} inclui a possível necessidade de sensores extras, além de apresentar
-dificuldades na detecção de sensores descalibrados que apresentam \textit{drift} na mesma
-direção. Além disso, no caso dos sensores de fundo de poço, componentes redundantes ocupam
+medições (pela média das medições, por exemplo). 
+Entretanto, além da necessidade de aquisição de sensores extras, a redundância por
+\textit{hardware} apresenta dificuldades na detecção de sensores descalibrados que
+apresentam \textit{drift} na mesma direção.
+Além disso, no caso dos sensores de fundo de poço, componentes redundantes ocupam
 um valioso e limitado espaço, e consomem uma energia preciosa.
 
 A outra abordagem, por redundância analítica, consiste na estimação das medidas
@@ -64,8 +66,8 @@ durante a análise de dados de medições livres de falhas, coletados
 durante situações normais de operação da planta. Apesar de serem normalmente limitados a
 trabalharem em pontos de operação da planta semelhantes aos quais foram treinados, os
 modelos empíricos possuem diversos benefícios práticos, como: aplicabilidade livre de contexto, ou
-seja, a essência dos modelos podem ser aplicados a quaisquer tipos de sistemas, sem a
-necessidade de conhecimentos específicos sobre este; simplicidade de desenvolvimento, uma
+seja, a essência dos modelos pode ser aplicada a quaisquer tipos de sistemas, sem a
+necessidade de conhecimentos profundos sobre este; simplicidade de desenvolvimento, uma
 vez que não existe a necessidade de modelos explícitos, o que torna-se um atrativo quando
 se trata de sistemas complexos; e flexibilidade de configuração,
 facilitando a configuração dos modelos para atender a novos requisitos de
@@ -76,7 +78,7 @@ monitoramento do desempenho de sensores de poços de petróleo, cujas técnicas são
 em técnicas de aprendizado de máquina e modelos empíricos construídos com histórico de
 dados. 
 Como as técnicas baseadas em modelos empíricos são livres de contexto, este
-trabalho possui potencial aplicação para diversas outros setores industriais.
+trabalho possui potencial aplicação para diferentes setores industriais.
 
 
 \section{Definição do problema e abordagens existentes}
@@ -89,9 +91,9 @@ acompanhada da estimativa ou predição das medições corretas, durante o funcionam
 planta ou processo.
 
 Os sensores de poços são passíveis a vários tipos de falhas, como mudanças abruptas,
-polarização (\textit{bias}), picos etc. O principal tipo de falha tratado neste trabalho é
+polarização (\textit{bias}), picos, etc. O principal tipo de falha tratado neste trabalho é
 o \textit{drift} ou desvio de medição. Na literatura, o \textit{drift} é normalmente
-definido como um desvio lento, continuo ou incremental, das medições de um sensor ao longo
+definido como um desvio lento, contínuo ou incremental, das medições de um sensor ao longo
 do tempo.
 
 % TODO: verificar utilidade deste texto
@@ -116,13 +118,13 @@ Os modelos são
 normalmente desenvolvidos utilizando histórico de medições livres de erros, capturando a
 correlação verdadeira entre as variáveis. Depois de construídos, esses modelos conseguem
 gerar estimativas das medições corretas dos sensores, as quais são comparadas com as
-medições reais afim de se identificar e isolar possíveis falhas.
+medições reais com o intuito de se identificar e isolar possíveis falhas.
 Casos de sucesso no emprego de tais técnicas na indústria já foram reportados, como
 é o caso das plantas de energia nuclear \cite{Ma2011}.
 
-Normalmente, os sistemas de monitoramento de desempenho de sensores baseados em modelos
+Normalmente, os sistemas de monitoramento do desempenho de sensores baseados em modelos
 empíricos segue o esquema apresentado na Fig. \ref{fig:chap1_ddfdd}.  Supondo uma matriz
-de dados de treinamento $\mathbf{X} \in \mathbb{R}^{n \times p}$, onde $n_m$ é número de amostras
+de dados de treinamento $\mathbf{X} \in \mathbb{R}^{n_m \times p}$, onde $n_m$ é o número de amostras
 de treino e $p$ é a quantidade de variáveis amostradas, um modelo empírico $f$ é treinado
 usando $\mathbf{X}$. Quando novas medições $\mathbf{r} \in \mathbb{R}^{1\times p}$ tornam-se
 disponíveis, estimações de $\mathbf{r}$ são obtidas por $\hat{\mathbf{r}} = f(\mathbf{r})$
@@ -130,7 +132,7 @@ e resíduos são gerados como $\mathbf{d} = \mathbf{r} - \hat{\mathbf{r}}$. A ocor
 \textit{drift} nas medições causa mudanças nas relações entre as variáveis de
 $\mathbf{r}$, o que resulta em mudanças estatísticas anormais nos resíduos. Então,
 avaliando estatisticamente os resíduos podem-se estabelecer as condições de operação ou
-saúde dos sensores \cite{Ma2011}.
+a saúde dos sensores \cite{Ma2011}.
 
 \simbolo{$p$}{Número de sensores cujas leituras compõem uma amostra de dados}
 
@@ -153,7 +155,7 @@ amostras de treinamento do modelo regressivo AAKR.}
     \centering
     \includegraphics[width=.9\textwidth]{figuras/data_driven_fdd.eps}
     \caption{Esquema de funcionamento de sistemas baseados em modelos empíricos para
-    monitoramento de desempenho de sensores. Adaptado de Ma e Jiang~\cite{Ma2011}.}
+    monitoramento do desempenho de sensores. Adaptado de Ma e Jiang~\cite{Ma2011}.}
     \label{fig:chap1_ddfdd}
 \end{figure}
 
@@ -161,7 +163,7 @@ Inicialmente vários trabalhos empregaram redes neurais para o
 desenvolvimento de modelos, mas atualmente as técnicas baseadas em kernel estão entre as
 mais utilizadas. 
 
-No trabalho de Hines e Uhrig~\cite{Hines1998}, um sistema de monitoramento de desempenho de
+No trabalho de Hines e Uhrig~\cite{Hines1998}, um sistema de monitoramento do desempenho de
 sensores foi implementado utilizando basicamente
 uma rede neural auto-associativa (AANN) como modelo empírico e o algoritmo SPRT
 (\textit{Sequential Probability Ratio Test}) para a análise das propriedades estatísticas
@@ -223,17 +225,18 @@ estáveis.
 
 \section{Objetivos e Contribuições}
 
-Esta dissertação tem como principais objetivos:
+O principal objetivo desta dissertação é apresentar o esquema de funcionamento de um
+sistema para detecção e correção de desvios em sensores dentro de uma arquitetura mais
+genérica para sistemas de monitoramento e manutenção baseado na condição.
+Para se atingir esse objetivo principal, os seguintes objetivos são incluídos como etapas
+intermediárias:
 
 \begin{itemize}
-    \item Desenvolver um sistema de validação de sensores baseado em modelos
-        empíricos e técnicas de aprendizado de máquina;
+    \item Desenvolver um sistema de detecção/correção de desvios em sensores baseado em
+        modelos empíricos e técnicas de aprendizado de máquina;
     \item Ensaiar diferentes técnicas de modelagem empírica e configurações do sistema;
-    \item Ensaiar e avaliar o sistema de validação de sensores para dados de poços de
-        produção de petróleo;
-    \item Apresentar um esquema de funcionamento do sistema de validação de sensores
-        dentro de uma arquitetura mais genérica para sistemas de monitoramento e
-        manutenção baseado em condição.
+    \item Ensaiar e avaliar o sistema desenvolvido com dados de poços de produção de
+        petróleo.
 \end{itemize}
 
 Como principais contribuições deste trabalho, podem-se destacar:
@@ -243,7 +246,7 @@ Como principais contribuições deste trabalho, podem-se destacar:
         modelagem empírica baseada em histórico de dados;
     \item Apresentação de uma estrutura modular para implementação do sistema de validação
         de sensores dentro de uma arquitetura mais geral para monitoramento e manutenção
-        baseado em condição;
+        baseado na condição;
     \item Emprego de um modelo de estimação de \textit{drift} ao resíduo gerado entre um
         modelo empírico de predição auto-associativo e as leituras dos sensores.
 \end{itemize}
@@ -1705,7 +1708,7 @@ afetadas pelos desvios presentes em PT$_g$.
 Com excessão das variáveis PT$_f$ e PT$_g$, o Sistema 2 foi o mais afetado pelos desvios,
 confirmando seu maior valor de $S_C$, entretanto, as predições de PT$_g$
 permanceram inalteradas pelos desvios, uma vez que a autosensibilidade do seu modelo
-gressivo é nula.
+regressivo é nula.
 O Sistema 3 apresenta, em geral, o melhor desempenho aparente entre os três sistemas,
 confirmando as métricas de desempenho, gerando predições muito próximas do desejado mesmo
 na ocorrência de desvios; entretanto, pelo valor de $E_a$, na ausência de desvios nas
