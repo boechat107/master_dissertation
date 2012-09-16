@@ -47,8 +47,8 @@ medições (pela média das medições, por exemplo).
 Entretanto, além da necessidade de aquisição de sensores extras, a redundância por
 \textit{hardware} apresenta dificuldades na detecção de sensores descalibrados que
 apresentam \textit{drift} na mesma direção.
-Além disso, no caso dos sensores de fundo de poço, componentes redundantes ocupam
-um valioso e limitado espaço, e consomem uma energia preciosa.
+Além disso, segundo Eck et al.~\cite{Eck1999}, no caso dos sensores de fundo de poço,
+componentes redundantes ocupam um espaço limitado, e consomem uma energia preciosa.
 
 A outra abordagem, por redundância analítica, consiste na estimação das medidas
 dos sensores baseando-se em outras medidas correlacionadas disponíveis no sistema. Existem
@@ -159,10 +159,6 @@ amostras de treinamento do modelo regressivo AAKR.}
     \label{fig:chap1_ddfdd}
 \end{figure}
 
-Inicialmente vários trabalhos empregaram redes neurais para o
-desenvolvimento de modelos, mas atualmente as técnicas baseadas em kernel estão entre as
-mais utilizadas. 
-
 No trabalho de Hines e Uhrig~\cite{Hines1998}, um sistema de monitoramento do desempenho de
 sensores foi implementado utilizando basicamente
 uma rede neural auto-associativa (AANN) como modelo empírico e o algoritmo SPRT
@@ -215,13 +211,16 @@ gerando uma estimação da leitura correta, ou verdadeira, do sensor em questão.
 
 \abreviatura{KF}{Filtro de Kalman}
 
-Neste trabalho, os modelos empíricos foram desenvolvidos utilizando AAKR ou SVM. A técnica
-AAKR possui implementação simples e esforço mínimo para o desenvolvimento de modelos,
-quando comparado às demais técnicas. A técnica SVM possui característica inferencial, o
-treinamento dos modelos é mais simples, comparado às redes neurais, e gera resultados
-estáveis.
-
-
+Neste trabalho, as técnicas de predição escolhidas são AAKR e SVM. 
+Comparado aos demais modelos, os modelos AAKR possuem implementação computacional simples;
+os modelos SVM possuem muitos relatos de sucesso na literatura e estrutura inferencial,
+gerando estimativas das leituras de um sensor monitorado sem a necessidade das respectivas
+leituras reais.
+A análise estatística dos resíduos é realizada pelo algoritmo SPRT, largamente utilizado
+na literatura para testes sequenciais de hipóteses probabilísticas.
+Utilizando tais técnicas, a implementação do sistema de monitoramento de desempenho e
+detecção de desvios em sensores é avaliada pela consistência e qualidade das predições e
+pela capacidade de detecção e isolamento de desvios.
 
 \section{Objetivos e Contribuições}
 
