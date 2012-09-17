@@ -166,11 +166,9 @@ uma rede neural auto-associativa (AANN) como modelo empírico e o algoritmo SPRT
 dos resíduos.
 O sistema foi avaliado em dados de plantas nucleares, envolvendo problemas como
 \textit{drifts} e erros grosseiros nos sensores.
-%As estimações geradas pela rede eram
-%comparadas às leituras dos sensores para a formação
-%dos resíduos, cujas propriedades estatísticas, analisadas pelo módulo estatístico com o
-%algoritmo SPRT (\textit{Sequential Probability Ratio Test}),
-%indicavam a ocorrência de falhas ou \textit{drifts}.
+Apesar dos bons resultados, o treinamento do modelo inicial e o retreinamento para
+mudanças significativas nas condições de operação da planta possuem alto custo
+computacional.
 
 \abreviatura{AANN}{Redes neurais artificiais auto-associativas}
 \abreviatura{SPRT}{Sequential Probability Ratio Test}
@@ -179,7 +177,8 @@ Gribok, Hines e Uhrig~\cite{Gribok2000} realizaram uma comparação entre diferent
 para a predição de dados de plantas nucleares. Entre as técnicas utilizadas, encontram-se
 redes neurais, mínimos quadrados ordinários, regressão kernel, MSET (\textit{Multivariate
 State Estimation Techniques}) e SVM (\textit{Support Vector Machines}). Os resultados
-apontaram as técnicas baseadas em kernel como promissoras.
+apontaram as técnicas baseadas em kernel como promissoras, principalmente a SVM pela sua
+inerente regularização e estabilidade das predições.
 
 \abreviatura{MSET}{Multivariate State Estimation Techniques}
 \abreviatura{SVM}{Support Vector Machines}
@@ -191,15 +190,27 @@ eram analisadas usando SPRT para a detecção de falhas.
 
 Garvey et al.~\cite{Garvey2007} apresentaram os resultados da aplicação da técnica de regressão
 kernel auto-associativa (AAKR) a conjuntos de sensores de plantas nucleares. Diferentes
-métricas são apresentadas para a avaliação de desempenho dos modelos AAKR e a detecção de
-\textit{drifts} é realizada pela análise de incerteza dos modelos.
+métricas foram apresentadas para a avaliação de desempenho dos modelos AAKR e 
+a detecção de desvios foi realizada a partir dos intervalos de confidência construídos
+pela estimação da incerteza dos modelos.
+Um dos ganhos de se estimar as incertezas dos modelos é a capacidade de se indicar, a
+partir de uma métrica, o menor desvio detectável nos sensores.
 
 \abreviatura{AAKR}{Regressão kernel auto-associativa}
 
-Aggrey e Davies~\cite{Davies2007} apresentaram um estudo sobre o uso de redes neurais para a predição de
-dados de sensores de fundo de poços de petróleo e estimação de parâmetros de
-reservatórios. A detecção de sensores degradados foi realizada por análises de limites
-(\textit{thresholds}) dos valores dos resíduos.
+Aggrey e Davies~\cite{Davies2007} apresentaram um estudo sobre o uso de redes neurais para
+a predição de dados de sensores de fundo de poços de petróleo e estimação de parâmetros de
+reservatórios. 
+Vários ganhos que se poderiam obter para a indústria de petróleo, advindos do emprego de
+modelos baseados em histórico (\textit{soft sensing}), foram citados.
+Os experimentos consistiram no emprego de uma rede neural inferencial para se estimar a
+pressão de fundo de poço considerando medidas de outros sensores correlacionados, cujas
+leituras correspondiam à temperatura e pressão de diferentes pontos do poço.
+Os resultados do modelo empírico foram consideradas muito precisas ($\approx 0.1\%$ de
+erro) e robustas a falhas.
+Entretanto, os testes incluíram apenas falhas no sensor estimado pela rede neural, cujas
+medidas não são usadas pela rede durante as predições.
+Nenhuma forma de detecção automática de falhas de sensores foi utilizada.
 
 Takruri, Rajasegarar e Challa~\cite{Takruri2008} propuseram um novo algoritmo para
 correção de medições de redes de sensores sem fio. O algoritmo foi concebido para
@@ -207,7 +218,10 @@ trabalhar de forma descentralizada, sendo executado por cada sensor correlaciona
 rede. Cada sensor recebe as leituras de sensores correlacionados, com as quais infere a
 própria leitura utilizando um modelo SVM.  A leitura inferida e a leitura real são
 utilizadas por um filtro de Kalman (KF) que possui um modelo genérico de \textit{drift},
-gerando uma estimação da leitura correta, ou verdadeira, do sensor em questão.
+gerando uma estimação do valor verdadeiro da variável mensurada pelo sensor.
+Em trabalhos mais recentes de Takruri, Challa e Yunis~\cite{Takruri2009}, o filtro de
+Kalman foi substituído por um \textit{Unscented Kalman Filter}, resultando na redução do
+\textit{bias} normalmente gerado pela formulação anterior.
 
 \abreviatura{KF}{Filtro de Kalman}
 
