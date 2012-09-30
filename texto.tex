@@ -287,8 +287,8 @@ Em esquemas de manutenção baseados em CBM, as condições de funcionamento de equi
 sistemas são monitoradas com o intuito de otimizar as ações de manutenção. As manutenções
 preventivas deixam de ser periódicas, passando a serem agendadas de forma dinâmica, de
 acordo com evidências de real necessidade. A implementação de estratégias desse tipo pode
-reduzir o tempo de inatividade de plantas de produção, melhorar o desempneho de sistemas e
-o gerênciamento de recursos humanos limitados, prolongar a vida útil de equipamentos,
+reduzir o tempo de inatividade de plantas de produção, melhorar o desempenho de sistemas e
+o gerenciamento de recursos humanos limitados, prolongar a vida útil de equipamentos,
 reduzir custos e tornar a produção gradualmente mais efetiva.
 
 A tendência atual de utilização de centros integrados remotos, localizados em
@@ -356,7 +356,7 @@ arquitetura para sistemas CBM que facilitasse a interoperabilidade entre compone
 
 \abreviatura{OSA-CBM}{Open System Architecture Condition-Based Maintenance}
 
-No OSA-CBM, a arquitetura de um sistema CBM é dividido em diferentes camadas funcionais,
+No OSA-CBM, a arquitetura de um sistema CBM é dividida em diferentes camadas funcionais,
 cujos conteúdos devem ser implementados seguindo as interfaces definidas pelo padrão.
 Atualmente, as camadas funcionais, ou módulos, somam um total de seis, seguindo a norma
 ISO-13374. As camadas são: aquisição
@@ -387,17 +387,19 @@ vibração, temperatura etc.) e provêem as seguintes funções \cite{PennStateUniver
 
     \item[Monitoramento de condição:] criação e manutenção de perfis de comportamento
         normal do sistema, procura por anomalias a cada novo dado adquirido e determinação
-        da zona de anormalidade no qual o sistema pode se encontrar.
+        da zona de anormalidade no qual o sistema pode se encontrar. Em resumo, o bloco
+        gera indicadores, ou sintomas, do estado de funcionamento.
 \end{description}
 
-Os três blocos restantes combinam conceitos humanos com tecnologias de monitoramento para
-se determinar o estado de funcionamento corrente do sistema, realizar predições de falhas
-e recomendações de possíveis ações a serem tomadas por operadores e mantenedores do
-sistema. Podem-se citar as funções:
+Os três blocos restantes combinam conhecimentos especialistas com tecnologias de
+monitoramento para se determinar o estado de funcionamento corrente do sistema, realizar
+predições de falhas e recomendações de possíveis ações a serem tomadas por operadores e
+mantenedores do sistema. Podem-se citar as funções:
 
 \begin{description}
-    \item[Avaliação de saúde (diagnóstico):] diagnóstico das falhas e avaliação da
-        condição de operação do sistema de acordo com todas as informações de estado.
+    \item[Avaliação de saúde (diagnóstico):] diagnóstico das falhas e situações anômalas
+        e avaliação da condição de operação do sistema de acordo com todas as informações
+        de estado.
 
     \item[Prognóstico:] previsão dos estados de operação, modos de falhas e vida útil de
         equipamentos/sistemas baseado na condição de operação corrente e no planejamento
@@ -468,7 +470,7 @@ As principais funcionalidades presentes em cada módulo são:
 
 \begin{description}
     \item[Aquisição de dados:] composta basicamente por sensores e transdutores,
-        responsáveis pela mensuração de grandezas físicas e pela transformação dessas
+        responsáveis pela medição de grandezas físicas e pela transformação dessas
         medidas para dados digitais. Contando com um sistema de banco de dados, as medidas
         são armazenadas para futuras análises de histórico.
 
@@ -497,6 +499,15 @@ As principais funcionalidades presentes em cada módulo são:
         de usuários, como o de manuntenção, operação da planta ou o grupo responsável por
         tomadas de decisões estratégicas de negócio.
 \end{description}
+
+No caso da arquitetura apresentada na Fig.~\ref{fig:osa_drift}, o diagnóstico de
+ocorrência de desvios deve ser realizado implicitamente pelo usuário a partir das
+indicações de mudanças nas propriedades estatísticas dos reísduos apresentadas pela camada
+de monitoramento da condição.
+Em casos mais gerais, onde a detecção de desvios faria parte de um sistema de manutenção
+mais completo, a implementação de uma rotina para o diagnóstico (como um conjunto de
+regras do tipo \textit{if-then-else} sobre as propriedades estatísticas dos resíduos),
+dentro do módulo de avaliação de saúde, seria de maior importância.
 
 Vale destacar ainda uma das principais vantagens da adoção de uma arquitetura padronizada
 como a OSA-CBM: a facilidade de inserção de novos algoritmos para cada um dos módulos do
