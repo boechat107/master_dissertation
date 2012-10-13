@@ -455,6 +455,7 @@ A Figura \ref{fig:osa_eai} ilustra a atual relação entre entre a OSA-CBM e a OSA
 Integration}}
 
 \section{Validação de Sensores e o Modelo OSA-CBM}
+\label{sec:osa_drift}
 
 Considerando a arquitetura OSA-CBM, um sistema básico de validação de sensores poderia ser
 composto por quatro diferentes módulos e uma base de dados de histórico, como ilustrado na
@@ -507,7 +508,8 @@ de monitoramento da condição.
 Em casos mais gerais, onde a detecção de desvios faria parte de um sistema de manutenção
 mais completo, a implementação de uma rotina para o diagnóstico (como um conjunto de
 regras do tipo \textit{if-then-else} sobre as propriedades estatísticas dos resíduos),
-dentro do módulo de avaliação de saúde, seria de maior importância.
+dentro do módulo de avaliação de saúde, seria de maior importância e mais coerente com a
+proposta da arquitetura.
 
 Vale destacar ainda uma das principais vantagens da adoção de uma arquitetura padronizada
 como a OSA-CBM: a facilidade de inserção de novos algoritmos para cada um dos módulos do
@@ -527,10 +529,10 @@ mudança nos algoritmos e módulos já presentes no sistema.
 % empíricos (livro ``Learning from data'').
 % Explicação básica sobre detecção por métodos estatísticos.
 
-Pode-se dividir o processo de validação de sensores em três etapas principais:
+Pode-se dividir o processo de validação de sensores em quatro etapas principais:
 pré-processamento, processamento, pós-processamento dos sinais e o monitoramento de
 condição.
-Cada uma dessas etapas são detalhadas a seguir.
+Cada uma dessas etapas é detalhada a seguir.
 
 %Como discutido no Capítulo 1, o monitoramento do desempenho de sensores é composto
 %basicamente por três etapas: predição das leituras dos sensores por um modelo empírico, a
@@ -541,8 +543,8 @@ Cada uma dessas etapas são detalhadas a seguir.
 
 A etapa de pré-processamento dos sinais consiste na preparação dos dados que serão
 utilizados pelos modelos empíricos, tanto para o treinamento quanto para a predição.
-O condicionamento dos dados às técnicas de modelagem normalmente são
-necessárias para que os modelos consigam extrair dos sinais as informações corretas e
+O condicionamento dos dados às técnicas de modelagem normalmente é
+necessário para que os modelos consigam extrair dos sinais as informações corretas e
 realmente relevantes para futuras predições.
 
 Pode-se dividir a etapa de pré-processamento em quatro tarefas: limpeza dos dados,
@@ -609,14 +611,21 @@ quando expressadas em Pascal que em kgf/m$^2$.
 Para técnicas de aprendizagem de máquina, uma das formas comuns de se normalizar sinais é
 escalá-los no hipercubo $[0,1]^p$, onde $p$ é o número de variáveis de entrada do modelo.
 Neste caso, a normalização de uma amostra $r_p \in \mathbb{R}$ obtida de um sensor $p$ é dada
-pela Eq.~(\ref{eq:scaling}), onde $r_{norm,p}$ é o valor normalizado de $r_p$ e
+pela Eq.~(\ref{eq:scaling}), onde $r_{norm,p}$ é o valor normalizado de $r_p$,
 $r_{max,p}$ e $r_{min,p}$ são os valores máximos e mínimos dos dados de treinamento
 relativos ao sensor $p$.
+No caso de sistemas OLM, as novas amostras dos sensores, coletadas ao longo do tempo, são
+normalizadas de acordo com os valores de referência ($r_{max,p}$ e $r_{min,p}$) dos dados
+de treinamento dos modelos.
+Na ocorrência de novas amostras com valores maiores que $r_{max,p}$ ou menore
+$r_{min,p}$), seus valores normalizados serão maiores que 1 ou menores que 0,
+respectivamente.
 
 \begin{equation}
     r_{norm,p} = \frac{r_p - r_{min,p}}{r_{max,p} - r_{min,p}}
     \label{eq:scaling}
 \end{equation}
+
 
 
 \subsection{Seleção das Variáveis de Entrada}
@@ -627,9 +636,9 @@ Como os modelos empíricos baseiam suas predições nas correlações das variáveis d
 o agrupamento é uma tarefa de fundamental importância.
 A adição de variáveis não relevantes (sem correlação com a variável a ser predita) tende a
 gerar modelos instáveis, cujas predições apresentam alta variância.
-Entretanto, para algumas técnicas de regressão, variáveis altamente correlacionadas podem
-causar singularidade na matriz de dados entrada e, consequentemente, predições de baixa
-qualidade.
+Entretanto, para algumas técnicas de regressão, como a regressão linear pela solução da
+equação normal \cite{Gribok2000}, variáveis altamente correlacionadas podem
+causar singularidade na matriz de dados entrada e, consequentemente, predições instáveis.
 Além disso, quanto maior o número de variáveis de entrada de um modelo empírico de
 regressão, maior deve ser o número de amostras de treinamento para que o modelo cubra o
 mínimo possível do espaço de entrada.
@@ -641,7 +650,7 @@ Para os casos onde redundâncias não necessariamente existem, o
 conjunto de sensores que se deseja monitorar deve ser separado em grupos menores altamente
 correlacionados.
 Segundo Hines e Seibert\cite{Hines2006}, agrupamentos ótimos normalmente contém menos
-de 30 sensores e que a adição de sinais irrelevantes acaba por aumentar a variância das
+de 30 sensores e a adição de sinais irrelevantes acaba por aumentar a variância das
 predições de um modelo, enquanto a ausência de sinais relevantes tende a causar
 polarização.
 
@@ -701,7 +710,7 @@ Portanto, a seleção das amostras de treinamento de um modelo regressivo deve con
 primeiramente a cobertura de todos os futuros pontos de operação da planta ou poço para,
 finalmente, se fazer uma análise de ganho de precisão das predições em relação à
 quantidade de amostras.
-Além disso, é de suma importantância certificar que as amostras não correspondem à pontos
+Além disso, é de suma importância certificar que as amostras não correspondem a pontos
 de operação atípicos, como em casos de falha em equipamento ou de desvios em sensores.
 Se presentes no conjunto de treinamento do modelo, os pontos de operação atípicos são
 aprendidos pelo modelo como comportamento normal dos sensores.
@@ -836,8 +845,8 @@ O funcionamento do modelo AAKR é composto de três passos básicos.
 Primeiro, calcula-se as distâncias entre $\mathbf{r}$ e cada linha da matriz de memória
 $\mathbf{X}$.
 Dentre as possíveis métricas de distância, a distância Euclidiana é a mais comumente
-utilizada~\cite{Hines2008}, dada pela Eq.~(\ref{eq:aakr_distance}), onde $u_i$ é a distancia Euclidiana
-entre o vetor de memória $\mathbf{x}^{(i)}$ e a entrada $\mathbf{r}$.
+utilizada~\cite{Hines2008}, dada pela Eq.~(\ref{eq:aakr_distance}), onde $u_i$ é a
+distancia Euclidiana entre o vetor de memória $\mathbf{x}^{(i)}$ e a entrada $\mathbf{r}$.
 
 \simbolo{$u_i$}{Distância Euclidiana entre o vetor de memória $\mathbf{x}^{(i)}$ e um vetor de
 entrada $\mathbf{r}$.}
@@ -865,6 +874,10 @@ Em seguida, as distâncias são convertidas em medidas de similaridade ou pesos at
 da função kernel, como a Gaussiana apresentada na Eq.~(\ref{eq:gauss_kernel}), onde
 $\overline{w}_i$ é o i-ésimo peso relativo a i-ésima distância $u_i$ e $h$ é a largura de banda da
 função kernel $\textsf{K}$.
+Apesar de outras funções kernel possuírem vantagens e desvantagens em certas situações,
+segundo trabalhos indicados por Hines et al.~\cite{Hines2008} e An, Heo e
+Chang~\cite{An2011}, a função kernel não desempenha um papel crítico no desempenho de
+modelos localmente ponderados, como o AAKR.
 
 \simbolo{$\textsf{K}$}{Função kernel}
 
@@ -909,13 +922,15 @@ entre as variáveis.
 
 Basicamente, duas questões devem ser consideradas para a seleção dos vetores de memória: 
 qual é a \emph{quantidade} adequada e \emph{como} realizar essa seleção.
-Em relação à quantidade, normalmente existe um número crítico para cada conjunto de dados:
-quantidades menores pioram o desempenho do modelo drasticamente, quantidades maiores
-melhoram discretamente o desempenho ao custo de aumentos drásticos no tempo
-computacional~\cite{HinesGarvey2008}.
-Em relação à forma de seleção dos vetores, dois métodos simples e comumente utilizados são
-a seleção por mínimos-máximos e a seleção por ordenamento dos vetores.
+Em relação à quantidade de vetores $n_m$, o valor deve ser adequado às necessidades do
+sistema OLM, retratando um balanceamento entre o custo computacional (ou velocidade do
+cálculo das predições) e a qualidade das predições~\cite{HinesGarvey2008}.
+Modelos com alto $n_m$ tendem a gerar melhores predições, entretando, o
+custo computacional de cada uma delas pode ser impraticável, caso o tempo de uma predição
+seja crítico.
 
+Em relação à forma de seleção dos vetores, dois métodos simples e comumente utilizados são
+a seleção por mínimos-máximos e a seleção por ordenamento dos vetores~\cite{Hines2008}.
 O método de seleção por mínimos-máximos é dividido em duas etapas.
 Primeiro, particiona-se o conjunto de dados em $n_b$ bandas, de acordo com a
 Eq.~(\ref{eq:aakrMinMax}), onde $n_m$ é o número de vetores a serem selecionados e
@@ -942,7 +957,7 @@ variáveis antes da utilização deste método de seleção.
     \label{eq:aakrVecOrd}
 \end{equation}
 
-Um outra forma de realizar a seleção dos vetores de memória é a combinação dos dois
+Neste trabalho a seleção dos vetores de mémoria foi realizada pela combinação dos dois
 métodos anteriores.
 Como normalmente o método de seleção por mínimos-máximos não obtém o número $n_m$ de
 vetores desejado (um mesmo vetor pode conter os valores máximos ou mínimos de mais de uma
@@ -1002,7 +1017,7 @@ A Figura
 \ref{fig:DF_svm_insensibilidade} ilustra a zona de insensibilidade formada por $\varepsilon$
 e a penalização efetuada pelas variáveis de folga. Por isso, qualquer erro absoluto menor
 que $\varepsilon$ não necessita de valores diferentes de zero para as variáveis $\xi^{(i)},
-\xi^{* \; (i)}$ na função objetiva, o que causa a esparsividade da solução.
+\xi^{* \; (i)}$ na função objetivo, o que causa a esparsividade da solução.
 A constante $C$ determina o custo-benefício entre a complexidade da função $f$ e a
 quantidade tolerada de desvios maiores que $\varepsilon$.
 
@@ -1063,9 +1078,12 @@ especificado na Eq.~(\ref{eq:DF_svm_minimize}).
 
 A configuração do modelo SVM consiste na escolha da função kernel e de seus parâmetros, e
 na especificação de $\varepsilon$ e $C$.
-Uma função kernel largamente utilizada para regressão é a função de base radial (RBF),
-apresentada na Eq.~(\ref{eq:DF_svm_kernel}),
-onde $\gamma$ é a largura de banda, o parâmetro de configuração.
+Usualmente, tais parâmetros são selecionados por
+\textit{cross-validation}~\cite{Smola2004}, entretanto, neste trabalho apenas um tipo de
+função kernel foi utilizada, a função de base radial (RBF).
+Apresentada na Eq.~(\ref{eq:DF_svm_kernel}), onde $\gamma$ é um parâmetro de configuração
+de suavidade, a função RBF é normalmente uma escolha razoável quando pouco se sabe sobre
+os dados~\cite{Smola2004}.
 
 \begin{equation}
     \textsf{K}(\mathbf{r}, \mathbf{r}^{(i)}) = \exp \left( - \frac{||\mathbf{r}-\mathbf{r}^{(i)}||^2}{2 \gamma^2} \right)
@@ -1124,9 +1142,9 @@ Se o modelo não é flexível, ele não será capaz de modelar as relações dos dados 
 treinamento; se o modelo é excessivamente complexo, problemas de sobreajustamento
 (\textit{overfitting}) dos dados podem ocorrer, incluindo ruídos na modelagem.
 Considerando o uso de funções kernel do tipo Gaussiana ou RBF, a complexidade dos modelos
-(o grau de ajustamento do modelo aos dados de treinamento) SVM é determinada pelos
+(o grau de ajuste do modelo aos dados de treinamento) SVM é determinada pelos
 parâmetros $C$, $\varepsilon$ e $\gamma$; nos modelos AAKR, pelo parâmetro $h$.
-Em muitas aplicações, esses valores podem são encontrados por tentativa e erro, ou
+Em muitas aplicações, esses valores podem ser encontrados por tentativa e erro, ou
 \textit{grid search}, onde treinam-se vários modelos com diferentes permutações de valores
 de configuração e avalia-se a qualidade das predições destes atráves de um novo conjunto
 de amostras.
@@ -1160,7 +1178,7 @@ construção do modelo.
 \abreviatura{MSE}{Erro quadrático médio}
 
 \begin{equation}
-    \mbox{MSE} = \frac{1}{n} \sum \limits^n_{i=1} (y^{(i)} - f(\mathbf{r}^{(i)})) 
+    \mbox{MSE} = \frac{1}{n} \sum \limits^n_{i=1} (y^{(i)} - f(\mathbf{r}^{(i)}))^2 
     \label{eq:mse}
 \end{equation}
 
@@ -1182,9 +1200,9 @@ Deve-se preferir modelos mais simples a modelos complexos e otimizar a relação e
 complexidade e acurácia do modelo para o conjunto de dados de treinamento.
 
 Existem métodos mais completos para o desenvolvimento e avaliação de modelos
-regressivos\footnote{http://www.cedar.buffalo.edu/~srihari/CSE574/Chap3/Bias-Variance.pdf
+regressivos\footnote{http://www.cedar.buffalo.edu/\texttildelow srihari/CSE574/Chap3/Bias-Variance.pdf
 \\http://blog.stephenpurpura.com/post/13052575854/managing-bias-variance-tradeoff-in-machine-learning
-\\http://www.cedar.buffalo.edu/~srihari/CSE555/Chap9.Part2.pdf}, mas o método descrito
+\\http://www.cedar.buffalo.edu/\texttildelow srihari/CSE555/Chap9.Part2.pdf}, mas o método descrito
 anteriormente é suficiente para a proposta deste trabalho. 
 
 %% Flexibilidade x Complexidade
@@ -1268,7 +1286,7 @@ erro.
 Se um valor alto é usado para $\sigma_q$, as estimativas do desvio demoram mais para
 seguir o desvio real; para valores pequenos de $\sigma_q$, as estimativas seguem qualquer
 pequena diferença entre as predições $\hat{r}$ e as leituras $r$ do sensor.
-O valor de $\sigma_v$ possui efeito contrário: valores altos emplicam em estimativas
+O valor de $\sigma_v$ possui efeito contrário: valores altos implicam em estimativas
 instáveis do desvio que seguem qualquer pequena diferença entre as predições $\hat{r}$ e
 as leituras $r$ do sensor; valores baixos implicam em maior lentidão para as estimativas
 seguirem o desvio real.
@@ -1319,9 +1337,9 @@ trabalho emprega-se o método SPRT, descrito a seguir.
 
 \subsection{SPRT}
 
-O método conhecido por SPRT, desenvolvido por Wald~\cite{wald1947sequential}, consiste em
-testes estatísticos de hipóteses e tem sido aplicado frequentemente para a detecção de
-anomalias em sistemas.
+O método conhecido por teste de razão de probabilidade sequencial (SPRT), desenvolvido por
+Wald~\cite{wald1947sequential}, consiste em testes estatísticos de hipóteses e tem sido
+aplicado frequentemente para a detecção de anomalias em sistemas.
 No caso de detecção de falhas em sensores, duas hipóteses são testadas a cada nova amostra
 de dados do sistema: modo normal de operação, ou $H_0$, e modo degradado de operação, ou
 $H_1$.
@@ -1384,8 +1402,8 @@ valor de $M$ que resulte em uma probabilidade de alarmes falsos semelhante a $\a
     \Lambda^i =
     \left\{
         \begin{array}{ll}
-            M / \sigma^2 (d^i - M/2), \quad \mbox{for a positive change} \\
-            M / \sigma^2 (- d^i - M/2), \quad \mbox{for a negative change}
+            M / \sigma^2 (d^i - M/2), \quad \mbox{para uma mudança positiva} \\
+            M / \sigma^2 (- d^i - M/2), \quad \mbox{para uma mudança negativa}
         \end{array}\right.
     \label{eq:pdfM}
 \end{equation}
@@ -1407,7 +1425,8 @@ As métricas de desempenho e os resultados das avaliações também são apresentados
 \section{Sistemas de Validação de Sensores}
 
 Descrevem-se a seguir três diferentes sistemas de validação de sensores implementados
-neste trabalho, os quais se diferem pela técnica de modelagem e/ou pelo emprego do KF.
+neste trabalho, os quais se distinguem pela técnica de modelagem e/ou pelo emprego do filtro
+de Kalman.
 
 \subsection{Sistema 1 --- AAKR-SPRT}
 
@@ -1458,7 +1477,7 @@ ou desvios, $D \in [0,1]$.
 
 \subsection{Sistema 3 --- AAKR-KF-SPRT}
 
-O Sistema 3 é composto por um modelo de regressão SVM, um filtro de Kalman e o algoritmo
+O Sistema 3 é composto por um modelo de regressão AAKR, um filtro de Kalman e o algoritmo
 estatístico SPRT.
 Na Figura \ref{fig:aakr_kf_sprt} é ilustrado o esquema de funcionamento do Sistema 3.
 
@@ -1598,7 +1617,17 @@ O algoritmo SPRT deve gerar alarmes para níveis intoleráveis de desvios (definid
 valor de $M$) para o sensor defeituoso e gerar o mínimo possível de falsos alarmes para os
 demais sensores, de forma que não comprometa a identificação do sensor defeituoso.
 
-Com o intuito de verificar e entender o funcionamento dos sistemas, o primeiro ensaio foi
+Com exceção dos algoritmos do modelo SVM, utilizados por uma interface da biblioteca
+LIBSVM~\cite{CC01a}, todos os demais algoritmos dos sistemas foram implementados em
+Matlab.
+Como o intuito dos ensaios é apenas verificar a aplicabilidade dos sistemas, não se
+implementaram as rotinas segundo as interfaces estabelecidas pela arquitetura OSA-CBM.
+Além disso, como dito na Seção \ref{sec:osa_drift}, nenhuma rotina ou módulo de
+diagnóstico foi implementado.
+Neste trabalho tal tarefa é realizada a partir da interpretação dos resultados da detecção
+de mudanças das propriedades estatísticas dos resíduos.
+
+Almejando verificar e entender o funcionamento dos sistemas, o primeiro ensaio foi
 realizado com um conjunto de dados gerados pela simulação do modelo de um poço.
 Aos corresponder as expectativas de aplicabilidade no primeiro ensaio, o segundo ensaio
 foi realizado com um conjunto de dados coletados de sensores reais de um poço de produção
@@ -1607,7 +1636,7 @@ de petróleo.
 \subsection{Ensaios com Dados de Simulação}
 
 Os dados simulados foram gerados por um modelo de poço construído com simulador
-OLGA\footnote{Mais informações o simulador são encontradas em
+OLGA\footnote{Mais informações sobre o simulador são encontradas em
 http://www.sptgroup.com/Products/olga/}.  
 O modelo representa um poço operado por \textit{gas-lift} com um tubo de produção de 2500
 metros de profundidade.
@@ -1619,20 +1648,29 @@ condições de operação.
 O conjunto de dados é composto pela pressão de fundo de poço
 (PT$_f$), no topo do tubo de produção (PT$_t$), no topo do anular (PT$_g$) e a montante do
 \textit{choke} de injeção (PT$_m$), como ilustrado na Fig. \ref{fig:poco_sim}.
-A taxa de amostragem é de uma amostra por minuto. Um ruído branco com SNR (Relação
-Sinal-Ruído) igual a $0.3$ foi adicionado às medições.
+A taxa de amostragem é de uma amostra por minuto. 
+Um ruído branco de desvio padrão equivalente a 30\% do desvio padrão do sinal ($\sigma_N =
+0.3 \sigma_S$, onde $\sigma_N$ é  o desvio padrão do ruído, $\sigma_S$ é o desvio padrão
+dos dados da variável correspondente e $0.3$ é o valor próximo ao valor estimado do desvio
+padrão dos ruídos presentes nos dados reais da Seção~\ref{sec:dados_reais}) foi adicionado
+aos dados de cada sensor simulado.
 Os dados de cada uma das variáveis são apresentados na Fig. \ref{fig:sim_dataset}.
+%
+\simbolo{$\sigma_N$}{Desvio padrão do ruído branco adicionado aos dados de uma variável de
+simulação.}
+%
+\simbolo{$\sigma_S$}{Desvio padrão dos dados de uma variável de simulação.}
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
-    \includegraphics[width=.5\textwidth]{figuras/poco_simulado.ps}
+    \includegraphics[width=.5\textwidth]{figuras/poco.eps}
     \caption{Esquema do poço usado para gerar os dados de simulação.}
     \label{fig:poco_sim}
 \end{figure}
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.2cm 1.2cm 1.5cm 1cm,clip=true,width=.6\textwidth]{figuras/sim_dataset.eps}
+    \includegraphics[width=.6\textwidth] {figuras/sim_dataset2.eps}
     \caption{Dados de variáveis gerados pela simulação de um poço de petróleo.}
     \label{fig:sim_dataset}
 \end{figure}
@@ -1642,8 +1680,8 @@ restante dos dados foi dividido em duas partes: 20 horas como conjunto de otimiz
 horas como conjunto de testes.
 
 Para os Sistemas 1 e 3 foram utilizados o mesmo modelo AAKR, construído a partir dos dados
-de treinamento  e cujos parâmetros são $h = 0.1$ e $n_m = 600$ (20\% das amostras do
-conjunto de treinamento).
+de treinamento  e cujos parâmetros são $h = 0.1$ e $n_m = 600$ (aproximadamente 17\% das
+amostras do conjunto de treinamento).
 Os parâmetros escolhidos advêm dos resultados apresentados no gráfico da Fig.
 \ref{fig:mse_aakr_sim}, onde os melhores parâmetros são aqueles que apresentam menor
 valor de MSE médio (ou $E_a$ médio) entre o conjunto de dados de otimização e suas
@@ -1651,7 +1689,7 @@ predições gerados pelo modelo.
 Apesar de maiores quantidades de amostras resultarem em menores valores de MSE médio, a
 partir de 600 amostras o ganho de desempenho foi insignificante.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
     \caption{Relação entre o MSE médio e diferentes valores de largura de banda $h$ e
@@ -1665,7 +1703,7 @@ partir do treinamento com o conjunto de dados de treinamento e da minimização do
 o conjunto de dados de otimização e suas predições.
 Na Tabela \ref{tab:svm_sim_pars} são apresentados as configurações dos modelos.
 
-\begin{table}[bt]
+\begin{table}[!bt]
     \centering
     \caption{\label{tab:svm_sim_pars}Configuração dos modelos SVM construídos com
     conjunto de dados de treinamento gerados por simulação.}
@@ -1694,7 +1732,7 @@ Para tal análise, um desvio linearmente crescente terminando com uma magnitude
 de $3\sigma$ (três vezes o desvio padrão dos dados da variável) foi introduzido
 sequencialmente (em uma variável por vez) no conjunto de dados de teste.
 
-\begin{table}[bt]
+\begin{table}[!bt]
     \centering
     \caption{\label{tab:DF_sensibilidades} Valores médios das métricas de desempenho para
     os sistemas de monitoramento e validação de sensores:
@@ -1738,7 +1776,7 @@ confirmando as métricas de desempenho, gerando predições muito próximas do desej
 na ocorrência de desvios; entretanto, pelo valor de $E_a$, na ausência de desvios nas
 leituras o Sistema 3 tende a ser menos preciso que o Sistema 1.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
     \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys1_pred_d4.eps}
     \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys2_pred_d4.eps}
@@ -1759,7 +1797,7 @@ não gera nenhum falso alarme para os resíduos gerados por seus respectivos siste
 A Tabela \ref{tab:sim_sprt_conf} contem os valores de $M$ utilizados por cada um sistema e
 para cada uma das variáveis monitoradas.
 
-\begin{table}[bt]
+\begin{table}[!bt]
     \centering
     \caption{\label{tab:sim_sprt_conf}Configurações do algoritmo SPRT para o conjunto de
 dados de teste gerados por simulação.}
@@ -1787,7 +1825,7 @@ Por exemplo, poderia-se considerar a ocorrência de desvios apenas quando o algor
 gerasse $n$ ou mais resultados positivos consecutivos.
 Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_resid_d4.eps}
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_sprt_d4.eps}
@@ -1796,7 +1834,7 @@ Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
     \label{fig:sim_sys1_sprt}
 \end{figure}
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_resid_d4.eps}
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_sprt_d4.eps}
@@ -1807,13 +1845,13 @@ Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
 
 No caso do Sistema 3, a estimativa dos desvios sofreu menos interferência dos ruídos de
 leitura, como pode ser notado na Fig. \ref{fig:sim_sys3_sprt}.
-A correção efetuada pelo filtro de Kalman contribuíram para a melhoria da qualidade das
+As correções efetuadas pelo filtro de Kalman contribuíram para a melhoria da qualidade das
 predições do modelo AAKR, gerando diferenças nítidas nas estimativas dos desvios das
 leituras de cada variável.
 Desta forma, o algoritmo SPRT conseguiu detectar corretamente e mais rapidamente a
 ocorrência de desvios, além de ter gerado menos falsos alarmes.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_resid_d4.eps}
     \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_sprt_d4.eps}
@@ -1823,6 +1861,7 @@ ocorrência de desvios, além de ter gerado menos falsos alarmes.
 \end{figure}
 
 \subsection{Ensaios com Dados Reais}
+\label{sec:dados_reais}
 
 O conjunto de dados reais é composto pelas leituras de pressão de três diferentes
 sensores de um poço de petróleo: um de fundo de poço (PDG), um na árvore de natal
@@ -1969,8 +2008,6 @@ dados reais de teste.}
 Para o caso de ocorrência de desvios no PDG, por exemplo, os resultados da detecção
 automática pelos Sistemas 1, 2 e 3 são ilustrados nas Figs. \ref{fig:real_sys1_sprt},
 \ref{fig:real_svm_sprt} e \ref{fig:real_sys3_sprt}, respectivamente.
-Apesar dos falsos alarmes para os sensores TPT e PT$_m$, os resultados do algoritmo SPRT
-do Sistema 1 apontaram corretamente a 
 Pelos resultados do algoritmo SPRT na Fig. \ref{fig:real_sys1_sprt}, o Sistema 1 detectou
 corretamente a ocorrência de desvios no PDG antes da ocorrência de vários falsos alarmes
 consecutivos nos demais sensores.
@@ -2033,520 +2070,6 @@ subtraídos das entradas do modelo) entre as estimativas geradas pelo modelo regr
 leituras dos sensores.
 
 
-% \chapter{Versão antiga dos ensaios}
-% \section{Ensaio --- Construção dos Modelos Empíricos}
-% 
-% \textcolor{red}{Escrever introdução}
-% 
-% Testes sem o filtro de Kalman com AAKR e SVM. Verificar qualidade das predições.
-% Testes do AAKR com KF. Se possível, testar o SVM também, pelo menos para algumas
-% variáveis.
-% Testes com sinais filtrados (fácil para o caso de simulação).
-% 
-% \subsection{Dados de Simulação}
-% 
-% \subsubsection{AAKR}
-% 
-% O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
-% Fig.~\ref{fig:mse_aakr_sim}.
-% Modelos com valores altos de $h$ apresentaram grandes valores de MSE total, independente
-% da quantidade de vetores de memória, $n_m$.
-% Maiores valores de $n_m$ combinados com menores valores de $h$ tenderam a apresentar
-% modelos com menor MSE total.
-% Porém, apesar de não ser perceptível pela Fig.~\ref{fig:mse_aakr_sim}, para valores muito
-% pequenos de $h$ ocorreram leves acréscimos no MSE total, para todos as quantidades
-% $n_m$.
-% Para evitar \textit{overfitting} e o armazenamento de grandes quantidades de dados
-% desnecessariamente, escolheu-se $h = 0.1$ e $n_m = 600$ (20\% da quantidade amostras dos
-% dados de treinamento).
-% 
-% %Nota-se que modelos com menor MSE apresentam maior equilíbrio entre acurácia e
-% %capacidade de generalização, ou seja, são aqueles localizados entre modelos com pequena
-% %largura de banda e alta variância e modelos com largura de banda maiores e estimações
-% %polarizadas. Em relação ao tamanho da matriz de memória, matrizes maiores não implicam em
-% %menor MSE; a partir de um certo tamanho, a inclusão de mais vetores não aumenta a acurácia
-% %do modelo. Os parâmetros selecionados para a contrução do modelo final foram $h = $ e
-% % vetores de memória.
-% 
-% % \begin{figure}[!htb]
-% %     \centering
-% %     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_sim.eps}
-% %     \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
-% %     vetores de memória $n_m$ para o modelo AAKR aplicado aos dados de simulação para
-% % otimização.}
-% %     \label{fig:mse_aakr_sim}
-% % \end{figure}
-% 
-% \subsubsection{SVM}
-% 
-% Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
-% \ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
-% Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
-% grade, variando-se os valores em potências de 2.
-% Nota-se que o valor de $\varepsilon$ parece ser o principal determinante da quantidade de
-% vetores suporte armazenados pelo modelo.
-% Menores valores de $\varepsilon$ implicaram em maiores números de vetores suporte e
-% menores valores do MSE.
-% Entretanto, maior número de vetores suporte indicam modelos mais complexos, e modelos
-% excessivamente complexos tendem a incluir ruídos na modelagem.
-% Portanto, modelos com a mínima complexidade possível para se atingir valores de MSE
-% toleráveis são normalmente as melhores opções.
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_sim_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_f$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.03 & 0.0625 & 2 & 813 & 0.752\\
-%         \rowcolor{gray}0.05 & 0.5 & 0.25 & 234 & 0.778 \\
-%         0.1 & 2 & 0.5 & 50 & 1.20 \\
-%         0.2 & 2 & 2 & 15 & 3.90 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% 
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_sim_v2}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_t$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.05 & 32 & 2 & 1149 & 2.974 \\
-%         \rowcolor{gray}0.1 & 1 & 8 & 246 & 2.991 \\
-%         0.15 & 0.5 & 2 & 36 & 3.125 \\
-%         0.2 & 4 & 0.125 & 7 & 3.408 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_sim_v3}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_m$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$)\\
-%         \midrule
-%         0.05 & 0.25 & 16 & 1220 & 3.572 \\
-%         \rowcolor{gray}0.1 & 8 & 4 & 331 & 3.555 \\
-%         0.15 & 0.5 & 8 & 52 & 3.624 \\
-%         0.2 & 8 & 0.5 & 17 & 4.145 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_sim_v4}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% da variável PT$_g$ dos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE ($\times 10^{-3}$) \\
-%         \midrule
-%         0.1 & 0.125 & 8 & 525 & 5.642 \\
-%         \rowcolor{gray}0.12 & 32 & 2 & 316 & 5.694 \\
-%         0.15 & 0.25 & 4 & 133 & 5.764 \\
-%         0.2 & 32 & 1 & 29 & 5.814 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
-% \ref{tab:svm_sim_v1}, \ref{tab:svm_sim_v2}, \ref{tab:svm_sim_v3} e \ref{tab:svm_sim_v4}.
-% Foram priorizados modelos cujo número de vetores suporte fosse próximo ao número de vetores
-% de memória do modelo AAKR, ou seja, próximo de 20\% do número de amostras do conjunto de
-% treinamento.
-% 
-% 
-% 
-% \subsection{Dados Reais}
-% 
-% \subsubsection{AAKR}
-% 
-% O resultado do processo de otimização dos parâmetros do modelo AAKR é apresentado na
-% Fig.~\ref{fig:mse_aakr_real}.
-% Para este conjunto de dados, menores valores de $h$ realmente geraram menores valores de
-% MSE total, exceto para quantidades $n_m$ muito pequenas.
-% Entretanto, modelos com $h < 0.07$ apresentaram problemas
-% numéricos para a predição dos dados de otimização, pois valores muito pequenos de
-% $h$ geram modelos com baixa capacidade de generalização, onde os denominadores da
-% Eq.~\ref{eq:aakr_var_pred} são muito próximos de zero.
-% Para diminuir a possibilidade de problemas numéricos por baixa capacidade de generalização
-% e ao mesmo tempo obter baixos valores de MSE total, adotou-se $h = 0.15$.
-% %Considerou-se $h = 0.15$ como um valor equilibrado entre acurácia e capacidade de
-% %generalização.
-% %Portanto, assim como ocorreu com os dados de simulação, 
-% %modelos com menor MSE apresentam maior equilíbrio entre acurácia e
-% %capacidade de generalização.
-% 
-% Em relação ao número de vetores de memória, foi escolhido $n_m = 4800$, que corresponde a
-% $20\%$ do conjunto de dados de treinamento. Maiores valores de $n_m$ apresentaram
-% impacto insignificante na redução do MSE (alterações a partir da quarta casa decimal).
-% 
-% \begin{figure}[!hbt]
-%     \centering
-%     \includegraphics[width=.7\textwidth]{figuras/mse_aakr_real.eps}
-%     \caption{Relação entre o MSE total e diferentes valores de largura de banda $h$ e
-%     vetores de memória $n_m$ para o modelo AAKR aplicado aos dados reais para
-% otimização.}
-%     \label{fig:mse_aakr_real}
-% \end{figure}
-% 
-% 
-% \subsubsection{SVM}
-% 
-% Os resultados da otimização dos parâmetros do modelo SVM são apresentados nas Tabelas
-% \ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
-% Para cada valor de $\varepsilon$, os valores de $C$ e $\gamma$ são obtidos por busca em
-% grade, variando-se os valores em potências de 2.
-% Nota-se que o comportamento dos modelos é semelhante para o conjunto de dados de
-% simulação: o valor de $\varepsilon$ apresenta-se como principal determinante do número de
-% vetores suporte e do limite inferior do MSE.
-% Os modelos selecionados para o sistema de validação estão destacados nas Tabelas
-% \ref{tab:svm_real_v1}, \ref{tab:svm_real_v2} e \ref{tab:svm_real_v3}.
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_real_v1}Relação entre parâmetros do modelo SVM e o impacto no MSE na predição
-% do sensor PDG dos dados reais.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
-%         \midrule
-%         0.5 & 0.5 & 1 & 19621 & 7.19 \\
-%         0.8 & 32 & 0.25 & 17109 & 7.12 \\
-%         1 & 0.25 & 0.5 & 15886 & 6.97 \\
-%         \rowcolor{gray} 2 & 0.5 & 2 & 10662 & 7.00 \\
-%         5 & 0.25 & 2 & 2221 & 8.86 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_real_v2}Relação entre parâmetros do modelo SVM e o impacto no
-% MSE na predição do sensor TPT dos dados reais.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
-%         \midrule
-%         0.8 & 0.03125 & 0.03125 & 16775 & 4.36 \\
-%         1.5 & 0.0625 & 0.5 & 10535 & 4.30 \\
-%         2 & 0.0625 & 0.5 & 6922 & 4.25 \\
-%         \rowcolor{gray}3 & 0.03125 & 0.5 & 3026 & 4.19 \\
-%         4 & 0.03125 & 0.25 & 1087 & 4.22 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:svm_real_v3}Relação entre parâmetros do modelo SVM e o impacto no
-% MSE na predição do sensor PT$_m$ dos dados reais.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         $\varepsilon$ & $C$ & $\gamma$ & Vetores suporte & MSE \\
-%         \midrule
-%         0.1 & 0.03125 & 32 & 20834 & 0.48 \\
-%         0.5 & 0.03125 & 8 & 10117 & 0.47 \\
-%         \rowcolor{gray}1 & 0.015625 & 0.25 & 2852 & 0.50 \\
-%         2 & 128 & 0.125 & 143 & 0.80 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% % \subsubsection{Comentários}
-% % 
-% % Para ambas as técnicas, o processo de otimização dos modelos norteada pelo MSE foi
-% % fortemente influenciada pela largura de banda da função kernel.
-% % Nos modelos AAKR, o MSE
-% % total cresceu com o aumento dos valores de $h$, entretanto, valores muito pequenos
-% % ocasionaram problemas numéricos.
-% % Nos modelos SVM,
-% % 
-% % Não houve uma escolha automática das variáveis, usou-se senso de engenharia.
-% 
-% 
-% \section{Ensaio --- Verificação de Acurácia}
-% 
-% % Supondo que exista uma seção descrevendo os critérios de avaliação.
-% 
-% 
-% \subsection{Dados de Simulação}
-% 
-% \subsubsection{AAKR}
-% 
-% As predições do modelo AAKR para os dados de validação são apresentados na
-% Fig.~\ref{fig:pred_mse_sim_aakr}.
-% Nota-se que as predições correspondem à expectativa de serem bem similares aos valores
-% originados obtidos na simulação, uma vez que os dados não possuem falhas de sensores.
-% Os valores de MSE para as predições de cada variável do modelo são apresentados na
-% Tab.~\ref{tab:mse_aakr_sim}.
-% 
-% \begin{figure}[!hbt]
-%     \centering
-%     \includegraphics[width=\textwidth]{figuras/pred_sim_aakr.eps}
-%     \caption{Predição do modelo AAKR para o conjunto de dados de validação gerados por
-%     simulação.}
-%     \label{fig:pred_mse_sim_aakr}
-% \end{figure}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:mse_aakr_sim}Resultados do cálculo do MSE para as predições do
-% modelo AAKR para o conjunto de dados de validação gerados por simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-%         MSE & $1.0 \times 10^{-3}$ & $2.2 \times 10^{-3}$ & $2.4 \times 10^{-3}$ &
-%         $2.5 \times 10^{-3}$ \\
-%         \midrule
-%         MSE médio & \multicolumn{4}{l}{$2.0 \times 10^{-3}$} \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% \subsubsection{SVM}
-% 
-% As predições dos modelos SVM para os dados de validação são apresentados na
-% Fig.~\ref{fig:pred_mse_sim_svm}.
-% Nota-se que as predições estão próximas dos valores originados pela simulação, uma
-% indicação visual da qualidade das predições do modelo.
-% 
-% \begin{figure}[!hbt]
-%     \centering
-%     \includegraphics[width=\textwidth]{figuras/pred_sim_svm.eps}
-%     \caption{Predição do modelo SVM para o conjunto de dados de validação gerados por
-%     simulação.}
-%     \label{fig:pred_mse_sim_svm}
-% \end{figure}
-% 
-% 
-% Os valores de MSE para as predições de cada variável, ou modelo, são apresentados na
-% Tab.~\ref{tab:mse_svm_sim}.
-% Em comparação ao modelo AAKR, em geral as predições do modelo SVM apresentaram maior MSE,
-% ou seja, menor acurácia nas predições, exceto para a variável PT$_f$.
-% 
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:mse_svm_sim}Resultados do cálculo do MSE para as predições do
-% modelo SVM para o conjunto de dados de validação gerados por simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-%         MSE & $0.749 \times 10^{-3}$ & $3.392 \times 10^{-3}$ & $3.996 \times 10^{-3}$ &
-%         $5.621 \times 10^{-3}$ \\
-%         \midrule
-%         MSE médio & \multicolumn{4}{l}{$3.949 \times 10^{-3}$} \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% 
-% \subsection{Dados Reais}
-% 
-% \subsubsection{AAKR}
-% 
-% As predições do modelo AAKR para os dados reais de validação são apresentados na
-% Fig.~\ref{fig:pred_mse_real_aakr}.
-% Nota-se que as predições apresentaram um comportamento mais suave que os sinais
-% verdadeiros e não acompanharam tão bem as mudanças bruscas de valores.
-% Tais características parecem corresponder ao agrupamento pobre de variáveis, uma vez que
-% o sistema sensoriado apresenta alta complexidade e não linearidade no relacionamento entre
-% as variáveis.
-% Para lidar com casos deste tipo, normalmente é necessário formar agrupamentos com maior
-% quantidade de variáveis correlacionadas ou, pelo menos, agrupar variáveis que apresentem
-% forte correlação.
-% 
-% Os valores de MSE para as predições de cada variável do modelo são apresentados na
-% Tab.~\ref{tab:mse_aakr_real}.
-% 
-% \begin{figure}[!hbt]
-%     \centering
-%     \includegraphics[width=\textwidth]{figuras/pred_real_aakr.eps}
-%     \caption{Predição do modelo AAKR para o conjunto de dados reais de validação.}
-%     \label{fig:pred_mse_real_aakr}
-% \end{figure}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:mse_aakr_real}Resultados do cálculo do MSE para as predições do
-% modelo AAKR para o conjunto de dados reais de validação.}
-%     \begin{tabular}{cccc}
-%         \toprule
-%         & PDG & TPT & PT$_m$ \\
-%         MSE & $7.9 \times 10^{-3}$ & $4.0 \times 10^{-3}$ & $2.3 \times 10^{-3}$\\
-%         \midrule
-%         MSE médio & \multicolumn{3}{l}{$4.7 \times 10^{-3}$} \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% \subsubsection{SVM}
-% 
-% 
-% \section{Ensaio --- Análise de Sensibilidade e Detecção de \textit{Drifts}}
-% 
-% \subsection{Dados de Simulação}
-% 
-% \subsubsection{AAKR}
-% 
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:auto_sens_aakr_sim}Resultados do cálculo da autosensibilidade
-%     do modelo AAKR para o conjunto de testes gerados por simulação.}
-%     \begin{tabular}{cccc}
-%         \toprule
-%         PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-%         \midrule
-%         0.1038 & 0.2794 & 0.3169 & 0.3700 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:cross_sens_aakr_sim}Resultados do cálculo da sensibilidade cruzada
-%     do modelo AAKR para o conjunto de testes gerados por simulação.}
-%     \begin{tabular}{llccccc}
-%         \toprule
-%         & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
-%         & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
-%         \midrule
-%         \multirow{4}{*}{Saídas} & PT$_f$ & & 0.0984 & 0.0976 & 0.0952 & 0.0971 \\
-%         & PT$_t$ & 0.2973 & & 0.2775 & 0.2707 & 0.2818\\
-%         & PT$_m$ & 0.3253 & 0.3184 & & 0.3118 & 0.3185\\
-%         & PT$_g$ & 0.3779 & 0.3748 & 0.3738 & & 0.3755\\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% \subsubsection{SVM}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:cross_sens_svm_sim}Resultados do cálculo da sensibilidade cruzada
-%     dos modelos SVM para o conjunto de testes gerados por simulação.}
-%     \begin{tabular}{llccccc}
-%         \toprule
-%         & \multicolumn{5}{c}{Entradas com desvio} & \multirow{2}{*}{Média}\\
-%         & & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ & \\
-%         \midrule
-%         \multirow{4}{*}{Saídas} & PT$_f$ & & 0.1411 & 0.1102 & 0.0343 & 0.0952\\
-%         & PT$_t$ & 0.5922 & & 0.3272 & 0.2890 & 0.4028 \\
-%         & PT$_m$ & 0.6395 & 0.3618 & & 0.2704 & 0.4239 \\
-%         & PT$_g$ & 0.2836 & 0.4161 & 0.5620 & & 0.4206 \\
-%         \bottomrule
-%     \end{tabular}
-% \end{table}
-% 
-% 
-% \subsection{Dados Reais}
-% 
-% \subsubsection{AAKR}
-% 
-% \subsubsection{SVM}
-% 
-% 
-% \section{Ensaio --- Detecção de Desvios}
-% 
-% \subsection{Dados de Simulação}
-% 
-% \subsubsection{AAKR}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:sim_aakr_sprtconf}Valores de mudança na média $M$ das variáveis do
-% modelo AAKR aplicado aos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-%         \midrule
-%         $M$ & 0.3 & 0.4 & 0.4 & 0.5 \\
-%         \bottomrule        
-%     \end{tabular}
-% \end{table}
-% 
-% \begin{figure}[!hbt]
-%     \begin{center}
-%         \hspace*{-3cm}
-%         \includegraphics[width=1.4\textwidth]{figuras/sim_aakr_drift_detect_d1.eps}
-%     \end{center}
-%     \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos AAKR
-%     aplicados aos dados simulados de validação, com inserção de desvio artificial em
-% PT$_f$.}
-%     \label{fig:sim_aakr_drift_detec_d1}
-% \end{figure}
-% 
-% 
-% \subsubsection{SVM}
-% 
-% \begin{table}[!hbt]
-%     \centering
-%     \caption{\label{tab:sim_svm_sprtconf}Valores de mudança na média $M$ das variáveis do
-% modelo SVM aplicado aos dados de simulação.}
-%     \begin{tabular}{ccccc}
-%         \toprule
-%         & PT$_f$ & PT$_t$ & PT$_m$ & PT$_g$ \\
-%         \midrule
-%         $M$ & 0.2 & 0.4 & 0.4 & 0.5 \\
-%         \bottomrule        
-%     \end{tabular}
-% \end{table}
-% 
-% Apesar da ocorrência de alarmes nas demais variáveis, grandes quantidades de decisões
-% $H_1$ consecutivas só ocorreram na variável PT$_f$.
-% 
-% \begin{figure}[!hbt]
-%     \begin{center}
-%         \hspace*{-3cm}
-%         \includegraphics[width=1.4\textwidth]{figuras/sim_drift_detect_d1.eps}
-%     \end{center}
-%     \caption{Detecção de mudanças de média nos resíduos gerados pelos modelos SVM
-%     aplicados aos dados simulados de validação, com inserção de desvio artificial em
-% PT$_f$.}
-%     \label{fig:sim_drift_detec_d1}
-% \end{figure}
-% 
-% \subsection{Dados Reais}
-% 
-% 
-% \section{Ensaio --- Estimação de \textit{Drifts} com o KF}
-% 
-% 
-% 
-% % \textcolor{red}{Figura:} comportamento do mse para diferentes valores de bandwidth.
-% % 
-% % Pela análise dos resíduos gerados entre a predição do modelo selecionado e os dados de
-% % otimização, os parâmetros selecionados para o algoritmo SPRT foram:
-% % \textcolor{red}{variância}, $M = $, probabilidade de falso alarme igual a $1\%$ e
-% % probabilidade de alarmes perdidos igual a $10\%$.
-% % 
-% % \subsubsection{AAKR-KF-SPRT}
-% % 
-% % Como os parâmetros $h = ?$ e $n_m = ?$ geraram o modelo com o melhor balanço entre
-% % acurácia e capacidade de generalização para os dados de treinamento, tais valores também
-% % foram adotados para o modelo AAKR do sistema AAKR-KF-SPRT. A busca pelos melhores valores
-% % no espaço dos parâmetros $\mathbf{Q}$ e $\mathbf{V}$ do KF resultou nos valores
-% % $\mathbf{Q} = \mathbf{I} \; ?$ e $\mathbf{V} = \mathbf{I} \; ?$; a Figura ?? apresenta o
-% % comportamento do MSE para os diferentes valores dos parâmetros do KF.
-% 
-% 
-% 
-% 
-% 
 \chapter{Conclusões}
 \label{chap:conclusoes}
 
