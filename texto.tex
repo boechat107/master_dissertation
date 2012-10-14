@@ -1778,9 +1778,13 @@ leituras o Sistema 3 tende a ser menos preciso que o Sistema 1.
 
 \begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys1_pred_d4.eps}
-    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys2_pred_d4.eps}
-    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]{figuras/sim_sys3_pred_d4.eps}
+    \hspace*{-0.2cm}\mbox{
+    \includegraphics[trim=0cm .7cm 1cm .1cm, clip=true,width=.35\textwidth]
+    {figuras/sim_sys1_pred_d4-2.eps}
+    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]
+    {figuras/sim_sys2_pred_d4.eps}
+    \includegraphics[trim=1cm .7cm 1cm .1cm, clip=true,width=.32\textwidth]
+    {figuras/sim_sys3_pred_d4.eps}}
     \caption{Predições dos sistemas para o conjunto de dados de testes gerados por
     simulação, com inserção de desvios na variável PT$_g$. Linhas vermelhas são
     as predições, linhas verdes são as leituras das variáveis (sujeitas a falhas) usadas
@@ -1827,8 +1831,11 @@ Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
 
 \begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_resid_d4.eps}
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys1_sprt_d4.eps}
+    \mbox{
+    \includegraphics[trim=0.5cm .7cm 1.1cm .5cm,clip=true,width=.425\textwidth]
+    {figuras/sim_sys1_resid_d4-2.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .5cm,clip=true,width=.4\textwidth]
+    {figuras/sim_sys1_sprt_d4-2.eps}}
     \caption{Resíduos gerados pelo Sistema 1 e resultados do algoritmo SPRT para o
     caso de ocorrência de desvios em PT$_g$ do conjunto de dados de simulação.}
     \label{fig:sim_sys1_sprt}
@@ -1836,8 +1843,10 @@ Outra alternativa é a sintonia mais precisa dos parâmetros do algoritmo SPRT.
 
 \begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_resid_d4.eps}
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_svm_sprt_d4.eps}
+    \includegraphics[trim=0.5cm .7cm 1.1cm .5cm,clip=true,width=.425\textwidth]
+    {figuras/sim_svm_resid_d4-2.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .5cm,clip=true,width=.4\textwidth]
+    {figuras/sim_svm_sprt_d4-2.eps}
     \caption{Resíduos gerados pelo Sistema 2 e resultados do algoritmo SPRT para o
     caso de ocorrência de desvios em PT$_g$ do conjunto de dados de simulação.}
     \label{fig:sim_svm_sprt}
@@ -1853,13 +1862,16 @@ ocorrência de desvios, além de ter gerado menos falsos alarmes.
 
 \begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_resid_d4.eps}
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/sim_sys3_sprt_d4.eps}
+    \includegraphics[trim=0.5cm .7cm 1.1cm .5cm,clip=true,width=.425\textwidth]
+    {figuras/sim_sys3_resid_d4-2.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .5cm,clip=true,width=.4\textwidth]
+    {figuras/sim_sys3_sprt_d4-2.eps}
     \caption{Resíduos gerados pelo Sistema 3 e resultados do algoritmo SPRT para o
     caso de ocorrência de desvios em PT$_g$ do conjunto de dados de simulação.}
     \label{fig:sim_sys3_sprt}
 \end{figure}
 
+\pagebreak
 \subsection{Ensaios com Dados Reais}
 \label{sec:dados_reais}
 
