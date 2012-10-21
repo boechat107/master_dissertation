@@ -306,7 +306,7 @@ sobre equipamentos críticos (compressores, bombas, turbinas, etc).
 Ferramentas CBM podem garantir o enriquecimento dos dados provenientes de plataformas ao
 mesmo tempo que reduz a quantidade de informações a serem analisadas pelas equipes,
 causando um consequente aumento da segurança e confiabilidade nas tomadas de decisão, além
-de reduzir custos materias e humanos.
+de reduzir custos materiais e humanos.
 
 Apesar dos benefícios obtidos com a estratégia CBM, sérias dificuldades são frequentemente
 encontradas para implementá-la de forma plena \cite{Campos2009}.  A quantidade de dados
@@ -318,7 +318,7 @@ significativas. Finalmente, torna-se indispensável a disponibilidade de conhecim
 especialistas para converter os dados gerados em informações úteis para manutenção.
 
 No caso da indústria de petróleo, a implementação de um sistema CBM que envolvesse todas
-as etapas do processo de produção tornaria-se altamente complexo, mesmo utilizando-se
+as etapas do processo de produção se tornaria altamente complexo, mesmo utilizando-se
 técnicas simples para o processamento de sinais, monitoramento e detecção. Daí vem a
 necessidade de uma metodologia de desenvolvimento que permitisse a implementação do
 sistema de manutenção de forma bem estruturada, dentro de uma arquitetura flexível e
@@ -378,7 +378,7 @@ Os primeiros três blocos são específicos para determinadas tecnologias (monitora
 vibração, temperatura etc.) e provêem as seguintes funções \cite{PennStateUniversity2006}:
 
 \begin{description}
-    \item[Aquisição de dados:] converção da saída de um transdutor ou sensor em um dado
+    \item[Aquisição de dados:] conversão da saída de um transdutor ou sensor em um dado
         digital que represente uma medida física ou uma informação relacionada (como
         tempo, qualidade dos dados etc.).
 
@@ -497,13 +497,13 @@ As principais funcionalidades presentes em cada módulo são:
 
     \item[Interface gráfica:] módulo de apresentação de resultados e indicadores para os
         usuários, realiza a tarefa de apresentar as informações relevantes para cada grupo
-        de usuários, como o de manuntenção, operação da planta ou o grupo responsável por
+        de usuários, como o de manutenção, operação da planta ou o grupo responsável por
         tomadas de decisões estratégicas de negócio.
 \end{description}
 
 No caso da arquitetura apresentada na Fig.~\ref{fig:osa_drift}, o diagnóstico de
 ocorrência de desvios deve ser realizado implicitamente pelo usuário a partir das
-indicações de mudanças nas propriedades estatísticas dos reísduos apresentadas pela camada
+indicações de mudanças nas propriedades estatísticas dos resíduos apresentadas pela camada
 de monitoramento da condição.
 Em casos mais gerais, onde a detecção de desvios faria parte de um sistema de manutenção
 mais completo, a implementação de uma rotina para o diagnóstico (como um conjunto de
@@ -617,7 +617,7 @@ relativos ao sensor $p$.
 No caso de sistemas OLM, as novas amostras dos sensores, coletadas ao longo do tempo, são
 normalizadas de acordo com os valores de referência ($r_{max,p}$ e $r_{min,p}$) dos dados
 de treinamento dos modelos.
-Na ocorrência de novas amostras com valores maiores que $r_{max,p}$ ou menore
+Na ocorrência de novas amostras com valores maiores que $r_{max,p}$ ou menores que
 $r_{min,p}$), seus valores normalizados serão maiores que 1 ou menores que 0,
 respectivamente.
 
@@ -689,7 +689,7 @@ qualidade de predição.
 
 \subsection{Seleção das Amostras de Treinamento}
 
-Dois aspectos principais, intrinsicamente relacionados, devem ser considerados para a
+Dois aspectos principais, intrinsecamente relacionados, devem ser considerados para a
 seleção das amostras para o treinamento dos modelos: quantidade e representatividade.
 
 Normalmente, quanto maior a quantidade de amostras que se tem de um sistema, mais
@@ -753,7 +753,7 @@ regressivo com novas amostras ao longo da vida útil do poço.
 % Listar modelos estudados e as razões da escolha destes.
 % -> Premissas
 
-O processamento dos sinais é a etapa de predição propriamnente dita. A partir de novas
+O processamento dos sinais é a etapa de predição propriamente dita. A partir de novas
 amostras das variáveis de entrada, o modelo empírico gera predições sobre a variável de
 saída.
 Os principais aspectos a serem considerados nesta etapa são: a escolha do tipo de
@@ -786,7 +786,7 @@ Um modelo auto-associativo é normalmente treinado para emular as próprias variáv
 entrada, ou seja, um conjunto de variáveis $[r_1, \cdots, r_p]$ é usado para
 gerar predições $[\hat{r}_1, \cdots, \hat{r}_p]$, que correspondem aos valores
 ``corrigidos'' das variáveis de entrada de acordo com o conjunto de dados de treinamento
-usado para a contrução do modelo.
+usado para a construção do modelo.
 Dessa forma, se as variáveis de entrada possuem a mesma correlação existente nos dados de
 treinamento, os valores de saída do modelo auto-associativo tendem a ser iguais aos
 valores de entrada.
@@ -925,7 +925,7 @@ qual é a \emph{quantidade} adequada e \emph{como} realizar essa seleção.
 Em relação à quantidade de vetores $n_m$, o valor deve ser adequado às necessidades do
 sistema OLM, retratando um balanceamento entre o custo computacional (ou velocidade do
 cálculo das predições) e a qualidade das predições~\cite{HinesGarvey2008}.
-Modelos com alto $n_m$ tendem a gerar melhores predições, entretando, o
+Modelos com alto $n_m$ tendem a gerar melhores predições, entretanto, o
 custo computacional de cada uma delas pode ser impraticável, caso o tempo de uma predição
 seja crítico.
 
@@ -957,7 +957,7 @@ variáveis antes da utilização deste método de seleção.
     \label{eq:aakrVecOrd}
 \end{equation}
 
-Neste trabalho a seleção dos vetores de mémoria foi realizada pela combinação dos dois
+Neste trabalho a seleção dos vetores de memória foi realizada pela combinação dos dois
 métodos anteriores.
 Como normalmente o método de seleção por mínimos-máximos não obtém o número $n_m$ de
 vetores desejado (um mesmo vetor pode conter os valores máximos ou mínimos de mais de uma
@@ -1145,9 +1145,9 @@ Considerando o uso de funções kernel do tipo Gaussiana ou RBF, a complexidade do
 (o grau de ajuste do modelo aos dados de treinamento) SVM é determinada pelos
 parâmetros $C$, $\varepsilon$ e $\gamma$; nos modelos AAKR, pelo parâmetro $h$.
 Em muitas aplicações, esses valores podem ser encontrados por tentativa e erro, ou
-\textit{grid search}, onde treinam-se vários modelos com diferentes permutações de valores
-de configuração e avalia-se a qualidade das predições destes atráves de um novo conjunto
-de amostras.
+\textit{grid-search} com \textit{cross-validation}~\cite{Hsu2003}, onde treinam-se vários
+modelos com diferentes permutações de valores de configuração e avalia-se a qualidade das
+predições destes através de um novo conjunto de amostras.
 O modelo com a configuração de melhor desempenho é adotado como o modelo final para o
 sistema de validação.
 
@@ -1192,10 +1192,10 @@ construção do modelo.
 %observações $\mathbf{r}$, consequentemente o modelo só pode ser uma estimação da solução
 %ótima.
 
-Segundo Cherkassky e Mulier~\cite{cherkassky2007learning}, existe o seguinte consenso: para métodos
-flexíveis de aprendizado  com um número finito de amostras (como os métodos baseados em
-kernel utilizados neste trabalho), as predições com melhor desempenho são obtidas por
-modelos de complexidade ótima.
+Segundo Cherkassky e Mulier~\cite{cherkassky2007learning}, existe o seguinte consenso:
+para métodos flexíveis de aprendizado  com um número finito de amostras (como os métodos
+baseados em kernel utilizados neste trabalho), as predições com melhor desempenho são
+obtidas por modelos de complexidade ótima.
 Deve-se preferir modelos mais simples a modelos complexos e otimizar a relação entre
 complexidade e acurácia do modelo para o conjunto de dados de treinamento.
 
@@ -1314,7 +1314,7 @@ $\mathbf{r}$ de sensores correlacionados.
     \label{eq:residuo}
 \end{equation}
 
-Considerando o sistema sensoriado operando na região de treinamento do modelo,
+Considerando o sistema sensoreado operando na região de treinamento do modelo,
 as predições são virtualmente iguais às medidas realizadas pelos sensores quando estes se
 encontram funcionando corretamente, e os resíduos tendem a apresentar média zero e
 variância semelhante a do sensor.
@@ -1586,7 +1586,7 @@ a sensores de poços de petróleo.
 A aplicabilidade é avaliada em dois aspectos principais:
 
 \begin{itemize}
-    \item consistência e qualidade das predições, ou seja, quão próximas estãos as
+    \item consistência e qualidade das predições, ou seja, quão próximas estão as
         predições e os valores corretos/verdadeiros que os sensores deveriam gerar;
 
     \item capacidade de detecção de desvios, ou seja, os sistemas devem detectar a
@@ -1765,11 +1765,11 @@ autosensibilidade ($S_A$), sensibilidade cruzada ($S_C$) e erro de predição ($E_
 O Sistema 1, com valores intermediários de $S_C$ e $E_p$, aparentemente apresenta predições
 com menores $E_p$ que o Sistema 2 para as variáveis PT$_t$ e PT$_m$, mas piores
 que o Sistema 3; no caso da variável PT$_f$, o modelo regressivo do Sistema 2 parece ser
-mais independete dos valores de PT$_g$, uma vez que suas predições praticamente não foram
+mais independente dos valores de PT$_g$, uma vez que suas predições praticamente não foram
 afetadas pelos desvios presentes em PT$_g$.
-Com excessão das variáveis PT$_f$ e PT$_g$, o Sistema 2 foi o mais afetado pelos desvios,
+Com exceção das variáveis PT$_f$ e PT$_g$, o Sistema 2 foi o mais afetado pelos desvios,
 confirmando seu maior valor de $S_C$, entretanto, as predições de PT$_g$
-permanceram inalteradas pelos desvios, uma vez que a autosensibilidade do seu modelo
+permaneceram inalteradas pelos desvios, uma vez que a autosensibilidade do seu modelo
 regressivo é nula.
 O Sistema 3 apresenta, em geral, o melhor desempenho aparente entre os três sistemas,
 confirmando as métricas de desempenho, gerando predições muito próximas do desejado mesmo
@@ -1871,7 +1871,8 @@ ocorrência de desvios, além de ter gerado menos falsos alarmes.
     \label{fig:sim_sys3_sprt}
 \end{figure}
 
-\pagebreak
+\FloatBarrier
+
 \subsection{Ensaios com Dados Reais}
 \label{sec:dados_reais}
 
@@ -1887,8 +1888,10 @@ armazenadas por algum motivo desconhecido.
 As primeiras 400 horas de dados foram separadas como conjunto de treinamento dos modelos,
 enquanto as 100 horas consecutivas foram usadas como conjunto de otimização e o restante
 como conjunto de testes.
+Por falta de conhecimentos mais profundos sobre os dados, nenhum procedimento de limpeza
+dos dados foi realizado.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
     \includegraphics[trim=2cm .7cm 2cm .7cm,clip=true,width=.9\textwidth]{figuras/real_dataset.eps}
     \caption{Dados coletados por sensores de um poço de petróleo real, amostrados à taxa
@@ -1897,9 +1900,9 @@ como conjunto de testes.
 \end{figure}
 
 Novamente, os Sistemas 1 e 2 compartilharam o mesmo modelo AAKR, construído com $h=0.05$ e
-$n_m=4800$ (~20\% do conjunto de dados de treinamento).
+$n_m=4800$ (20\% do conjunto de dados de treinamento).
 Assim como feito com os dados de simulação, os parâmetros do modelo foram selecionados
-visando minizar o MSE das predições do conjunto de dados de otimização.
+visando minimizar o MSE das predições do conjunto de dados de otimização.
 Neste caso, devido ao volume do conjunto de dados de treinamento, a quantidade $n_m$ de
 amostras impactou significativamente no custo de tempo das predições.
 Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempenho
@@ -1907,10 +1910,10 @@ Considerou-se 4800 amostras uma quantidade razoável para a relação entre desempe
 
 As configurações dos modelos SVM, obtidos a partir do conjunto de treinamento, são
 apresentadas na Tab. \ref{tab:svm_real_pars}.
-Os valores dos parâmetros foram obtidos por \textit{grid search} visando minimizar o MSE
-das estimativas do conjunto de otimização.
+Os valores dos parâmetros foram obtidos minimizando o MSE das estimativas do conjunto de
+otimização.
 
-\begin{table}[bt]
+\begin{table}[!bt]
     \centering
     \caption{\label{tab:svm_real_pars}Configuração dos modelos SVM construídos com
     conjunto de dados reais de treinamento.}
@@ -1926,7 +1929,9 @@ das estimativas do conjunto de otimização.
 \end{table}
 
 Para o Sistema 3, utilizando o mesmo modelo AAKR do Sistema 1, foram selecionados os
-parâmetros como $\sigma_v = 0.0001$ e $\sigma_q = 500$.
+parâmetros como $\sigma_v = 0.0001$ e $\sigma_q = 500$, cujos valores, encontrados por
+tentativa e erro, geraram as melhores estimativas de desvios inseridos no conjunto de
+dados de otimização.
 Em relação ao ensaio com dados de simulação, o valor mais alto de $\sigma_q$ se deve aos
 sinais mais ruidosos dos dados reais, tornando as observações $z$ dos desvios (vide Seção
 \ref{sec:kf}) menos confiáveis.
@@ -1937,7 +1942,7 @@ Novamente, um desvio linearmente crescente terminando com uma magnitude
 de $3\sigma$ (três vezes o desvio padrão dos dados da variável) foi introduzido
 sequencialmente (em uma variável por vez) no conjunto de dados de teste.
 
-\begin{table}[bt]
+\begin{table}[!bt]
     \centering
     \caption{\label{tab:real_sensibilidades} Valores médios das métricas de desempenho para
     os sistemas de monitoramento e validação de sensores:
@@ -1980,11 +1985,15 @@ Além do próprio ruído original dos sensores, possivelmente as informações apenas
 dos sensores disponíveis são insuficientes para inferir com melhor qualidade as leituras
 do terceiro.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]{figuras/real_aakr_pred_d1.eps}
-    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]{figuras/real_svm_pred_d1.eps}
-    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]{figuras/real_aakr_kf_pred_d1.eps}
+    \hspace*{-.2cm}\mbox{
+    \includegraphics[trim=0cm .7cm .8cm .1cm, clip=true,width=.35\textwidth]
+    {figuras/real_aakr_pred_d1.eps}
+    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]
+    {figuras/real_svm_pred_d1.eps}
+    \includegraphics[trim=1cm .7cm .8cm .1cm, clip=true,width=.32\textwidth]
+    {figuras/real_aakr_kf_pred_d1.eps}}
     \caption{Predições dos sistemas para o conjunto de dados reais de testes, com inserção
         de desvios nas leituras do PDG. Linhas vermelhas são as predições,
         linhas verdes são as leituras dos sensores (sujeitas a falhas) usadas como
@@ -2001,7 +2010,7 @@ não gera nenhum falso alarme para os resíduos gerados por seus respectivos siste
 A Tabela \ref{tab:real_sprt_conf} contem os valores de $M$ utilizados por cada um sistema e
 para cada uma das variáveis monitoradas.
 
-\begin{table}[bt]
+\begin{table}[!bt]
     \centering
     \caption{\label{tab:real_sprt_conf}Configurações do algoritmo SPRT para o conjunto de
 dados reais de teste.} 
@@ -2031,29 +2040,35 @@ indicação de outros tipos de falhas, como mudanças abruptas; entretanto, é de su
 importância se certificar que o conjunto de treinamento dos modelos regressivos abrange o
 ponto de operação atual do poço.
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys1_res_d1.eps}
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys1_sprt_d1.eps}
+    \includegraphics[trim=.5cm .7cm 1.1cm .7cm,clip=true,width=.425\textwidth]
+    {figuras/real_sys1_res_d1.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]
+    {figuras/real_sys1_sprt_d1.eps}
     \caption{Resíduos gerados pelo Sistema 1 e resultados do algoritmo SPRT para o
     caso de ocorrência de desvios nas leituras do PDG do conjunto de dados reais.}
     \label{fig:real_sys1_sprt}
 \end{figure}
 
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys2_res_d1.eps}
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys2_sprt_d1.eps}
+    \includegraphics[trim=.5cm .7cm 1.1cm .7cm,clip=true,width=.425\textwidth]
+    {figuras/real_sys2_res_d1.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]
+    {figuras/real_sys2_sprt_d1.eps}
     \caption{Resíduos gerados pelo Sistema 2 e resultados do algoritmo SPRT para o
     caso de ocorrência de desvios nas leituras do PDG do conjunto de dados reais.}
     \label{fig:real_svm_sprt}
 \end{figure}
 
-\begin{figure}[bt]
+\begin{figure}[!bt]
     \centering
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys3_res_d1.eps}
-    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]{figuras/real_sys3_sprt_d1.eps}
+    \includegraphics[trim=.5cm .7cm 1.1cm .7cm,clip=true,width=.425\textwidth]
+    {figuras/real_sys3_res_d1.eps}
+    \includegraphics[trim=1.5cm .7cm 1.1cm .7cm,clip=true,width=.4\textwidth]
+    {figuras/real_sys3_sprt_d1.eps}
     \caption{Resíduos gerados pelo Sistema 3 e resultados do algoritmo SPRT para o
     caso de ocorrência de desvios nas leituras do PDG do conjunto de dados reais.}
     \label{fig:real_sys3_sprt}
@@ -2065,12 +2080,12 @@ refletem o pior desempenho do sistema verificado pelas análises de sensibilidade
 Apesar de aparentar média próxima de zero, a grande variância das estimativas das leituras
 do sensor TPT causaram a indicação incorreta de que o sensor com desvios seria o TPT.
 Aparentemente, a ocorrência de desvios no PDG afetou de tal forma as estimativas das
-leituras do TPT que a variância dos resíduos foi bem supeior à variância dos resíduos nas
+leituras do TPT que a variância dos resíduos foi bem superior à variância dos resíduos nas
 estimativas do conjunto de otimização, usado para a configuração do algoritmo SPRT.
 
 Pela Figura \ref{fig:real_sys3_sprt}, apesar das estimativas de desvios no TPT e
 PT$_m$, nota-se que o Sistema 3 estimou corretamente o desvio verdadeiro no PDG, dada a
-diferença de amplitudade entre os desvios estimados.
+diferença de amplitude entre os desvios estimados.
 As estimativas dos desvios do PDG não conseguiram corrigir perfeitamente as leituras do
 sensor, pois desvios crescentes, apesar de menor amplitude, também foram estimados no TPT
 e no PT$_m$.
@@ -2160,7 +2175,7 @@ Além disso, a aplicação de métodos automáticos para validação dos próprios model
 empíricos seria desejável, uma vez que as características de um poço de petróleo mudam ao
 longo de sua vida útil, assim como o comportamento da correlação entre as variáveis
 mensuradas pelos sensores.
-Finalmente, vislumbra-se a possibilidade de contruir modelos SVM de séries temporais, onde
+Finalmente, vislumbra-se a possibilidade de construir modelos SVM de séries temporais, onde
 a saída do modelo não dependa apenas das entradas atuais, mas também de entradas
 anteriores \cite{Chen2004}.
 
