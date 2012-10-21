@@ -1238,7 +1238,12 @@ apresentem \textit{drift}.
 Um possível modelo matemático usado para estimar a amplitude do \textit{drift} $d$ de um
 sensor é apresentado na Eq. (\ref{eq:kf_dmodel}), onde $v^{(k)}$ é considerado um ruído
 Gaussiano de média zero e variância $\sigma_v$. 
-
+%
+\simbolo{$v^{(k)}$}{${d}^{(k)} = {d}^{(k-1)} + {v}^{(k)}$, ruído Gaussiano na dinâmica dos
+desvios do filtro de Kalman}
+\simbolo{$\sigma_v$}{$\quad {v}^{(k)} \sim \mathcal{N} ({0}, \sigma_v)$, variância do ruído
+Gaussiano do modelo da dinâmica dos desvios incorporado no filtro de Kalman}
+%
 \begin{equation}
     {d}^{(k)} = {d}^{(k-1)} + {v}^{(k)}, \quad {v}^{(k)} \sim \mathcal{N} ({0}, \sigma_v)
     \label{eq:kf_dmodel}
@@ -1258,7 +1263,12 @@ A observação do desvio no sensor estimado, dado por $$z = r - \hat{r},$$ não
 corresponde ao valor verdadeiro do desvio, uma vez que este valor não está disponível.
 Então, pode-se descrever a equação de medição como a Eq.~(\ref{eq:kf_observ}), onde
 ${q}^{(k)}$ é um ruído Gaussiano de variância $\sigma_q$.
-
+%
+\simbolo{${q}^{(k)}$}{${z} = {d}^{(k)} +{q}^{(k)}$, ruído Gaussiano na equação de
+observação do filtro de Kalman}
+\simbolo{$\sigma_q$}{$\quad {q}^{(k)} \sim \mathcal{N} ({0}, \sigma_q)$, variância do
+ruído Gaussiano na equação de observação do filtro de Kalman}
+%
 \begin{equation}
     {z} = {d}^{(k)} +{q}^{(k)}, \quad {q}^{(k)} \sim
     \mathcal{N} ({0}, \sigma_q)
