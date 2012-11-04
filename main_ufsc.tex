@@ -36,7 +36,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % \titulo{Sistemas de Monitoramento e Validação de Sensores Baseados em Modelos Empíricos
 % Aplicados a Sensores de Poços de Petróleo} % Titulo do trabalho
-\titulo{Algoritmos para a Detecção de \textit{Drifting} em Sensores de Poços de Petróleo}
+\titulo{Algoritmos para a Detecção de \textit{Drifting} em Sensores de Fundo de Poço}
 %\subtitulo{Estilo \LaTeX~ padrão}                % Subtitulo do trabalho (opcional)
 \autor{André Ambrósio Boechat}
 \data{29}{Agosto}{2012}                           % Data da publicação do trabalho
@@ -62,14 +62,29 @@
 %\bancaMembroG{Prof. sétimo membro}       % Nome do membro da Banca
 
 
-\departamento{Departamento de Automação e Sistemas}
+%\departamento{Departamento de Automação e Sistemas}
+\departamento{Programa de Pós-Graduação em Engenharia de Automação e Sistemas}
 \curso{Programa de Pós-Graduação em Engenharia de Automação e Sistemas}
 
 \grau{Mestre em Engenharia de Automação e Sistemas}
 \documento[a]{Dissertação}
 % \dedicatoria{A quem o trabalho é dedicado, se é que o é (opcional)}
 % 
-% \agradecimento{Agradecimentos opcionais, caso existam pessoas ou entidades a quem se deve apoio ou suporte ao trabalho ora apresentado.}
+\agradecimento{
+Ao meu orientador prof. Ubirajara F. Moreno, pela troca de ideias, direcionamento do
+trabalho e por toda cordialidade.
+\vspace{.5cm}
+
+Ao grupo de trabalho do projeto de pesquisa com o Cenpes/Petrobras, pelo importante
+compartilhamento de conhecimentos.
+\vspace{.5cm}
+
+Ao Cenpes/Petrobras, pelo suporte financeiro e fornecimento de informações cruciais para o
+desenvolvimento do trabalho.
+\vspace{.5cm}
+
+Aos grandes amigos que fiz durante esta jornada.
+}
 
 \epigrafe{In God we trust, all others bring data.}{William Edwards Deming}
 
@@ -93,7 +108,7 @@ modelos empíricos baseados em histórico para a validação de sensores de poços de
 }
 
 \palavrasChave {validação de sensores, desvios, modelos regressivos, monitoramento de
-desempenho, manutenção baseada em condição.}
+desempenho, manutenção baseada em condição, monitoramento de poços de petróleo.}
 
 \textAbstract {
 This work demonstrates the development and implementation of monitoring and validation
@@ -113,7 +128,7 @@ data-driven models for validation of oil well sensors is promising.
 }
 
 \keywords {sensor validation, drift, regressive models, performance monitoring, condition
-based maintenance.}
+based maintenance, oil well monitoring.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Início do documento                                
@@ -125,7 +140,7 @@ based maintenance.}
 \folhaderosto %[comficha] % Se nao quiser imprimir a ficha, é só não usar o parâmetro
 \folhaaprovacao
 %\paginadedicatoria
-%\paginaagradecimento
+\paginaagradecimento
 \paginaepigrafe
 \paginaresumo
 \paginaabstract
@@ -250,7 +265,7 @@ based maintenance.}
 % Firulas opcionais - Dedicatória, Agradecimento e Epígrafe
 %
 % \dedicatoria{Dedicatória para alguem}
-% \agradecimento{Agradecimentos, se for o caso...blabla blablablabla blabla ipsum loren e a sophia também blab ablablabl ablbalbalblab lablablbalb lab la}
+\agradecimento{Agradecimentos, se for o caso...blabla blablablabla blabla ipsum loren e a sophia também blab ablablabl ablbalbalblab lablablbalb lab la}
 % \epigrafe{Um bonito pensamento ou citação, se for o caso}{autor do pensamento}
 
 %----------------------------------------------------------------------
